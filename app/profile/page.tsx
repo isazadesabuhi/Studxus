@@ -121,7 +121,7 @@ export default function Profile() {
 
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <p className="text-gray-600 text-sm font-medium">
-                      Type d'utilisateur
+                      Type d&apos;utilisateur
                     </p>
                     <p className="text-gray-900 font-semibold">
                       {profile.user_type === "Professeur"

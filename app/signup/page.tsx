@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function Signup() {
+// Create a separate component that uses useSearchParams
+function SignupForm() {
   const [formData, setFormData] = useState({
     email: "",
     name: "",
@@ -85,6 +86,7 @@ export default function Signup() {
       }
     } catch (error) {
       setMessage("Une erreur inattendue s'est produite");
+      console.error("Signup error:", error);
     } finally {
       setLoading(false);
     }
@@ -172,7 +174,7 @@ export default function Signup() {
                 htmlFor="userType"
                 className="block text-sm font-medium text-gray-700"
               >
-                Type d'utilisateur
+                Type d&lsquo;utilisateur
               </label>
               <select
                 id="userType"
@@ -221,5 +223,23 @@ export default function Signup() {
         </form>
       </div>
     </div>
+  );
+}
+
+// Loading component for Suspense fallback
+function SignupLoading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="text-lg">Chargement...</div>
+    </div>
+  );
+}
+
+// Main component that wraps SignupForm in Suspense
+export default function Signup() {
+  return (
+    <Suspense fallback={<SignupLoading />}>
+      <SignupForm />
+    </Suspense>
   );
 }

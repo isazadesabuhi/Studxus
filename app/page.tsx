@@ -63,7 +63,7 @@ export default function Home() {
         router.push(`/signup?email=${encodeURIComponent(email)}`);
       }
     } catch (error) {
-      setMessage("Une erreur inattendue s'est produite");
+      setMessage(`Une erreur inattendue s'est produite: ${error}`);
     } finally {
       setLoading(false);
     }
