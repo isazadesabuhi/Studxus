@@ -5,8 +5,18 @@ import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 
+interface UserProfile {
+  id: string;
+  email: string;
+  name: string;
+  surname: string;
+  user_type: "Professeur" | "Etudiant";
+  created_at: string;
+}
+
 export default function Profile() {
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -23,6 +33,24 @@ export default function Profile() {
       }
 
       setUser(user);
+
+      // Get user profile data
+      try {
+        const { data: profileData, error: profileError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
+
+        if (profileError) {
+          console.error("Error fetching profile:", profileError);
+        } else {
+          setProfile(profileData);
+        }
+      } catch (error) {
+        console.error("Error in profile fetch:", error);
+      }
+
       setLoading(false);
     };
 
@@ -49,7 +77,7 @@ export default function Profile() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-lg">Loading...</div>
+        <div className="text-lg">Chargement...</div>
       </div>
     );
   }
@@ -60,32 +88,86 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
+      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Welcome to your Profile
+          <h1 className="text-2xl font-bold text-gray-900 mb-6">
+            Bienvenue sur votre profil
           </h1>
 
-          <div className="space-y-2 mb-6">
-            <p className="text-gray-600">
-              <span className="font-medium">Email:</span> {user.email}
-            </p>
-            <p className="text-gray-600">
-              <span className="font-medium">User ID:</span> {user.id}
-            </p>
-            <p className="text-gray-600">
-              <span className="font-medium">Last sign in:</span>{" "}
-              {user.last_sign_in_at
-                ? new Date(user.last_sign_in_at).toLocaleString()
-                : "Never"}
-            </p>
+          <div className="space-y-4 mb-8 text-left">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p className="text-gray-600 text-sm font-medium">Email</p>
+                <p className="text-gray-900 font-semibold">{user.email}</p>
+              </div>
+
+              {profile && (
+                <>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <p className="text-gray-600 text-sm font-medium">Prénom</p>
+                    <p className="text-gray-900 font-semibold">
+                      {profile.name}
+                    </p>
+                  </div>
+
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <p className="text-gray-600 text-sm font-medium">
+                      Nom de famille
+                    </p>
+                    <p className="text-gray-900 font-semibold">
+                      {profile.surname}
+                    </p>
+                  </div>
+
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <p className="text-gray-600 text-sm font-medium">
+                      Type d'utilisateur
+                    </p>
+                    <p className="text-gray-900 font-semibold">
+                      {profile.user_type === "Professeur"
+                        ? "Professeur"
+                        : "Etudiant"}
+                    </p>
+                  </div>
+                </>
+              )}
+
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p className="text-gray-600 text-sm font-medium">
+                  ID utilisateur
+                </p>
+                <p className="text-gray-900 font-mono text-xs">{user.id}</p>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p className="text-gray-600 text-sm font-medium">
+                  Dernière connexion
+                </p>
+                <p className="text-gray-900 font-semibold">
+                  {user.last_sign_in_at
+                    ? new Date(user.last_sign_in_at).toLocaleString("fr-FR")
+                    : "Jamais"}
+                </p>
+              </div>
+            </div>
+
+            {profile && (
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p className="text-gray-600 text-sm font-medium">
+                  Compte créé le
+                </p>
+                <p className="text-gray-900 font-semibold">
+                  {new Date(profile.created_at).toLocaleString("fr-FR")}
+                </p>
+              </div>
+            )}
           </div>
 
           <button
             onClick={handleSignOut}
-            className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
           >
-            Sign Out
+            Se déconnecter
           </button>
         </div>
       </div>

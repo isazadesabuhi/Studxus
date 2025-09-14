@@ -10,11 +10,30 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const router = useRouter();
 
+  const checkUserExists = async (email: string) => {
+    try {
+      // Check if user exists in auth.users
+      const { data, error } = await supabase.rpc("check_user_exists", {
+        user_email: email,
+      });
+
+      if (error) {
+        console.error("Error checking user:", error);
+        return false;
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error in checkUserExists:", error);
+      return false;
+    }
+  };
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!email) {
-      setMessage("Please enter your email");
+      setMessage("Veuillez entrer votre email");
       return;
     }
 
@@ -22,20 +41,29 @@ export default function Home() {
     setMessage("");
 
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/profile`,
-        },
-      });
+      // First check if user exists
+      const userExists = await checkUserExists(email);
 
-      if (error) {
-        setMessage(`Error: ${error.message}`);
+      if (userExists) {
+        // User exists, send magic link for signin
+        const { error } = await supabase.auth.signInWithOtp({
+          email,
+          options: {
+            emailRedirectTo: `${window.location.origin}/profile`,
+          },
+        });
+
+        if (error) {
+          setMessage(`Erreur: ${error.message}`);
+        } else {
+          setMessage("Vérifiez votre email pour le lien de connexion!");
+        }
       } else {
-        setMessage("Check your email for the magic link!");
+        // User doesn't exist, redirect to signup
+        router.push(`/signup?email=${encodeURIComponent(email)}`);
       }
     } catch (error) {
-      setMessage("An unexpected error occurred");
+      setMessage("Une erreur inattendue s'est produite");
     } finally {
       setLoading(false);
     }
@@ -48,15 +76,12 @@ export default function Home() {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Se connecter avec votre email
           </h2>
-          {/* <p className="mt-2 text-center text-sm text-gray-600">
-            Envoyer le lien magique
-          </p> */}
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSignIn}>
           <div>
             <label htmlFor="email" className="sr-only">
-              Email address
+              Adresse email
             </label>
             <input
               id="email"
@@ -65,7 +90,7 @@ export default function Home() {
               autoComplete="email"
               required
               className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Address email"
+              placeholder="Adresse email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
@@ -78,14 +103,14 @@ export default function Home() {
               disabled={loading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Envoyer..." : "Envoyer le lien magique"}
+              {loading ? "Vérification..." : "Continuer"}
             </button>
           </div>
 
           {message && (
             <div
               className={`text-center text-sm ${
-                message.includes("Error") ? "text-red-600" : "text-green-600"
+                message.includes("Erreur") ? "text-red-600" : "text-green-600"
               }`}
             >
               {message}
