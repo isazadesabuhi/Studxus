@@ -9,7 +9,9 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const router = useRouter();
-
+  console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
+  console.log(email)
+  console.log(supabase)
   const checkUserExists = async (email: string) => {
     try {
       // Check if user exists in auth.users
