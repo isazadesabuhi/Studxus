@@ -10,8 +10,8 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const router = useRouter();
   console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
-  console.log(email)
-  console.log(supabase)
+  console.log(email);
+  console.log(supabase);
   const checkUserExists = async (email: string) => {
     try {
       // Check if user exists in auth.users
@@ -45,6 +45,7 @@ export default function Home() {
     try {
       // First check if user exists
       const userExists = await checkUserExists(email);
+      console.log("User exists:", userExists);
 
       if (userExists) {
         // User exists, send magic link for signin
