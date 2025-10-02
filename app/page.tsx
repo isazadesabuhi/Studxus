@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
@@ -9,27 +8,6 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const router = useRouter();
-  console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
-  console.log(email);
-  console.log(supabase);
-  const checkUserExists = async (email: string) => {
-    try {
-      // Check if user exists in auth.users
-      const { data, error } = await supabase.rpc("check_user_exists", {
-        user_email: email,
-      });
-
-      if (error) {
-        console.error("Error checking user:", error);
-        return false;
-      }
-
-      return data;
-    } catch (error) {
-      console.error("Error in checkUserExists:", error);
-      return false;
-    }
-  };
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,30 +21,50 @@ export default function Home() {
     setMessage("");
 
     try {
-      // First check if user exists
-      const userExists = await checkUserExists(email);
-      console.log("User exists:", userExists);
+      // Check if user exists using the API endpoint
+      const checkResponse = await fetch("/api/auth/check-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
 
-      if (userExists) {
+      if (!checkResponse.ok) {
+        setMessage("Erreur lors de la vérification de l'utilisateur");
+        setLoading(false);
+        return;
+      }
+
+      const { exists } = await checkResponse.json();
+
+      if (exists) {
         // User exists, send magic link for signin
-        const { error } = await supabase.auth.signInWithOtp({
-          email,
-          options: {
-            emailRedirectTo: `${window.location.origin}/profile`,
+        const signinResponse = await fetch("/api/auth/signin", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
+          body: JSON.stringify({ email }),
         });
 
-        if (error) {
-          setMessage(`Erreur: ${error.message}`);
+        const signinData = await signinResponse.json();
+
+        if (!signinResponse.ok) {
+          setMessage(signinData.error || "Erreur lors de l'envoi du lien");
         } else {
-          setMessage("Vérifiez votre email pour le lien de connexion!");
+          setMessage(
+            signinData.message ||
+              "Vérifiez votre email pour le lien de connexion!"
+          );
         }
       } else {
         // User doesn't exist, redirect to signup
         router.push(`/signup?email=${encodeURIComponent(email)}`);
       }
     } catch (error) {
-      setMessage(`Une erreur inattendue s'est produite: ${error}`);
+      console.error("Error:", error);
+      setMessage("Une erreur inattendue s'est produite");
     } finally {
       setLoading(false);
     }

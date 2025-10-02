@@ -1,11 +1,10 @@
-// app/api/auth/signup/route.ts
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 // Service role client (server-side only)
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!, // 🔑 Service role key
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
   {
     auth: {
       autoRefreshToken: false,
@@ -73,7 +72,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // Create user with magic link (using service role)
+    // Create user with metadata using service role
     const { data: signUpData, error: signUpError } =
       await supabaseAdmin.auth.admin.createUser({
         email: email,
@@ -93,15 +92,13 @@ export async function POST(req: Request) {
       );
     }
 
-    // Send magic link
-    const { error: magicLinkError } =
-      await supabaseAdmin.auth.admin.generateLink({
-        type: "magiclink",
-        email: email,
-        options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/profile`,
-        },
-      });
+    // Send magic link using Supabase's built-in email service
+    const { error: magicLinkError } = await supabaseAdmin.auth.signInWithOtp({
+      email: email,
+      options: {
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/profile`,
+      },
+    });
 
     if (magicLinkError) {
       console.error("Error sending magic link:", magicLinkError);
