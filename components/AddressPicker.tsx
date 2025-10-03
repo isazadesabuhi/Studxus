@@ -1,6 +1,30 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+type LngLatLike = [number, number];
+
+interface MapboxContextItem {
+  id: string; // e.g. "place.123", "country.456", "postcode.789"
+  text: string; // e.g. "Lyon", "France", "69000"
+}
+
+interface MapboxGeometry {
+  type: "Point";
+  coordinates: LngLatLike; // [lng, lat]
+}
+
+interface MapboxGeocodeFeature {
+  place_name?: string;
+  text?: string;
+  context?: MapboxContextItem[];
+  geometry: MapboxGeometry;
+}
+
+// Optional: type for the geocoder "result" event payload
+interface GeocoderResultEvent {
+  result: MapboxGeocodeFeature;
+}
+
+import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -17,17 +41,17 @@ interface AddressData {
 
 interface AddressPickerProps {
   onAddressSelect: (address: AddressData) => void;
-  initialAddress?: string;
+  // initialAddress?: string;
 }
 
 export default function AddressPicker({
   onAddressSelect,
-  initialAddress,
-}: AddressPickerProps) {
+}: // initialAddress,
+AddressPickerProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const marker = useRef<mapboxgl.Marker | null>(null);
-  const [mapLoaded, setMapLoaded] = useState(false);
+  // const [mapLoaded, setMapLoaded] = useState(false);
 
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
@@ -45,7 +69,7 @@ export default function AddressPicker({
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/streets-v12",
-      center: [2.3522, 48.8566], // Paris default
+      center: [4.867652, 45.752195], // Lyon default
       zoom: 12,
     });
 
@@ -58,7 +82,7 @@ export default function AddressPicker({
     // Add geocoder (search box)
     const geocoder = new MapboxGeocoder({
       accessToken: mapboxToken,
-      mapboxgl: mapboxgl,
+      mapboxgl: mapboxgl as unknown as typeof import("mapbox-gl"),
       marker: false,
       placeholder: "Search for your address...",
     });
@@ -66,20 +90,17 @@ export default function AddressPicker({
     map.current.addControl(geocoder);
     map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
-    // Handle geocoder result
-    geocoder.on("result", (e) => {
+    // 1) Strongly type the geocoder event
+    geocoder.on("result", (e: GeocoderResultEvent) => {
       const result = e.result;
       const coordinates = result.geometry.coordinates;
 
-      // Extract address components
       const addressData = parseGeocoderResult(result);
 
-      // Update marker position
       if (marker.current && map.current) {
         marker.current.setLngLat(coordinates).addTo(map.current);
       }
 
-      // Notify parent component
       onAddressSelect({
         ...addressData,
         latitude: coordinates[1],
@@ -96,10 +117,12 @@ export default function AddressPicker({
 
         // Reverse geocode to get address
         try {
+          // 3) Type the reverse-geocode response before using it
           const response = await fetch(
             `https://api.mapbox.com/geocoding/v5/mapbox.places/${lngLat.lng},${lngLat.lat}.json?access_token=${mapboxToken}`
           );
-          const data = await response.json();
+          const data: { features?: MapboxGeocodeFeature[] } =
+            await response.json();
 
           if (data.features && data.features.length > 0) {
             const addressData = parseGeocoderResult(data.features[0]);
@@ -115,9 +138,9 @@ export default function AddressPicker({
       });
     }
 
-    map.current.on("load", () => {
-      setMapLoaded(true);
-    });
+    // map.current.on("load", () => {
+    //   setMapLoaded(true);
+    // });
 
     // Cleanup
     return () => {
@@ -128,9 +151,9 @@ export default function AddressPicker({
     };
   }, [onAddressSelect]);
 
-  // Helper function to parse geocoder results
+  // 2) Strongly type the helper (remove 'any')
   const parseGeocoderResult = (
-    result: any
+    result: MapboxGeocodeFeature
   ): Omit<AddressData, "latitude" | "longitude"> => {
     let address = result.place_name || "";
     let city = "";
@@ -138,29 +161,22 @@ export default function AddressPicker({
     let postalCode = "";
 
     // Extract components from context
-    if (result.context) {
-      result.context.forEach((item: any) => {
-        if (item.id.startsWith("place")) {
-          city = item.text;
-        } else if (item.id.startsWith("country")) {
-          country = item.text;
-        } else if (item.id.startsWith("postcode")) {
-          postalCode = item.text;
-        }
-      });
-    }
+    result.context?.forEach((item: MapboxContextItem) => {
+      if (item.id.startsWith("place")) {
+        city = item.text;
+      } else if (item.id.startsWith("country")) {
+        country = item.text;
+      } else if (item.id.startsWith("postcode")) {
+        postalCode = item.text;
+      }
+    });
 
-    // Try to get address from text field
+    // Prefer place_name (full) but fall back to text (short)
     if (result.text) {
       address = result.place_name || result.text;
     }
 
-    return {
-      address,
-      city,
-      country,
-      postalCode,
-    };
+    return { address, city, country, postalCode };
   };
 
   return (

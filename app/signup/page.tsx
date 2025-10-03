@@ -215,7 +215,7 @@ function SignupForm() {
                 htmlFor="userType"
                 className="block text-sm font-medium text-gray-700"
               >
-                Type d'utilisateur *
+                {"Type d'utilisateur"} *
               </label>
               <select
                 id="userType"
@@ -235,7 +235,7 @@ function SignupForm() {
             <div>
               <AddressPicker
                 onAddressSelect={handleAddressSelect}
-                initialAddress=""
+                // initialAddress=""
               />
               {addressData && (
                 <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
