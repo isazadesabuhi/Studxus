@@ -9,11 +9,12 @@ export default function Home() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const router = useRouter();
 
   const handleSignIn = async (e: React.FormEvent) => {
 
 
-        router.push(`/signup?email=${encodeURIComponent(email)}`);
+    router.push(`/signup?email=${encodeURIComponent(email)}`);
     e.preventDefault();
 
     if (!email) {
@@ -74,7 +75,7 @@ export default function Home() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <img
-           className="mx-auto h-20 sm:h-24 md:h-28 lg:h-32 w-auto"
+            className="mx-auto h-20 sm:h-24 md:h-28 lg:h-32 w-auto"
             src="/logo.png"
             alt="Logo"
           />
@@ -117,9 +118,8 @@ export default function Home() {
 
           {message && (
             <div
-              className={`text-center text-sm ${
-                message.includes("Erreur") ? "text-red-600" : "text-green-600"
-              }`}
+              className={`text-center text-sm ${message.includes("Erreur") ? "text-red-600" : "text-green-600"
+                }`}
             >
               {message}
             </div>
