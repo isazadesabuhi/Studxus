@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-// Service role client (server-side only)
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -13,12 +12,8 @@ const supabaseAdmin = createClient(
   }
 );
 
-/**
- * GET - Fetch user profile
- */
 export async function GET(req: Request) {
   try {
-    // Get the authorization header
     const authHeader = req.headers.get("authorization");
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -30,7 +25,6 @@ export async function GET(req: Request) {
 
     const token = authHeader.replace("Bearer ", "");
 
-    // Verify the token and get the user
     const {
       data: { user },
       error: authError,
@@ -43,13 +37,18 @@ export async function GET(req: Request) {
       );
     }
 
-    // Return user profile data
     return NextResponse.json({
       id: user.id,
       email: user.email,
       name: user.user_metadata?.name || "",
       surname: user.user_metadata?.surname || "",
       user_type: user.user_metadata?.user_type || "Etudiant",
+      address: user.user_metadata?.address || "",
+      city: user.user_metadata?.city || "",
+      country: user.user_metadata?.country || "",
+      latitude: user.user_metadata?.latitude || null,
+      longitude: user.user_metadata?.longitude || null,
+      postal_code: user.user_metadata?.postal_code || "",
       created_at: user.created_at,
     });
   } catch (error) {
@@ -61,15 +60,23 @@ export async function GET(req: Request) {
   }
 }
 
-/**
- * POST - Create user profile (called after signup)
- */
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { userId, email, name, surname, userType } = body;
+    const {
+      userId,
+      email,
+      name,
+      surname,
+      userType,
+      address,
+      city,
+      country,
+      latitude,
+      longitude,
+      postalCode,
+    } = body;
 
-    // Validate required fields
     if (!userId || !email || !name || !surname || !userType) {
       return NextResponse.json(
         { error: "Missing required fields" },
@@ -77,7 +84,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Update user metadata using service role
     const { data, error } = await supabaseAdmin.auth.admin.updateUserById(
       userId,
       {
@@ -85,6 +91,12 @@ export async function POST(req: Request) {
           name,
           surname,
           user_type: userType,
+          address: address || "",
+          city: city || "",
+          country: country || "",
+          latitude: latitude || null,
+          longitude: longitude || null,
+          postal_code: postalCode || "",
         },
       }
     );
@@ -106,6 +118,12 @@ export async function POST(req: Request) {
           name,
           surname,
           user_type: userType,
+          address: address || "",
+          city: city || "",
+          country: country || "",
+          latitude: latitude || null,
+          longitude: longitude || null,
+          postal_code: postalCode || "",
         },
       },
       { status: 201 }
