@@ -1,13 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 export default function Home() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const router = useRouter();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,28 +38,23 @@ export default function Home() {
       const { exists } = await checkResponse.json();
 
       if (exists) {
-        // User exists, send magic link for signin
-        const signinResponse = await fetch("/api/auth/signin", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+        // User exists - use Supabase client-side method to send magic link
+        // This ensures proper session handling when the link is clicked
+        const { error } = await supabase.auth.signInWithOtp({
+          email: email,
+          options: {
+            emailRedirectTo: `${window.location.origin}/profile`,
           },
-          body: JSON.stringify({ email }),
         });
 
-        const signinData = await signinResponse.json();
-
-        if (!signinResponse.ok) {
-          setMessage(signinData.error || "Erreur lors de l'envoi du lien");
+        if (error) {
+          setMessage(`Erreur: ${error.message}`);
         } else {
-          setMessage(
-            signinData.message ||
-              "Vérifiez votre email pour le lien de connexion!"
-          );
+          setMessage("Vérifiez votre email pour le lien de connexion!");
         }
       } else {
         // User doesn't exist, redirect to signup
-        router.push(`/signup?email=${encodeURIComponent(email)}`);
+        window.location.href = `/signup?email=${encodeURIComponent(email)}`;
       }
     } catch (error) {
       console.error("Error:", error);
