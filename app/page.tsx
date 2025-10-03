@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
+import Button from "./components/Buttons";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -9,6 +11,9 @@ export default function Home() {
   const [message, setMessage] = useState("");
 
   const handleSignIn = async (e: React.FormEvent) => {
+
+
+        router.push(`/signup?email=${encodeURIComponent(email)}`);
     e.preventDefault();
 
     if (!email) {
@@ -65,12 +70,20 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Se connecter avec votre email
+          <img
+           className="mx-auto h-20 sm:h-24 md:h-28 lg:h-32 w-auto"
+            src="/logo.png"
+            alt="Logo"
+          />
+          <h2 className="mt-6 text-center text-2xl font-extrabold text-gray-900">
+            Bienvenue !
           </h2>
+          <h1 className="mt-6 text-center  font-normal text-gray-900">
+            Merci de renseigner ton email
+          </h1>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSignIn}>
@@ -93,13 +106,13 @@ export default function Home() {
           </div>
 
           <div>
-            <button
+            <Button
               type="submit"
+              variant="primary"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Vérification..." : "Continuer"}
-            </button>
+            </Button>
           </div>
 
           {message && (

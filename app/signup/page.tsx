@@ -23,6 +23,7 @@ interface AddressData {
   longitude: number;
   postalCode: string;
 }
+import Button from "../components/Buttons";
 
 function SignupForm() {
   const [formData, setFormData] = useState({
@@ -132,10 +133,15 @@ function SignupForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
-      <div className="max-w-2xl w-full bg-white rounded-2xl shadow-lg p-8 space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
+      <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="text-center text-3xl font-extrabold text-gray-900">
+          <img
+           className="mx-auto h-16 sm:h-24 md:h-28 lg:h-32 w-auto"
+            src="/logo.png"
+            alt="Logo"
+          />
+          <h2 className="mt-6 text-center text-2xl font-extrabold text-gray-900">
             Créer un compte
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
@@ -255,23 +261,26 @@ function SignupForm() {
           </div>
 
           <div>
-            <button
+
+             <Button
               type="submit"
+              variant="primary"
               disabled={loading}
-              className="w-full flex justify-center rounded-lg bg-indigo-600 py-3 px-6 text-base font-medium text-white shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
-              {loading ? "Création..." : "Créer le compte"}
-            </button>
+              {loading ? "Vérification..." : "Créer le compte"}
+            </Button>
+            
           </div>
 
           <div className="text-center">
-            <button
+            <Button
               type="button"
+              variant="secondary"
+
               onClick={() => router.back()}
-              className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
             >
               Retour
-            </button>
+            </Button>
           </div>
 
           {message && (
