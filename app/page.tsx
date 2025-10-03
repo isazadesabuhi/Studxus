@@ -13,7 +13,6 @@ export default function Home() {
   const handleSignIn = async (e: React.FormEvent) => {
 
 
-        router.push(`/signup?email=${encodeURIComponent(email)}`);
     e.preventDefault();
 
     if (!email) {
