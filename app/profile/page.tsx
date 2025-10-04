@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
-import MobileLayout from "../components/MobileLayout";
 
 interface UserProfile {
   id: string;
@@ -24,12 +23,10 @@ interface UserProfile {
 export default function Profile() {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     const load = async () => {
-      setLoading(true);
       const { data: userData } = await supabase.auth.getUser();
 
       if (!userData?.user) {
@@ -57,8 +54,6 @@ export default function Profile() {
       } catch (error) {
         console.error("Error fetching profile:", error);
       }
-
-      setLoading(false);
     };
 
     load();
@@ -69,25 +64,7 @@ export default function Profile() {
     router.push("/");
   };
 
-  if (loading) {
-    return (
-    <MobileLayout title="Profil">
-
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-lg">Chargement...</div>
-      </div>
-      </MobileLayout>
-    );
-  }
-
-  if (!user) {
-    return null;
-  }
-  console.log(profile);
-  console.log(user);
   return (
-    <MobileLayout title="Profil">
-      
     <div className="min-h-screen bg-gray-50 py-16 px-4">
       <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-8">
         <div className="text-center">
@@ -104,7 +81,7 @@ export default function Profile() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-gray-50 p-6 rounded-lg">
                   <p className="text-gray-600 text-sm font-medium">Email</p>
-                  <p className="text-gray-900 font-semibold">{user.email}</p>
+                  <p className="text-gray-900 font-semibold">{user?.email}</p>
                 </div>
 
                 {profile && (
@@ -213,7 +190,7 @@ export default function Profile() {
                   <p className="text-gray-600 text-sm font-medium">
                     ID utilisateur
                   </p>
-                  <p className="text-gray-900 font-mono text-xs">{user.id}</p>
+                  <p className="text-gray-900 font-mono text-xs">{user?.id}</p>
                 </div>
 
                 <div className="bg-gray-50 p-6 rounded-lg">
@@ -221,7 +198,7 @@ export default function Profile() {
                     Dernière connexion
                   </p>
                   <p className="text-gray-900 font-semibold">
-                    {user.last_sign_in_at
+                    {user?.last_sign_in_at
                       ? new Date(user.last_sign_in_at).toLocaleString("fr-FR")
                       : "Jamais"}
                   </p>
@@ -250,7 +227,5 @@ export default function Profile() {
         </div>
       </div>
     </div>
-
-    </MobileLayout>
   );
 }

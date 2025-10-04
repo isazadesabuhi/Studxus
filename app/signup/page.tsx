@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
+import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
@@ -23,7 +24,7 @@ interface AddressData {
   longitude: number;
   postalCode: string;
 }
-import Button from "../components/Buttons";
+import Button from "../../components/Buttons";
 
 function SignupForm() {
   const [formData, setFormData] = useState({
@@ -136,8 +137,10 @@ function SignupForm() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <img
-           className="mx-auto h-16 sm:h-24 md:h-28 lg:h-32 w-auto"
+          <Image
+            width={100}
+            height={28}
+            className="mx-auto h-16 sm:h-24 md:h-28 lg:h-32 w-auto"
             src="/logo.png"
             alt="Logo"
           />
@@ -261,22 +264,15 @@ function SignupForm() {
           </div>
 
           <div>
-
-             <Button
-              type="submit"
-              variant="primary"
-              disabled={loading}
-            >
+            <Button type="submit" variant="primary" disabled={loading}>
               {loading ? "Vérification..." : "Créer le compte"}
             </Button>
-            
           </div>
 
           <div className="text-center">
             <Button
               type="button"
               variant="secondary"
-
               onClick={() => router.back()}
             >
               Retour
