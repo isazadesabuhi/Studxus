@@ -96,7 +96,7 @@ export default function Home() {
             className={`mt-8 space-y-6 transform transition-all duration-1000 ease-in-out 
               ${showForm ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}
           >
-            <div>
+            <div className="bg-[#D4EEFF] rounded-t-[4px] border-b-1">
               <label htmlFor="email" className="sr-only">
                 Adresse email
               </label>

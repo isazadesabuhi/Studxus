@@ -117,21 +117,15 @@ export default function MobileLayout({ title, children }: MobileLayoutProps) {
 
 function SunStarBadge() {
   return (
-    <div className="absolute h-11 w-11">
+    <div className="absolute h-20 w-20">
       <svg
         viewBox="0 0 100 100"
-        className="absolute inset-0 h-11 w-11"
+        className="absolute inset-0 h-full w-full"
         aria-hidden
       >
-        <defs>
-          <radialGradient id="g" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopOpacity="1" stopColor="#FACC15" />
-            <stop offset="100%" stopOpacity="1" stopColor="#EAB308" />
-          </radialGradient>
-        </defs>
         <path
-          d="M50 5 C60 10, 65 10, 70 5 C75 10, 80 10, 90 10 C90 20, 95 25, 100 30 C95 35, 95 40, 100 50 C95 60, 95 65, 100 70 C95 75, 90 80, 90 90 C80 90, 75 90, 70 95 C65 90, 60 90, 50 95 C40 90, 35 90, 30 95 C25 90, 20 90, 10 90 C10 80, 5 75, 0 70 C5 65, 5 60, 0 50 C5 40, 5 35, 0 30 C5 25, 10 20, 10 10 C20 10, 25 10, 30 5 C35 10, 40 10, 50 5Z"
-          fill="url(#g)"
+          d="M48 22C49 20 51 20 52 22L55 27C56 29 58 30 60 29L66 27C68 26 70 28 70 30L69 35C69 37 70 39 72 40L78 42C80 43 81 46 79 48L76 51C75 52 75 54 76 56L79 59C81 61 80 64 78 65L72 67C70 68 69 70 69 72L70 77C70 79 68 81 66 80L60 78C58 77 56 78 55 80L52 85C51 87 49 87 48 85L45 80C44 78 42 77 40 78L34 80C32 81 30 79 30 77L31 72C31 70 30 68 28 67L22 65C20 64 19 61 21 59L24 56C25 54 25 52 24 51L21 48C19 46 20 43 22 42L28 40C30 39 31 37 31 35L30 30C30 28 32 26 34 27L40 29C42 30 44 29 45 27L48 22Z"
+          fill="#FAB818"
         />
       </svg>
     </div>
