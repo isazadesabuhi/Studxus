@@ -4,8 +4,9 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import MobileLayout from "@/components/MobileLayout";
 import { usePathname } from "next/navigation";
-
+import Navbar from "@/components/NavBar";
 const inter = Inter({ subsets: ["latin"] });
+import motif_jeune from "@/public/motif_jaune.png";
 
 export default function RootLayout({
   children,
@@ -16,10 +17,24 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body
+        className={`${inter.className} grid place-items-center max-w-[450px] min-h-screen`}
+      >
+        <Navbar />
         {/* Hide MobileLayout on home page using Tailwind */}
-        <div className={pathname === "/" ? "hidden" : "block"}>
-          <MobileLayout title="">{children}</MobileLayout>
+        <div
+          className={`relative ${
+            pathname === "/" ? "hidden" : "block bg-cover bg-center"
+          }`}
+          // style={{ backgroundImage: `url(${motif_jeune.src})` }}
+        >
+          {/* Overlay */}
+          {/* <div className="absolute inset-0 bg-white/95"></div> */}
+
+          {/* Content */}
+          <div className="relative z-10">
+            <MobileLayout title="">{children}</MobileLayout>
+          </div>
         </div>
 
         {/* Show content normally on home page */}

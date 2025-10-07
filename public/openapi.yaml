@@ -1,0 +1,853 @@
+openapi: 3.0.3
+info:
+  title: GDP - Plateforme d'Apprentissage P2P
+  description: |
+    API pour la plateforme GDP permettant aux utilisateurs d'apprendre et partager des connaissances.
+    Authentification via Supabase avec magic links.
+  version: 1.0.0
+  contact:
+    name: GDP Support
+    email: support@gdp.com
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:3000/api
+    description: Serveur de développement
+  - url: https://gdp.com/api
+    description: Serveur de production
+
+tags:
+  - name: Authentication
+    description: Gestion de l'authentification
+  - name: Users
+    description: Gestion des utilisateurs et profils
+  - name: Courses
+    description: Gestion des cours
+  - name: Enrollments
+    description: Gestion des inscriptions
+  - name: Messages
+    description: Messagerie entre utilisateurs
+  - name: Reviews
+    description: Avis et évaluations
+  - name: Favorites
+    description: Gestion des favoris
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token JWT fourni par Supabase
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Identifiant unique de l'utilisateur
+        email:
+          type: string
+          format: email
+          description: Email de l'utilisateur
+        name:
+          type: string
+          description: Prénom
+        surname:
+          type: string
+          description: Nom de famille
+        user_type:
+          type: string
+          enum: [Professeur, Etudiant]
+          description: Type d'utilisateur
+        address:
+          type: string
+          description: Adresse complète
+        city:
+          type: string
+          description: Ville
+        country:
+          type: string
+          description: Pays
+        latitude:
+          type: number
+          format: float
+          description: Latitude GPS
+        longitude:
+          type: number
+          format: float
+          description: Longitude GPS
+        postal_code:
+          type: string
+          description: Code postal
+        created_at:
+          type: string
+          format: date-time
+          description: Date de création du compte
+      required:
+        - id
+        - email
+        - name
+        - surname
+        - user_type
+
+    Course:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          description: Titre du cours
+        subtitle:
+          type: string
+          description: Sous-titre du cours
+        level:
+          type: string
+          enum: [Débutant, Intermédiaire, Avancé]
+          description: Niveau du cours
+        days:
+          type: string
+          description: Jours de la semaine (ex. "Lun, Mer, Ven")
+        time:
+          type: string
+          description: Horaires (ex. "09h30 - 10h30")
+        price:
+          type: number
+          format: float
+          description: Prix en euros
+        teacher_id:
+          type: string
+          format: uuid
+          description: ID du professeur
+        teacher_name:
+          type: string
+          description: Nom du professeur
+        rating:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 5
+          description: Note moyenne
+        distance_km:
+          type: number
+          format: float
+          description: Distance en km depuis l'utilisateur
+        avatar_url:
+          type: string
+          format: uri
+          description: URL de l'avatar du professeur
+        popular:
+          type: boolean
+          description: Cours populaire ou non
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - title
+        - subtitle
+        - level
+        - price
+        - teacher_id
+
+    Enrollment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        student_id:
+          type: string
+          format: uuid
+        course_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [pending, active, completed, cancelled]
+          description: Statut de l'inscription
+        enrolled_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - student_id
+        - course_id
+        - status
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sender_id:
+          type: string
+          format: uuid
+        receiver_id:
+          type: string
+          format: uuid
+        content:
+          type: string
+          description: Contenu du message
+        read:
+          type: boolean
+          description: Message lu ou non
+        sent_at:
+          type: string
+          format: date-time
+      required:
+        - sender_id
+        - receiver_id
+        - content
+
+    Review:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        course_id:
+          type: string
+          format: uuid
+        student_id:
+          type: string
+          format: uuid
+        rating:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 5
+        comment:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+      required:
+        - course_id
+        - student_id
+        - rating
+
+    Favorite:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        course_id:
+          type: string
+          format: uuid
+        added_at:
+          type: string
+          format: date-time
+      required:
+        - user_id
+        - course_id
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Message d'erreur
+        code:
+          type: string
+          description: Code d'erreur
+        details:
+          type: object
+          description: Détails supplémentaires
+      required:
+        - error
+
+    Success:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+      required:
+        - success
+
+paths:
+  # ===== AUTHENTICATION =====
+  /auth/check-user:
+    post:
+      tags:
+        - Authentication
+      summary: Vérifier l'existence d'un utilisateur
+      description: Vérifie si un email existe dans la base de données
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+              required:
+                - email
+      responses:
+        "200":
+          description: Vérification réussie
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exists:
+                    type: boolean
+                  email:
+                    type: string
+        "400":
+          description: Email invalide
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /auth/signup:
+    post:
+      tags:
+        - Authentication
+      summary: Inscription d'un nouvel utilisateur
+      description: Crée un nouveau compte utilisateur et envoie un magic link
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                name:
+                  type: string
+                surname:
+                  type: string
+                userType:
+                  type: string
+                  enum: [Professeur, Etudiant]
+                address:
+                  type: string
+                city:
+                  type: string
+                country:
+                  type: string
+                latitude:
+                  type: number
+                longitude:
+                  type: number
+                postalCode:
+                  type: string
+              required:
+                - email
+                - name
+                - surname
+                - userType
+      responses:
+        "201":
+          description: Utilisateur créé avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  userId:
+                    type: string
+                  email:
+                    type: string
+        "409":
+          description: L'utilisateur existe déjà
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /auth/signin:
+    post:
+      tags:
+        - Authentication
+      summary: Connexion d'un utilisateur
+      description: Envoie un magic link à un utilisateur existant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+              required:
+                - email
+      responses:
+        "200":
+          description: Magic link envoyé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+
+  # ===== USERS =====
+  /profiles:
+    get:
+      tags:
+        - Users
+      summary: Obtenir le profil de l'utilisateur connecté
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Profil récupéré avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    post:
+      tags:
+        - Users
+      summary: Créer ou mettre à jour un profil
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                email:
+                  type: string
+                name:
+                  type: string
+                surname:
+                  type: string
+                userType:
+                  type: string
+                address:
+                  type: string
+                city:
+                  type: string
+                country:
+                  type: string
+                latitude:
+                  type: number
+                longitude:
+                  type: number
+                postalCode:
+                  type: string
+      responses:
+        "201":
+          description: Profil créé/mis à jour
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  profile:
+                    $ref: "#/components/schemas/User"
+
+  # ===== COURSES =====
+  /courses:
+    get:
+      tags:
+        - Courses
+      summary: Liste des cours
+      description: Récupère tous les cours avec filtres optionnels
+      parameters:
+        - name: level
+          in: query
+          schema:
+            type: string
+            enum: [Débutant, Intermédiaire, Avancé]
+        - name: maxDistance
+          in: query
+          schema:
+            type: number
+          description: Distance maximale en km
+        - name: popular
+          in: query
+          schema:
+            type: boolean
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Recherche par titre
+      responses:
+        "200":
+          description: Liste des cours
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Course"
+
+    post:
+      tags:
+        - Courses
+      summary: Créer un nouveau cours
+      description: Permet à un professeur de créer un cours
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Course"
+      responses:
+        "201":
+          description: Cours créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+        "403":
+          description: Seuls les professeurs peuvent créer des cours
+
+  /courses/{courseId}:
+    get:
+      tags:
+        - Courses
+      summary: Détails d'un cours
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Détails du cours
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+        "404":
+          description: Cours non trouvé
+
+    put:
+      tags:
+        - Courses
+      summary: Mettre à jour un cours
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Course"
+      responses:
+        "200":
+          description: Cours mis à jour
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+
+    delete:
+      tags:
+        - Courses
+      summary: Supprimer un cours
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Cours supprimé
+
+  # ===== ENROLLMENTS =====
+  /enrollments:
+    get:
+      tags:
+        - Enrollments
+      summary: Liste des inscriptions de l'utilisateur
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Liste des inscriptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Enrollment"
+
+    post:
+      tags:
+        - Enrollments
+      summary: S'inscrire à un cours
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                course_id:
+                  type: string
+                  format: uuid
+              required:
+                - course_id
+      responses:
+        "201":
+          description: Inscription réussie
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Enrollment"
+
+  /enrollments/{enrollmentId}:
+    delete:
+      tags:
+        - Enrollments
+      summary: Annuler une inscription
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: enrollmentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Inscription annulée
+
+  # ===== MESSAGES =====
+  /messages:
+    get:
+      tags:
+        - Messages
+      summary: Liste des messages
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Liste des messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
+
+    post:
+      tags:
+        - Messages
+      summary: Envoyer un message
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                receiver_id:
+                  type: string
+                  format: uuid
+                content:
+                  type: string
+              required:
+                - receiver_id
+                - content
+      responses:
+        "201":
+          description: Message envoyé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+
+  /messages/{messageId}/read:
+    patch:
+      tags:
+        - Messages
+      summary: Marquer un message comme lu
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Message marqué comme lu
+
+  # ===== REVIEWS =====
+  /courses/{courseId}/reviews:
+    get:
+      tags:
+        - Reviews
+      summary: Avis d'un cours
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Liste des avis
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Review"
+
+    post:
+      tags:
+        - Reviews
+      summary: Ajouter un avis
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rating:
+                  type: number
+                  minimum: 0
+                  maximum: 5
+                comment:
+                  type: string
+              required:
+                - rating
+      responses:
+        "201":
+          description: Avis créé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+
+  # ===== FAVORITES =====
+  /favorites:
+    get:
+      tags:
+        - Favorites
+      summary: Liste des favoris
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Liste des favoris
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Favorite"
+
+    post:
+      tags:
+        - Favorites
+      summary: Ajouter aux favoris
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                course_id:
+                  type: string
+                  format: uuid
+              required:
+                - course_id
+      responses:
+        "201":
+          description: Ajouté aux favoris
+
+  /favorites/{favoriteId}:
+    delete:
+      tags:
+        - Favorites
+      summary: Retirer des favoris
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: favoriteId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Retiré des favoris

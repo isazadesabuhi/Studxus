@@ -1,0 +1,29 @@
+[
+  {
+    "id": "vba-excel",
+    "title": "VBA - Excel",
+    "schedule": "Lun, Mar, Jeu, Ven : 18h -19h",
+    "wednesday": "Mer : 14h - 16h",
+    "level": "Intermédiaire",
+    "price": "15€/h",
+    "image": "/images/vba-excel.png"
+  },
+  {
+    "id": "python-debutant",
+    "title": "Python - Débutant",
+    "schedule": "Lun, Mer, Ven : 19h - 20h",
+    "wednesday": "Sam : 10h - 12h",
+    "level": "Débutant",
+    "price": "12€/h",
+    "image": "/images/python.png"
+  },
+  {
+    "id": "sql-inter",
+    "title": "SQL - Intermédiaire",
+    "schedule": "Mar, Jeu : 20h - 21h",
+    "wednesday": "Dim : 15h - 17h",
+    "level": "Intermédiaire",
+    "price": "14€/h",
+    "image": "/images/sql.png"
+  }
+]

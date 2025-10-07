@@ -5,7 +5,7 @@ import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
-import mascotte from "@/public/mascotte.svg";
+import mascotte_v1 from "@/public/mascotte_v1.png";
 
 // Dynamically import AddressPicker to avoid SSR issues with Mapbox
 const AddressPicker = dynamic(() => import("@/components/AddressPicker"), {
@@ -146,7 +146,12 @@ function SignupForm() {
             alt="Logo"
           />
           <div className="flex flex-row">
-            <Image src={mascotte} width={100} height={120} alt="mascotte" />
+            <Image
+              src={mascotte_v1}
+              width={100}
+              height={120}
+              alt="mascotte_v1"
+            />
 
             <div className="relative w-[203px] h-[101px] flex items-center justify-center">
               {/* SVG background */}
@@ -192,7 +197,7 @@ function SignupForm() {
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700"
               >
-                Quel est ton e-mail? *
+                Quel est ton e-mail?
               </label>
               <input
                 id="email"
@@ -214,7 +219,7 @@ function SignupForm() {
                   htmlFor="name"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Quel est ton prénom ? *
+                  Quel est ton prénom ?
                 </label>
                 <input
                   id="name"
@@ -235,7 +240,7 @@ function SignupForm() {
                   htmlFor="surname"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Quel est ton nom *
+                  Quel est ton nom
                 </label>
                 <input
                   id="surname"

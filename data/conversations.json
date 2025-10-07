@@ -1,0 +1,31 @@
+{
+  "conversations": [
+    {
+      "id": "1",
+      "type": "received",
+      "name": "Lucas",
+      "avatar": "",
+      "snippet": "Bonjour, pourriez-vous m’expliquer…",
+      "time": "1 min",
+      "unread": true
+    },
+    {
+      "id": "2",
+      "type": "sent",
+      "name": "Camille",
+      "avatar": "",
+      "snippet": "Merci pour votre retour, à bientôt !",
+      "time": "Hier",
+      "unread": false
+    },
+    {
+      "id": "3",
+      "type": "received",
+      "name": "Nicolas",
+      "avatar": "",
+      "snippet": "Parfait, on se tient au courant.",
+      "time": "3 j",
+      "unread": false
+    }
+  ]
+}
