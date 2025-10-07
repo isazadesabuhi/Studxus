@@ -1,6 +1,6 @@
 // components/MobileLayout.tsx
 import React, { ReactNode } from "react";
-import { HomeIcon, MagnifyingGlassIcon, ChatBubbleBottomCenterIcon, UserIcon, BellIcon, Bars3BottomLeftIcon } from "@heroicons/react/24/outline";
+import { HomeIcon, MagnifyingGlassIcon, ChatBubbleBottomCenterIcon,BookOpenIcon, UserIcon, BellIcon, Bars3BottomLeftIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
 interface MobileLayoutProps {
@@ -39,6 +39,11 @@ export default function MobileLayout({ title, children }: MobileLayoutProps) {
                 <Link href="/search" className="flex flex-col items-center text-gray-700">
                     <MagnifyingGlassIcon className="h-6 w-6" />
                     <span className="text-xs mt-1">Recherche</span>
+                </Link>
+
+                <Link href="/courses" className="flex flex-col items-center text-gray-700">
+                    <BookOpenIcon className="h-6 w-6" />
+                    <span className="text-xs mt-1">Mes cours</span>
                 </Link>
 
                 <Link href="/message" className="flex flex-col items-center text-gray-700">

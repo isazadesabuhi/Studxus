@@ -5,6 +5,8 @@ import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import MobileLayout from "../components/MobileLayout";
+import { ArrowLeftIcon, ArrowsPointingOutIcon, CalendarIcon, FolderIcon, LockClosedIcon, PencilIcon, QuestionMarkCircleIcon, ShieldCheckIcon } from "@heroicons/react/16/solid";
+import Image from "next/image";
 
 interface UserProfile {
   id: string;
@@ -71,185 +73,103 @@ export default function Profile() {
 
   if (loading) {
     return (
-    <MobileLayout title="Profil">
+      <MobileLayout title="Profil">
 
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-lg">Chargement...</div>
-      </div>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-lg">Chargement...</div>
+        </div>
       </MobileLayout>
     );
   }
 
-  if (!user) {
-    return null;
-  }
+
   console.log(profile);
   console.log(user);
   return (
-    <MobileLayout title="Profil">
-      
-    <div className="min-h-screen bg-gray-50 py-16 px-4">
-      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-8">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">
-            Bienvenue sur votre profil
-          </h1>
 
-          <div className="space-y-6 mb-10 text-left">
-            {/* Personal Information */}
-            <div className="border-b pb-4">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                Informations personnelles
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-gray-50 p-6 rounded-lg">
-                  <p className="text-gray-600 text-sm font-medium">Email</p>
-                  <p className="text-gray-900 font-semibold">{user.email}</p>
-                </div>
-
-                {profile && (
-                  <>
-                    <div className="bg-gray-50 p-6 rounded-lg">
-                      <p className="text-gray-600 text-sm font-medium">
-                        Prénom
-                      </p>
-                      <p className="text-gray-900 font-semibold">
-                        {profile.name}
-                      </p>
-                    </div>
-
-                    <div className="bg-gray-50 p-6 rounded-lg">
-                      <p className="text-gray-600 text-sm font-medium">
-                        Nom de famille
-                      </p>
-                      <p className="text-gray-900 font-semibold">
-                        {profile.surname}
-                      </p>
-                    </div>
-
-                    <div className="bg-gray-50 p-6 rounded-lg">
-                      <p className="text-gray-600 text-sm font-medium">
-                        Type d&apos;utilisateur
-                      </p>
-                      <p className="text-gray-900 font-semibold">
-                        {profile.user_type === "Professeur"
-                          ? "Professeur"
-                          : "Etudiant"}
-                      </p>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Address Information */}
-            {profile && profile.address && (
-              <div className="border-b pb-4">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                  Adresse
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-gray-50 p-6 rounded-lg md:col-span-2">
-                    <p className="text-gray-600 text-sm font-medium">
-                      Adresse complète
-                    </p>
-                    <p className="text-gray-900 font-semibold">
-                      {profile.address}
-                    </p>
-                  </div>
-
-                  {profile.city && (
-                    <div className="bg-gray-50 p-6 rounded-lg">
-                      <p className="text-gray-600 text-sm font-medium">Ville</p>
-                      <p className="text-gray-900 font-semibold">
-                        {profile.city}
-                      </p>
-                    </div>
-                  )}
-
-                  {profile.country && (
-                    <div className="bg-gray-50 p-6 rounded-lg">
-                      <p className="text-gray-600 text-sm font-medium">Pays</p>
-                      <p className="text-gray-900 font-semibold">
-                        {profile.country}
-                      </p>
-                    </div>
-                  )}
-
-                  {profile.postal_code && (
-                    <div className="bg-gray-50 p-6 rounded-lg">
-                      <p className="text-gray-600 text-sm font-medium">
-                        Code postal
-                      </p>
-                      <p className="text-gray-900 font-semibold">
-                        {profile.postal_code}
-                      </p>
-                    </div>
-                  )}
-
-                  {profile.latitude && profile.longitude && (
-                    <div className="bg-gray-50 p-6 rounded-lg">
-                      <p className="text-gray-600 text-sm font-medium">
-                        Coordonnées GPS
-                      </p>
-                      <p className="text-gray-900 font-mono text-xs">
-                        Lat: {profile.latitude.toFixed(6)}
-                        <br />
-                        Long: {profile.longitude.toFixed(6)}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* System Information */}
-            <div>
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                Informations système
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-gray-50 p-6 rounded-lg">
-                  <p className="text-gray-600 text-sm font-medium">
-                    ID utilisateur
-                  </p>
-                  <p className="text-gray-900 font-mono text-xs">{user.id}</p>
-                </div>
-
-                <div className="bg-gray-50 p-6 rounded-lg">
-                  <p className="text-gray-600 text-sm font-medium">
-                    Dernière connexion
-                  </p>
-                  <p className="text-gray-900 font-semibold">
-                    {user.last_sign_in_at
-                      ? new Date(user.last_sign_in_at).toLocaleString("fr-FR")
-                      : "Jamais"}
-                  </p>
-                </div>
-
-                {profile && (
-                  <div className="bg-gray-50 p-6 rounded-lg md:col-span-2">
-                    <p className="text-gray-600 text-sm font-medium">
-                      Compte créé le
-                    </p>
-                    <p className="text-gray-900 font-semibold">
-                      {new Date(profile.created_at).toLocaleString("fr-FR")}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
+    <MobileLayout title="Compte">
+      <div className="flex flex-col items-center p-4 pb-24">
+        {/* Boutons retour et aide */}
+        <div className="w-full flex justify-between items-center mb-2">
+          <button onClick={() => router.back()}>
+            <ArrowLeftIcon className="w-6 h-6 text-gray-700" />
+          </button>
+          <div className="flex gap-3">
+            <button>
+              <ArrowsPointingOutIcon className="w-6 h-6 text-gray-700" />
+            </button>
+            <button>
+              <QuestionMarkCircleIcon className="w-6 h-6 text-gray-700" />
+            </button>
           </div>
+        </div>
+
+        {/* Avatar */}
+        <div className="mt-2">
+          <Image
+            src="/placeholder-avatar.png"
+            alt="Avatar"
+            width={100}
+            height={100}
+            className="rounded-full border-2 border-gray-300"
+          />
+        </div>
+
+
+        {/* Nom */}
+        {profile && (
+          <h2 className="text-lg text-primary font-bold mt-3">{profile.name}</h2>
+        )}
+
+        {/* Bouton modifier */}
+        <button
+          onClick={() => router.push("/profil/edit")}
+          className="mt-2 text-primary flex items-center gap-1 text-sm border border-gray-400 rounded-full px-3 py-1"
+        >
+          <PencilIcon className="w-4 h-4" />
+          Modifier le profil
+        </button>
+
+        {/* Grille de liens */}
+        <div className="grid grid-cols-2 gap-4 mt-6 w-full max-w-xs">
+          <button
+            onClick={() => router.push("/reservations")}
+            className="flex flex-col items-center justify-center bg-blue-50 rounded-2xl p-4 shadow-sm"
+          >
+            <CalendarIcon className="w-8 h-8 text-black mb-1" />
+            <span className="text-sm text-primary font-medium text-center">
+              Mes réservations<br />de cours
+            </span>
+          </button>
 
           <button
-            onClick={handleSignOut}
-            className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
+            onClick={() => router.push("/annonces")}
+            className="flex flex-col items-center justify-center bg-blue-50 rounded-2xl p-4 shadow-sm"
           >
-            Se déconnecter
+            <FolderIcon className="w-8 h-8 text-black mb-1" />
+            <span className="text-sm text-primary font-medium text-center">Mes annonces</span>
+          </button>
+
+          <button
+            onClick={() => router.push("/confidentialite")}
+            className="flex flex-col items-center justify-center bg-blue-50 rounded-2xl p-4 shadow-sm"
+          >
+            <ShieldCheckIcon className="w-8 h-8 text-black mb-1" />
+            <span className="text-sm text-primary font-medium text-center">
+              CGU &<br />Confidentialité
+            </span>
+          </button>
+
+          <button
+            onClick={() => router.push("/securite")}
+            className="flex flex-col items-center justify-center bg-blue-50 rounded-2xl p-4 shadow-sm"
+          >
+            <LockClosedIcon className="w-8 h-8 text-black mb-1" />
+            <span className="text-sm font-medium text-primary text-center">Sécurité</span>
           </button>
         </div>
       </div>
-    </div>
+
 
     </MobileLayout>
   );
