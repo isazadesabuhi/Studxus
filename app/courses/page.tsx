@@ -54,7 +54,7 @@ export default function Courses() {
     <MobileLayout title="Courses">
 
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-lg">Chargement...</div>
+        <div className="text-lg text-primary">Chargement...</div>
       </div>
       </MobileLayout>
     );
