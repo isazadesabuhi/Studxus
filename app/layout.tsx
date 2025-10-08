@@ -23,13 +23,12 @@ export default function RootLayout({
         <Navbar />
         {/* Hide MobileLayout on home page using Tailwind */}
         <div
-          className={`relative ${
-            pathname === "/" ? "hidden" : "block bg-cover bg-center"
-          }`}
-          // style={{ backgroundImage: `url(${motif_jeune.src})` }}
+          className={`relative ${pathname === "/" ? "hidden" : "block bg-repeat bg-[length:280px_120px]"
+            }`}
+          style={{ backgroundImage: `url(${motif_jeune.src})` }}
         >
           {/* Overlay */}
-          {/* <div className="absolute inset-0 bg-white/95"></div> */}
+          {<div className="absolute inset-0 bg-white/90"></div>}
 
           {/* Content */}
           <div className="relative z-10">
