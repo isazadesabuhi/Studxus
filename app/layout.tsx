@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import Navbar from "@/components/NavBar";
 const inter = Inter({ subsets: ["latin"] });
 import motif_jeune from "@/public/motif_jaune.png";
+import path from "path";
 
 export default function RootLayout({
   children,
@@ -14,13 +15,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  console.log("/accueil");
+  console.log(pathname);
 
   return (
     <html lang="en">
       <body
         className={`${inter.className} grid place-items-center max-w-[450px] min-h-screen`}
       >
-        <Navbar />
+        <div className={`w-full ${pathname === "/" ? "hidden" : "block"}`}>
+          <Navbar />
+        </div>
+
         {/* Hide MobileLayout on home page using Tailwind */}
         <div
           className={`relative ${
