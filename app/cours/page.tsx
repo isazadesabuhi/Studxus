@@ -1,16 +1,17 @@
 "use client";
-import { useMemo, useState } from "react";
 import CourseCard, { type Course } from "@/components/CourseCard";
 import data from "@/data/courses.json";
+import { useState } from "react";
 
-import { Conversation } from "@/components/MessageItem";
+import { useRouter } from "next/navigation";
 
 type TabKey = "sent" | "received";
 
 export default function Page() {
   const courses = data as Course[];
+  const router = useRouter();
 
-  const handleDetails = (id: string) => console.log("details:", id);
+  const handleDetails = (id: string) => router.push(`/cours/detail/${id}`);
   const handleEdit = (id: string) => console.log("edit:", id);
 
   const [active, setActive] = useState<TabKey>("received");

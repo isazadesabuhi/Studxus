@@ -2,28 +2,98 @@
   {
     "id": "vba-excel",
     "title": "VBA - Excel",
+    "description": "Apprenez à automatiser vos tâches répétitives sur Excel avec VBA. Ce cours vous guidera à travers les bases de la programmation VBA, vous permettant de créer des macros personnalisées pour améliorer votre productivité.",
     "schedule": "Lun, Mar, Jeu, Ven : 18h -19h",
     "wednesday": "Mer : 14h - 16h",
+    "enseignant": "Sarah",
+    "note": 4.8,
+    "avis": 56,
     "level": "Intermédiaire",
     "price": "15€/h",
-    "image": "/images/vba-excel.png"
+    "image": "/images/vba-excel.png",
+    "date": [
+      {
+        "2025-10-07": [
+          "18h00",
+          "19h00",
+          "21h00"
+        ]
+      },
+      {
+        "2025-10-14": [
+          "11h00",
+          "13h00",
+          "15h00"
+        ]
+      },
+      {
+        "2025-10-21": [
+          "19h00",
+          "20h00"
+        ]
+      }
+    ]
   },
   {
     "id": "python-debutant",
     "title": "Python - Débutant",
+    "description": "Découvrez les bases de la programmation avec Python. Ce cours est conçu pour les débutants et couvre les concepts fondamentaux tels que les variables, les boucles, les fonctions et la manipulation des données.",
     "schedule": "Lun, Mer, Ven : 19h - 20h",
+    "enseignant": "Léo",
+    "note": 4.8,
+    "avis": 56,
     "wednesday": "Sam : 10h - 12h",
     "level": "Débutant",
     "price": "12€/h",
-    "image": "/images/python.png"
+    "image": "/images/python.png",
+    "date": [
+      {
+        "2025-10-08": [
+          "18h00",
+          "19h00",
+          "21h00"
+        ]
+      },
+      {
+        "2025-10-15": [
+          "10h00",
+          "11h00",
+          "14h00"
+        ]
+      },
+      {
+        "2025-10-22": [
+          "9h00",
+          "15h00"
+        ]
+      }
+    ]
   },
   {
     "id": "sql-inter",
     "title": "SQL - Intermédiaire",
+    "description": "Approfondissez vos connaissances en SQL avec ce cours intermédiaire. Apprenez à écrire des requêtes complexes, à optimiser les performances des bases de données et à gérer les transactions pour des applications robustes.",
     "schedule": "Mar, Jeu : 20h - 21h",
     "wednesday": "Dim : 15h - 17h",
+    "enseignant": "Thiago",
+    "note": 4.8,
+    "avis": 56,
     "level": "Intermédiaire",
     "price": "14€/h",
-    "image": "/images/sql.png"
+    "image": "/images/sql.png",
+    "date": [
+      {
+        "2025-10-08": [
+          "18h00",
+          "21h00"
+        ]
+      },
+      {
+        "2025-10-15": [
+          "10h00",
+          "14h00"
+        ]
+      }
+    ]
   }
 ]
