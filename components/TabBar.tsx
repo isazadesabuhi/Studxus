@@ -49,57 +49,58 @@ export default function TabBar({ title, children }: TabBarProps) {
       : pathname === href || pathname.startsWith(href + "/");
 
   return (
-    
-    <nav className="flex justify-between fixed bottom-0 h-16 bg-white shadow-t items-center border-t border-gray-200">
-      {items.map(({ id, label, icon: Icon, href }) => {
-        const active = isActive(href);
-        return (
-          <Link
-            key={id}
-            href={href}
-            aria-label={label}
-            aria-current={active ? "page" : undefined}
-            className={itemBase}
-          >
-            <span className="relative h-11 w-11 flex items-center justify-center">
-              {active && <SunStarBadge />}
-              {Icon ? (
-                <Icon
-                  className={`absolute ${
-                    active ? "text-gray-900" : inactiveIcon
-                  }`}
-                  size={36}
-                  strokeWidth={2.5}
-                />
-              ) : (
-                <svg
-                  className={`absolute h-9 w-9 ${
-                    active ? "text-gray-900" : inactiveIcon
-                  }`}
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M11.051 7.616a1 1 0 0 1 1.909.024l.737 1.452a1 1 0 0 0 .737.535l1.634.256a1 1 0 0 1 .588 1.806l-1.172 1.168a1 1 0 0 0-.282.866l.259 1.613a1 1 0 0 1-1.541 1.134l-1.465-.75a1 1 0 0 0-.912 0l-1.465.75a1 1 0 0 1-1.539-1.133l.258-1.613a1 1 0 0 0-.282-.867l-1.156-1.152a1 1 0 0 1 .572-1.822l1.633-.256a1 1 0 0 0 .737-.535z" />
-                  <circle cx="12" cy="12" r="10" />
-                </svg>
-              )}
-            </span>
-            <span
-              className={`${labelBase} ${
-                active ? "text-gray-900" : inactiveText
-              }`}
+    <div className="fixed bottom-0 left-0 right-0 bg-white ">
+      <nav className="flex justify-between h-16 items-center max-w-[450px] mx-auto shadow-t border-t border-gray-200">
+        {items.map(({ id, label, icon: Icon, href }) => {
+          const active = isActive(href);
+          return (
+            <Link
+              key={id}
+              href={href}
+              aria-label={label}
+              aria-current={active ? "page" : undefined}
+              className={itemBase}
             >
-              {label}
-            </span>
-          </Link>
-        );
-      })}
-    </nav>
+              <span className="relative h-11 w-11 flex items-center justify-center">
+                {active && <SunStarBadge />}
+                {Icon ? (
+                  <Icon
+                    className={`absolute ${
+                      active ? "text-gray-900" : inactiveIcon
+                    }`}
+                    size={36}
+                    strokeWidth={2.5}
+                  />
+                ) : (
+                  <svg
+                    className={`absolute h-9 w-9 ${
+                      active ? "text-gray-900" : inactiveIcon
+                    }`}
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M11.051 7.616a1 1 0 0 1 1.909.024l.737 1.452a1 1 0 0 0 .737.535l1.634.256a1 1 0 0 1 .588 1.806l-1.172 1.168a1 1 0 0 0-.282.866l.259 1.613a1 1 0 0 1-1.541 1.134l-1.465-.75a1 1 0 0 0-.912 0l-1.465.75a1 1 0 0 1-1.539-1.133l.258-1.613a1 1 0 0 0-.282-.867l-1.156-1.152a1 1 0 0 1 .572-1.822l1.633-.256a1 1 0 0 0 .737-.535z" />
+                    <circle cx="12" cy="12" r="10" />
+                  </svg>
+                )}
+              </span>
+              <span
+                className={`${labelBase} ${
+                  active ? "text-gray-900" : inactiveText
+                }`}
+              >
+                {label}
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
+    </div>
   );
 }
 
