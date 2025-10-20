@@ -11,12 +11,12 @@ type IconType = ComponentType<{
   strokeWidth?: number;
 }>;
 
-type MobileLayoutProps = {
+type TabBarProps = {
   title?: string;
   children?: ReactNode;
 };
 
-export default function MobileLayout({ title, children }: MobileLayoutProps) {
+export default function TabBar({ title, children }: TabBarProps) {
   const pathname = usePathname();
 
   const itemBase =
@@ -49,19 +49,8 @@ export default function MobileLayout({ title, children }: MobileLayoutProps) {
       : pathname === href || pathname.startsWith(href + "/");
 
   return (
-    <div className="flex min-h-screen flex-col">
-      {/* Optional top title */}
-      {title ? (
-        <header className="sticky top-0 z-10 bg-white/80 backdrop-blur border-b border-gray-200 px-4 py-3">
-          <h1 className="text-base font-semibold">{title}</h1>
-        </header>
-      ) : null}
-
-      {/* Page content */}
-      <main className="flex-1 pb-20">{children}</main>
-
-      {/* Bottom nav */}
-      <nav className="fixed bottom-0 left-0 right-0 h-16 bg-white shadow-t flex justify-around items-center border-t border-gray-200">
+    <div className="fixed bottom-0 left-0 right-0 bg-white ">
+      <nav className="flex justify-between h-16 items-center max-w-[450px] mx-auto shadow-t border-t border-gray-200">
         {items.map(({ id, label, icon: Icon, href }) => {
           const active = isActive(href);
           return (
