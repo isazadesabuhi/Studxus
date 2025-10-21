@@ -49,6 +49,7 @@ export async function GET(req: Request) {
       latitude: user.user_metadata?.latitude || null,
       longitude: user.user_metadata?.longitude || null,
       postal_code: user.user_metadata?.postal_code || "",
+      interests: user.user_metadata?.interests || [],
       created_at: user.created_at,
     });
   } catch (error) {
@@ -75,6 +76,7 @@ export async function POST(req: Request) {
       latitude,
       longitude,
       postalCode,
+      interests,
     } = body;
 
     if (!userId || !email || !name || !surname || !userType) {
@@ -97,6 +99,7 @@ export async function POST(req: Request) {
           latitude: latitude || null,
           longitude: longitude || null,
           postal_code: postalCode || "",
+          interests: interests || [],
         },
       }
     );
