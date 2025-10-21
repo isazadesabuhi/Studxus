@@ -40,6 +40,22 @@ function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // ADD THIS EFFECT TO CHECK IF USER IS ALREADY SIGNED IN
+  useEffect(() => {
+    const checkUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        // User is already signed in, redirect to accueil
+        router.push("/accueil");
+      }
+    };
+
+    checkUser();
+  }, [router]);
+
   useEffect(() => {
     const emailParam = searchParams.get("email");
     if (emailParam) {
@@ -81,7 +97,7 @@ function SignupForm() {
         email: formData.email,
         password: Math.random().toString(36),
         options: {
-          emailRedirectTo: `${window.location.origin}/profile`,
+          emailRedirectTo: `${window.location.origin}/accueil`,
           data: {
             name: formData.name,
             surname: formData.surname,

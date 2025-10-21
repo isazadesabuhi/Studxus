@@ -96,7 +96,7 @@ export async function POST(req: Request) {
     const { error: magicLinkError } = await supabaseAdmin.auth.signInWithOtp({
       email: email,
       options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/profile`,
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/accueil`,
       },
     });
 

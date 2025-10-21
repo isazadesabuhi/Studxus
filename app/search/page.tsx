@@ -19,8 +19,8 @@ export default function Message() {
         className="w-full mt-2 block rounded-[100px] border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
         placeholder="Jardinage"
       />
-      <Image src={map} width={400} height={300} className="pt-4" />
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 px-2">
+      <Image src={map} width={400} height={300} className="pt-4" alt="Map" />
+      <div className="grid grid-cols-1 px-2">
         {courses.slice(0, 1).map((c) => (
           <CourseCard
             key={c.id}

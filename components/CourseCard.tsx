@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import vba from "@/public/vba.jpg";
+import { useRouter } from "next/navigation";
 export type Course = {
   id: string;
   title: string;
@@ -19,6 +20,8 @@ type Props = {
 };
 
 export default function CourseCard({ course, onDetails, onEdit }: Props) {
+  const router = useRouter();
+
   return (
     <div className="w-full rounded-3xl border border-slate-200 bg-sky-50/60 p-4 shadow-sm sm:p-5 md:p-6">
       <h2 className="text-xl text-center font-extrabold text-slate-800 sm:text-2xl md:text-3xl">
@@ -55,7 +58,7 @@ export default function CourseCard({ course, onDetails, onEdit }: Props) {
       {/* Actions */}
       <div className="mt-4 flex flex-row gap-3 sm:flex-row">
         <button
-          onClick={() => onDetails?.(course.id)}
+          onClick={() => router.push(`/cours/detail/${course.id}`)}
           className="inline-flex w-full items-center justify-center rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 hover:bg-slate-50 sm:w-auto"
         >
           Plus de détails

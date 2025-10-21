@@ -1,16 +1,17 @@
 "use client";
-import { useMemo, useState } from "react";
 import CourseCard, { type Course } from "@/components/CourseCard";
 import data from "@/data/courses.json";
+import { useState } from "react";
 
-import { Conversation } from "@/components/MessageItem";
+import { useRouter } from "next/navigation";
 
 type TabKey = "sent" | "received";
 
 export default function Page() {
   const courses = data as Course[];
+  const router = useRouter();
 
-  const handleDetails = (id: string) => console.log("details:", id);
+  const handleDetails = (id: string) => router.push(`/cours/detail/${id}`);
   const handleEdit = (id: string) => console.log("edit:", id);
 
   const [active, setActive] = useState<TabKey>("received");
@@ -41,7 +42,7 @@ export default function Page() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 ">
         {courses.map((c) => (
           <CourseCard
             key={c.id}
