@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.className} flex flex-col items-center min-h-screen`}
+        className={`${inter.className} flex flex-col items-center min-h-screen pb-10`}
       >
         <div
           className={`w-full max-w-[450px] xs:mx-auto relative" ${

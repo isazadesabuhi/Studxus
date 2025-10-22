@@ -1,11 +1,21 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, use } from "react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import mascotte_v1 from "@/public/mascotte_v1.png";
+import Button from "../../components/Buttons";
+
+interface AddressData {
+  address: string;
+  city: string;
+  country: string;
+  latitude: number;
+  longitude: number;
+  postalCode: string;
+}
 
 // Dynamically import AddressPicker to avoid SSR issues with Mapbox
 const AddressPicker = dynamic(() => import("@/components/AddressPicker"), {
@@ -17,17 +27,11 @@ const AddressPicker = dynamic(() => import("@/components/AddressPicker"), {
   ),
 });
 
-interface AddressData {
-  address: string;
-  city: string;
-  country: string;
-  latitude: number;
-  longitude: number;
-  postalCode: string;
-}
-import Button from "../../components/Buttons";
-
 function SignupForm() {
+  // --- Step control ---------------------------------------------------------
+  const [step, setStep] = useState<1 | 2>(1); // NEW
+
+  // --- Form state -----------------------------------------------------------
   const [formData, setFormData] = useState({
     email: "",
     name: "",
@@ -35,27 +39,28 @@ function SignupForm() {
     userType: "Professeur" as "Professeur" | "Etudiant",
   });
   const [addressData, setAddressData] = useState<AddressData | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set()); // interests
+  const [errors, setErrors] = useState<Record<string, string>>({}); // NEW
+
+  // --- UX state -------------------------------------------------------------
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // ADD THIS EFFECT TO CHECK IF USER IS ALREADY SIGNED IN
+  // If already signed in → redirect
   useEffect(() => {
     const checkUser = async () => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-
-      if (user) {
-        // User is already signed in, redirect to accueil
-        router.push("/accueil");
-      }
+      if (user) router.push("/accueil");
     };
-
     checkUser();
   }, [router]);
 
+  // prefill email from query
   useEffect(() => {
     const emailParam = searchParams.get("email");
     if (emailParam) {
@@ -63,59 +68,129 @@ function SignupForm() {
     }
   }, [searchParams]);
 
+  // handlers
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    // clear per-field error as user types
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const handleAddressSelect = (address: AddressData) => {
     setAddressData(address);
-    console.log("Selected address:", address);
+    setErrors((prev) => ({ ...prev, address: "" }));
   };
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // --- Validation for Step 1 ------------------------------------------------
+  const validateStep1 = () => {
+    const nextErrors: Record<string, string> = {};
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!formData.email || !formData.name || !formData.surname) {
-      setMessage("Veuillez remplir tous les champs requis");
-      return;
-    }
+    if (!formData.email) nextErrors.email = "L’e-mail est requis.";
+    else if (!emailRe.test(formData.email))
+      nextErrors.email = "Format d’e-mail invalide.";
 
-    if (!addressData) {
-      setMessage("Veuillez sélectionner votre adresse sur la carte");
-      return;
-    }
+    if (!formData.name) nextErrors.name = "Le prénom est requis.";
+    if (!formData.surname) nextErrors.surname = "Le nom est requis.";
+    if (!addressData) nextErrors.address = "Sélectionnez votre adresse.";
 
-    setLoading(true);
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
+
+  // --- Navigation between steps --------------------------------------------
+  const goNext = () => {
     setMessage("");
+    if (validateStep1()) {
+      setStep(2);
+      // optionally scroll to top
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
+  const goBack = () => setStep(1);
+
+  //
+  const [serverInterests, setServerInterests] = useState<Option[] | null>(null);
+  const [interestsLoading, setInterestsLoading] = useState(false);
+  const [interestsError, setInterestsError] = useState("");
+  // NEW: GET request to fetch interests from your API
+  const loadInterests = async () => {
+    setInterestsLoading(true);
+    setInterestsError("");
+    try {
+      const res = await fetch("/api/users/interests", {
+        method: "GET",
+        headers: { Accept: "application/json" },
+        // credentials: "include", // uncomment if your API needs cookies/session
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      // Expecting `data` to be an array of { id, label, icon? } (you'll shape it later)
+      setServerInterests(data?.available_interests);
+    } catch (err: any) {
+      setInterestsError("Impossible de charger les centres d’intérêt.");
+      console.error("loadInterests error:", err);
+    } finally {
+      setInterestsLoading(false);
+    }
+  };
+
+  // NEW: when user reaches step 2, fetch interests
+  useEffect(() => {
+    if (step === 2 && serverInterests === null && !interestsLoading) {
+      loadInterests();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+
+  console.log("serverInterests:", serverInterests);
+
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+
+  const toggleInterest = (interest: string) => {
+    setSelectedInterests((prev) =>
+      prev.includes(interest)
+        ? prev.filter((i) => i !== interest)
+        : [...prev, interest]
+    );
+  };
+
+  // --- Final sign up on Step 2 ---------------------------------------------
+  const handleSignUp = async () => {
+    setMessage("");
+    setLoading(true);
     try {
       // Create user with Supabase Auth
       const { data, error } = await supabase.auth.signUp({
         email: formData.email,
-        password: Math.random().toString(36),
+        password: Math.random().toString(36), // temp random password
         options: {
           emailRedirectTo: `${window.location.origin}/accueil`,
           data: {
             name: formData.name,
             surname: formData.surname,
             user_type: formData.userType,
-            address: addressData.address,
-            city: addressData.city,
-            country: addressData.country,
-            latitude: addressData.latitude,
-            longitude: addressData.longitude,
-            postal_code: addressData.postalCode,
+            address: addressData?.address,
+            city: addressData?.city,
+            country: addressData?.country,
+            latitude: addressData?.latitude,
+            longitude: addressData?.longitude,
+            postal_code: addressData?.postalCode,
+            interests: Array.from(selectedInterests), // NEW: save interests in user metadata
           },
         },
       });
 
       if (error) {
         setMessage(`Erreur: ${error.message}`);
-      } else if (data.user) {
-        // Update profile via API
+        return;
+      }
+
+      if (data.user) {
+        // Create the profile in your DB
         const response = await fetch("/api/profiles", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -125,12 +200,13 @@ function SignupForm() {
             name: formData.name,
             surname: formData.surname,
             userType: formData.userType,
-            address: addressData.address,
-            city: addressData.city,
-            country: addressData.country,
-            latitude: addressData.latitude,
-            longitude: addressData.longitude,
-            postalCode: addressData.postalCode,
+            address: addressData?.address,
+            city: addressData?.city,
+            country: addressData?.country,
+            latitude: addressData?.latitude,
+            longitude: addressData?.longitude,
+            postalCode: addressData?.postalCode,
+            interests: Array.from(selectedInterests), // NEW: send to API
           }),
         });
 
@@ -138,18 +214,17 @@ function SignupForm() {
           console.error("Profile creation failed", await response.json());
         }
 
-        setMessage(
-          "Compte créé! Vérifiez votre email pour activer votre compte."
-        );
+        setMessage("Compte créé ! Vérifie ton e-mail pour activer ton compte.");
       }
-    } catch (error) {
-      setMessage("Une erreur inattendue s'est produite");
-      console.error("Signup error:", error);
+    } catch (err) {
+      console.error(err);
+      setMessage("Une erreur inattendue s'est produite.");
     } finally {
       setLoading(false);
     }
   };
 
+  // --- UI -------------------------------------------------------------------
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
       <div className="max-w-md w-full space-y-8">
@@ -170,7 +245,6 @@ function SignupForm() {
             />
 
             <div className="relative w-[203px] h-[101px] flex items-center justify-center">
-              {/* SVG background */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="203"
@@ -188,8 +262,6 @@ function SignupForm() {
                   mask="url(#path-1-inside-1_2147_3118)"
                 />
               </svg>
-
-              {/* Two lines of centered text */}
               <div className="absolute flex flex-col items-center justify-center text-center text-[#1A3A60] px-[10px]">
                 <span className="text-base leading-tight">Bienvenue !</span>
                 <span className="text-sm leading-tight">
@@ -198,153 +270,192 @@ function SignupForm() {
               </div>
             </div>
           </div>
-          {/* <h2 className="mt-6 text-center text-2xl font-extrabold text-gray-900">
-            Créer un compte
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Remplissez les informations ci-dessous
-          </p> */}
         </div>
 
-        <form className="mt-6 space-y-6" onSubmit={handleSignUp}>
-          <div className="space-y-5">
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Quel est ton e-mail?
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="mt-2 block w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-[#D4EEFFCC]"
-                placeholder="votre.email@example.com"
-                value={formData.email}
-                onChange={handleInputChange}
-                disabled={loading}
-              />
-            </div>
-
-            <div className="grid grid-cols-1  gap-4">
+        {/* STEP 1: Infos personnelles */}
+        {step === 1 && (
+          <div className="mt-6 space-y-6">
+            <div className="space-y-5">
               <div>
                 <label
-                  htmlFor="name"
+                  htmlFor="email"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Quel est ton prénom ?
+                  Quel est ton e-mail ?
                 </label>
                 <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  autoComplete="given-name"
-                  required
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
                   className="mt-2 block w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-[#D4EEFFCC]"
-                  placeholder="Votre prénom"
-                  value={formData.name}
+                  placeholder="votre.email@example.com"
+                  value={formData.email}
                   onChange={handleInputChange}
                   disabled={loading}
                 />
+                {errors.email && (
+                  <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                )}
               </div>
 
-              <div>
-                <label
-                  htmlFor="surname"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Quel est ton nom
-                </label>
-                <input
-                  id="surname"
-                  name="surname"
-                  type="text"
-                  autoComplete="family-name"
-                  required
-                  className="mt-2 block w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-[#D4EEFFCC]"
-                  placeholder="Votre nom de famille"
-                  value={formData.surname}
-                  onChange={handleInputChange}
-                  disabled={loading}
-                />
-              </div>
-            </div>
-
-            {/* <div>
-              <label
-                htmlFor="userType"
-                className="block text-sm font-medium text-gray-700"
-              >
-                {"Type d'utilisateur"} *
-              </label>
-              <select
-                id="userType"
-                name="userType"
-                required
-                className="mt-2 block w-full rounded-lg border border-gray-300 px-4 py-3 bg-white text-gray-900 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                value={formData.userType}
-                onChange={handleInputChange}
-                disabled={loading}
-              >
-                <option value="Professeur">Professeur</option>
-                <option value="Etudiant">Etudiant</option>
-              </select>
-            </div> */}
-
-            {/* Address Picker */}
-            <div>
-              <AddressPicker
-                onAddressSelect={handleAddressSelect}
-                // initialAddress=""
-              />
-              {addressData && (
-                <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-sm text-green-800">
-                    <strong>Adresse sélectionnée:</strong>
-                  </p>
-                  <p className="text-sm text-green-700 mt-1">
-                    {addressData.address}
-                  </p>
-                  <p className="text-xs text-green-600 mt-1">
-                    {addressData.city}, {addressData.country}{" "}
-                    {addressData.postalCode}
-                  </p>
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Quel est ton prénom ?
+                  </label>
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    autoComplete="given-name"
+                    className="mt-2 block w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-[#D4EEFFCC]"
+                    placeholder="Votre prénom"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    disabled={loading}
+                  />
+                  {errors.name && (
+                    <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                  )}
                 </div>
-              )}
+
+                <div>
+                  <label
+                    htmlFor="surname"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Quel est ton nom ?
+                  </label>
+                  <input
+                    id="surname"
+                    name="surname"
+                    type="text"
+                    autoComplete="family-name"
+                    className="mt-2 block w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-[#D4EEFFCC]"
+                    placeholder="Votre nom de famille"
+                    value={formData.surname}
+                    onChange={handleInputChange}
+                    disabled={loading}
+                  />
+                  {errors.surname && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.surname}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <AddressPicker onAddressSelect={handleAddressSelect} />
+                {errors.address && (
+                  <p className="mt-2 text-sm text-red-600">{errors.address}</p>
+                )}
+                {addressData && (
+                  <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm text-green-800">
+                      <strong>Adresse sélectionnée:</strong>
+                    </p>
+                    <p className="text-sm text-green-700 mt-1">
+                      {addressData.address}
+                    </p>
+                    <p className="text-xs text-green-600 mt-1">
+                      {addressData.city}, {addressData.country}{" "}
+                      {addressData.postalCode}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
 
-          <div>
-            <Button type="submit" variant="primary" disabled={loading}>
-              {loading ? "Vérification..." : "Créer le compte"}
-            </Button>
-          </div>
-
-          <div className="text-center">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => router.back()}
-            >
-              Retour
-            </Button>
-          </div>
-
-          {message && (
-            <div
-              className={`text-center text-sm p-3 rounded-lg ${
-                message.includes("Erreur")
-                  ? "bg-red-50 text-red-600 border border-red-200"
-                  : "bg-green-50 text-green-600 border border-green-200"
-              }`}
-            >
-              {message}
+            {/* Buttons for step 1 */}
+            <div className="flex justify-center">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={goNext}
+                disabled={loading}
+              >
+                Suivant
+              </Button>
             </div>
-          )}
-        </form>
+
+            {message && (
+              <div
+                className={`text-center text-sm p-3 rounded-lg ${
+                  message.includes("Erreur")
+                    ? "bg-red-50 text-red-600 border border-red-200"
+                    : "bg-green-50 text-green-600 border border-green-200"
+                }`}
+              >
+                {message}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* STEP 2: Interests + Create */}
+        {step === 2 && (
+          <div className="space-y-5">
+            <h2 className="text-lg font-semibold">
+              Quels sujets t’intéressent ?
+            </h2>
+            <div className="space-y-3">
+              <div className="space-y-3 mt-4">
+                {serverInterests?.map((interest) => (
+                  <label
+                    key={interest}
+                    className={`flex items-center gap-3 cursor-pointer rounded-xl border px-4 py-3 transition-all ${
+                      selectedInterests.includes(interest)
+                        ? "bg-blue-100 border-blue-500"
+                        : "bg-white border-gray-300 hover:border-gray-400"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      value={interest}
+                      checked={selectedInterests.includes(interest)}
+                      onChange={() => toggleInterest(interest)}
+                      className="h-5 w-5 accent-blue-600"
+                    />
+                    <span className="text-gray-800 font-medium">
+                      {interest}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-2">
+              <Button type="button" variant="ghost" onClick={goBack}>
+                Retour
+              </Button>
+              <Button
+                type="button"
+                variant="primary"
+                onClick={handleSignUp}
+                disabled={loading}
+              >
+                {loading ? "Création..." : "Créer le compte"}
+              </Button>
+            </div>
+
+            {message && (
+              <div
+                className={`text-center text-sm p-3 rounded-lg ${
+                  message.includes("Erreur")
+                    ? "bg-red-50 text-red-600 border border-red-200"
+                    : "bg-green-50 text-green-600 border border-green-200"
+                }`}
+              >
+                {message}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
