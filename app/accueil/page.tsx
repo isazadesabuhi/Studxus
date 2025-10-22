@@ -116,11 +116,6 @@ export default function Profile() {
     load();
   }, [router]);
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.push("/");
-  };
-
   return (
     <div className="min-h-screen max-w-[450px]">
       <div className="flex flex-col justify-center py-4 px-4">

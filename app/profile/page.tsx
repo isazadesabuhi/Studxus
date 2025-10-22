@@ -1,5 +1,8 @@
-// app/profile/page.tsx
+"use client";
 import Image from "next/image";
+import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
+
 import {
   ArrowLeft,
   Share2,
@@ -9,11 +12,19 @@ import {
   FolderClosed,
   ShieldCheck,
   Lock,
+  LogOut,
 } from "lucide-react";
 
 import avatar from "@/public/avatar.svg";
 
 export default function ProfilePage() {
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push("/");
+  };
+
   return (
     <main className="min-h-dvh bg-white text-neutral-900">
       {/* Safe width for mobile */}
@@ -35,10 +46,11 @@ export default function ProfilePage() {
               <Share2 className="h-5 w-5" />
             </button>
             <button
-              aria-label="Aide"
+              onClick={handleSignOut}
+              aria-label="Se déconnecter"
               className="rounded-full border border-neutral-200 p-2 active:scale-95"
             >
-              <HelpCircle className="h-5 w-5" />
+              <LogOut className="h-5 w-5" />
             </button>
           </div>
         </header>
