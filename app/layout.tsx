@@ -33,7 +33,7 @@ export default function RootLayout({
           className={`relative ${
             pathname === "/"
               ? "hidden"
-              : "block bg-repeat bg-[length:280px_120px]"
+              : "block bg-repeat w-full bg-[length:280px_120px]"
           }`}
           style={{ backgroundImage: `url(${motif_jeune.src})` }}
         >
