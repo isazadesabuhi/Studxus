@@ -26,13 +26,13 @@ export default function TabBar({ title, children }: TabBarProps) {
   const inactiveText = "text-gray-700";
 
   const items: {
-    id: "circle-star" | "search" | "courses" | "messages" | "account";
+    id: "circle-star" | "recherche" | "courses" | "messages" | "account";
     label: string;
     icon: IconType | null;
     href: string;
   }[] = [
     { id: "circle-star", label: "Accueil", icon: null, href: "/accueil" },
-    { id: "search", label: "Recherche", icon: Search, href: "/search" },
+    { id: "recherche", label: "Recherche", icon: Search, href: "/recherche" },
     { id: "courses", label: "Mes cours", icon: BookOpen, href: "/cours" },
     {
       id: "messages",

@@ -5,12 +5,18 @@ interface Props {
   onPrev: () => void;
   onNext: () => void;
   onUpdate: (updates: any) => void;
+  onSubmit: (shouldSubmit: boolean) => void; // New prop to trigger submission
 }
 
-export default function CourseFormStep3({ data, onPrev, onNext, onUpdate }: Props) {
+export default function CourseFormStep3({ data, onPrev, onNext, onUpdate, onSubmit }: Props) {
+  const handleSubmit = () => {
+    // Send true to parent to trigger course creation
+    onSubmit(true);
+  };
+
   return (
     <div>
-            {/* Barre de progression */}
+      {/* Barre de progression */}
       <ProgressBar step={3} />
       <h2 className="text-xl font-bold mb-4 text-blue-900">
         Choisissez votre tarif
@@ -56,7 +62,7 @@ export default function CourseFormStep3({ data, onPrev, onNext, onUpdate }: Prop
         Retour
       </button>
       <button
-        onClick={onNext}
+        onClick={handleSubmit}
         className="w-full bg-yellow-400 text-blue-900 py-3 rounded-xl font-semibold"
       >
         Proposer ce cours
