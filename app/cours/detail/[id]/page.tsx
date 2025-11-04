@@ -30,11 +30,23 @@ interface CourseDetail {
   } | null;
 }
 
+interface CourseSession {
+  id: string;
+  session_date: string;
+  start_time: string;
+  end_time: string;
+  location: string | null;
+  max_participants: number;
+  current_participants: number;
+}
+
 export default function CourseDetailPage() {
   const { id } = useParams();
   const router = useRouter();
   const [active, setActive] = useState<TabKey>("description");
   const [course, setCourse] = useState<CourseDetail | null>(null);
+  const [sessions, setSessions] = useState<CourseSession[]>([]);
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -75,6 +87,16 @@ export default function CourseDetailPage() {
         if (user && data.course.userId === user.id) {
           setIsOwner(true);
         }
+
+        // Fetch available sessions
+        const sessionsResponse = await fetch(`/api/courses/${id}/sessions`);
+        if (sessionsResponse.ok) {
+          const sessionsData = await sessionsResponse.json();
+          setSessions(sessionsData.sessions || []);
+          if (sessionsData.sessions && sessionsData.sessions.length > 0) {
+            setSelectedSessionId(sessionsData.sessions[0].id);
+          }
+        }
       } catch (err: any) {
         console.error("Error fetching course:", err);
         setError(err.message || "Une erreur s'est produite");
@@ -100,8 +122,14 @@ export default function CourseDetailPage() {
       return;
     }
 
-    // TODO: Implement booking functionality
-    alert("Fonctionnalité de réservation à venir !");
+    if (!selectedSessionId) {
+      alert("Veuillez sélectionner une date pour réserver");
+      setActive("date");
+      return;
+    }
+
+    // Redirect to reservation page
+    router.push(`/cours/reserver/${id}?sessionId=${selectedSessionId}`);
   };
 
   const handleEditCourse = () => {
@@ -321,8 +349,85 @@ export default function CourseDetailPage() {
               </div>
             </div>
           ) : active === "date" ? (
-            <div className="text-center text-gray-600 py-10">
-              📅 Calendrier des dates disponibles - Fonctionnalité à venir
+            <div className="px-2">
+              <h3 className="font-semibold text-gray-900 mb-4">
+                Prochaines dates
+              </h3>
+              {sessions.length === 0 ? (
+                <div className="text-center py-10 text-gray-500">
+                  <p>Aucune session disponible pour ce cours</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {sessions.map((session) => {
+                    const date = new Date(session.session_date);
+                    const days = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+                    const months = [
+                      "janv.",
+                      "févr.",
+                      "mars",
+                      "avr.",
+                      "mai",
+                      "juin",
+                      "juil.",
+                      "août",
+                      "sept.",
+                      "oct.",
+                      "nov.",
+                      "déc.",
+                    ];
+                    const dayName = days[date.getDay()];
+                    const dayNum = date.getDate();
+                    const monthName = months[date.getMonth()];
+                    const [hours, minutes] = session.start_time.split(":");
+                    const timeStr = `${hours}h${minutes}`;
+                    const isSelected = selectedSessionId === session.id;
+                    const isFull =
+                      session.current_participants >= session.max_participants;
+
+                    return (
+                      <div
+                        key={session.id}
+                        className={`flex items-center justify-between p-4 border-2 rounded-lg ${
+                          isSelected
+                            ? "border-blue-900 bg-blue-50"
+                            : "border-gray-200"
+                        } ${isFull ? "opacity-50" : "cursor-pointer hover:border-gray-300"}`}
+                        onClick={() => !isFull && setSelectedSessionId(session.id)}
+                      >
+                        <div className="flex-1">
+                          <p className="font-semibold text-gray-900">
+                            {dayName}, {dayNum} {monthName} {timeStr}
+                          </p>
+                          {session.location && (
+                            <p className="text-sm text-gray-600 mt-1">
+                              📍 {session.location}
+                            </p>
+                          )}
+                          {isFull && (
+                            <p className="text-sm text-red-600 mt-1">
+                              Complet ({session.current_participants}/
+                              {session.max_participants})
+                            </p>
+                          )}
+                        </div>
+                        <button
+                          className={`px-4 py-2 rounded-lg font-medium ${
+                            isSelected
+                              ? "bg-blue-900 text-white"
+                              : isFull
+                              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                          }`}
+                          disabled={isFull}
+                        >
+                          {isFull ? "Complet" : isSelected ? "Sélectionné" : "Réserver"}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           ) : (
             <div className="text-center text-gray-600 py-10">
@@ -336,9 +441,16 @@ export default function CourseDetailPage() {
           <div className="mt-6">
             <button
               onClick={handleBookCourse}
-              className="w-full bg-blue-900 text-white py-3 rounded-full font-semibold hover:bg-blue-800"
+              disabled={!selectedSessionId}
+              className={`w-full py-3 rounded-full font-semibold transition-all ${
+                selectedSessionId
+                  ? "bg-blue-900 text-white hover:bg-blue-800"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
             >
-              Réserver ce cours
+              {selectedSessionId
+                ? "Réserver ce cours"
+                : "Sélectionnez une date pour réserver"}
             </button>
           </div>
         )}

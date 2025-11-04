@@ -45,3 +45,6 @@ next-env.d.ts
 /lib/generated/prisma
 
 /lib/generated/prisma
+GUIDE_RESERVATION.md
+RESERVATION_README.md
+.gitignore

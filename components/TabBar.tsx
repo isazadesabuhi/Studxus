@@ -33,7 +33,7 @@ export default function TabBar({ title, children }: TabBarProps) {
   }[] = [
     { id: "circle-star", label: "Accueil", icon: null, href: "/accueil" },
     { id: "recherche", label: "Recherche", icon: Search, href: "/recherche" },
-    { id: "courses", label: "Mes cours", icon: BookOpen, href: "/cours" },
+    { id: "courses", label: "Mes cours", icon: BookOpen, href: "/cours/mes-cours" },
     {
       id: "messages",
       label: "Messages",
