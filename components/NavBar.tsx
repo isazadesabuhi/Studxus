@@ -26,7 +26,7 @@ export default function Navbar() {
           />
         </Link>
       </div>
-      <SlidingIconButton />
+      {/* <SlidingIconButton /> */}
     </nav>
   );
 }
