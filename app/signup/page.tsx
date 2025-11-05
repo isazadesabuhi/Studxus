@@ -262,7 +262,7 @@ function SignupForm() {
                   mask="url(#path-1-inside-1_2147_3118)"
                 />
               </svg>
-              <div className="absolute flex flex-col items-center justify-center text-center text-[#1A3A60] px-[10px]">
+              <div className="absolute flex flex-col items-center justify-center text-center text-primary px-[10px]">
                 <span className="text-base leading-tight">Bienvenue !</span>
                 <span className="text-sm leading-tight">
                   Pour commencer, j’ai quelques questions pour toi

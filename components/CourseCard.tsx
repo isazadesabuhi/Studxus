@@ -55,7 +55,7 @@ export default function CourseCard({ course, onDetails, onEdit }: Props) {
       <div className="flex items-start gap-4">
         {/* Left: Course Image with Teacher Avatar */}
         <div className="relative flex-shrink-0">
-          <div className="relative h-24 w-24 overflow-hidden rounded-2xl">
+          <div className="relative h-20 w-20 overflow-hidden rounded-2xl">
             <Image
               src={typeof image === "string" ? image : vba}
               alt={title}
@@ -106,7 +106,7 @@ export default function CourseCard({ course, onDetails, onEdit }: Props) {
               return (
                 <div
                   key={day}
-                  className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition-colors ${
+                  className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold transition-colors ${
                     isActive
                       ? "bg-slate-800 text-white"
                       : "bg-white text-slate-400"

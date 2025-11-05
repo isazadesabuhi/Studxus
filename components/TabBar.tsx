@@ -20,7 +20,7 @@ export default function TabBar({ title, children }: TabBarProps) {
   const pathname = usePathname();
 
   const itemBase =
-    "flex flex-col items-center justify-center gap-1 px-3 py-2 text-xs font-medium select-none";
+    "flex flex-col items-center justify-center  px-3 py-3 text-[10px] font-medium select-none";
   const labelBase = "leading-none";
   const inactiveIcon = "text-gray-700";
   const inactiveText = "text-gray-700";
@@ -68,12 +68,12 @@ export default function TabBar({ title, children }: TabBarProps) {
                     className={`absolute ${
                       active ? "text-gray-900" : inactiveIcon
                     }`}
-                    size={36}
+                    size={20}
                     strokeWidth={2.5}
                   />
                 ) : (
                   <svg
-                    className={`absolute h-9 w-9 ${
+                    className={`absolute h-7 w-7 ${
                       active ? "text-gray-900" : inactiveIcon
                     }`}
                     xmlns="http://www.w3.org/2000/svg"
@@ -90,7 +90,7 @@ export default function TabBar({ title, children }: TabBarProps) {
                 )}
               </span>
               <span
-                className={`${labelBase} ${
+                className={`z-10 ${labelBase} ${
                   active ? "text-gray-900" : inactiveText
                 }`}
               >
@@ -106,7 +106,7 @@ export default function TabBar({ title, children }: TabBarProps) {
 
 function SunStarBadge() {
   return (
-    <div className="absolute h-20 w-20">
+    <div className="absolute h-17 w-17">
       <svg
         viewBox="0 0 100 100"
         className="absolute inset-0 h-full w-full"

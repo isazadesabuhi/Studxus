@@ -1,6 +1,7 @@
 "use client";
 import { useRef } from "react";
 import CourseCard from "./RecommandationCard";
+import Heading from "./Heading";
 
 type Item = {
   id: string;
@@ -33,7 +34,9 @@ export default function CardCarousel({ items }: { items: Item[] }) {
   return (
     <div className="relative">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-2xl font-semibold">Recommandations</h2>
+       <Heading as="h4" underlined={true}>
+            Recommandations
+          </Heading>
         <div className="flex gap-2">
           <button
             onClick={() => scrollBy("left")}

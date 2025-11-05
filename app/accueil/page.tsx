@@ -8,6 +8,9 @@ import Link from "next/link";
 import CardCarousel from "@/components/CardRecommandation";
 import type { User } from "@supabase/supabase-js";
 import mascotte_v1 from "@/public/mascotte_v1.png";
+import vague from "@/public/wave2.png"; // ton image de vague bleue
+import Heading from "@/components/Heading";
+
 
 const demo = [
   {
@@ -117,81 +120,69 @@ export default function Profile() {
   }, [router]);
 
   return (
-    <div className="min-h-screen max-w-[450px]">
+    <div className="min-h-screen max-w-[450px] bg-gray-50">
       <div className="flex flex-col justify-center py-4 px-4">
         {profile && (
           <>
-            <div className="flex flex-row">
-              <Image
-                src={mascotte_v1}
-                width={160}
-                height={180}
-                alt="mascotte_v1"
-              />
+            <Heading as="h2" className="text-2xl text-primary font-semibold">Bonjour {profile.name}{" "}</Heading>
 
-              <div className="relative w-[203px] h-[101px] flex items-center justify-center">
-                {/* SVG background */}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="203"
-                  height="101"
-                  viewBox="0 0 203 101"
-                  fill="none"
-                  className="absolute inset-0"
-                >
-                  <mask id="path-1-inside-1_2147_3118" fill="white">
-                    <path d="M187 0C195.836 0 203 7.16344 203 16V79.8145C203 88.651 195.836 95.8145 187 95.8145H34.5701L3.10284 99.9968C1.51483 100.208 0.335531 98.5595 1.04803 97.1247L9.53916 80.0257C9.67643 79.7493 9.74786 79.4449 9.74786 79.1362V16C9.74786 7.16344 16.9113 0 25.7479 0H187Z" />
-                  </mask>
-                  <path
-                    d="M34.5701 95.8145V93.8145H34.4378L34.3066 93.8319L34.5701 95.8145ZM9.53916 80.0257L11.3305 80.9153L9.53916 80.0257ZM3.10284 99.9968L2.83933 98.0143L3.10284 99.9968ZM1.04803 97.1247L2.83933 98.0143L1.04803 97.1247ZM187 0V2C194.732 2 201 8.26801 201 16H203H205C205 6.05887 196.941 -2 187 -2V0ZM203 16H201V79.8145H203H205V16H203ZM203 79.8145H201C201 87.5464 194.732 93.8145 187 93.8145V95.8145V97.8145C196.941 97.8145 205 89.7556 205 79.8145H203ZM187 95.8145V93.8145H34.5701V95.8145V97.8145H187V95.8145ZM34.5701 95.8145L34.3066 93.8319L2.83933 98.0143L3.10284 99.9968L3.36634 101.979L34.8336 97.797L34.5701 95.8145ZM1.04803 97.1247L2.83933 98.0143L11.3305 80.9153L9.53916 80.0257L7.74786 79.1362L-0.743261 96.2352L1.04803 97.1247ZM9.74786 79.1362H11.7479V16H9.74786H7.74786V79.1362H9.74786ZM9.74786 16H11.7479C11.7479 8.26801 18.0159 2 25.7479 2V0V-2C15.8067 -2 7.74786 6.05887 7.74786 16H9.74786ZM25.7479 0V2H187V0V-2H25.7479V0ZM9.53916 80.0257L11.3305 80.9153C11.605 80.3624 11.7479 79.7535 11.7479 79.1362H9.74786H7.74786L9.53916 80.0257ZM3.10284 99.9968L2.83933 98.0143L2.83933 98.0143L1.04803 97.1247L-0.743261 96.2352C-2.16827 99.1048 0.190345 102.402 3.36634 101.979L3.10284 99.9968Z"
-                    fill="#FAB818"
-                    mask="url(#path-1-inside-1_2147_3118)"
-                  />
-                </svg>
+            <div className="flex relative flex-col items-center justify-center rounded-2xl  px-4 py-6 text-center shadow-sm bg-white">
 
-                {/* Two lines of centered text */}
-                <div className="absolute flex flex-col items-center justify-center text-center text-[#1A3A60] px-[10px]">
-                  <span className="text-base leading-tight">
-                    Bonjour {profile.name}{" "}
-                  </span>
-                  <span className="text-sm leading-tight">
-                    Prêt à apprendre et partager ?
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="flex justify-end w-full mt-[-50px]">
-              <div className="flex flex-col min-w-[25%]">
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  autoComplete="given-name"
-                  required
-                  className="mt-2 block rounded-[100px] border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  placeholder="Chercher un cours"
+
+              <div className="absolute z-0 top-0 left-0  w-50 h-full">
+                <Image
+                  src={vague}
+                  alt="Décor vague"
+                  fill
+                  className="object-cover rounded-2xl opacity-70"
                 />
-                <button className="mt-2 block rounded-[100px] border border-gray-300 px-4 py-3 text-[#FAB818] placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-[#1A3A60]">
-                  Proposer un cours
-                </button>
               </div>
+              <div className="flex flex-row w-full space-x-0 z-10">
+                <Image
+                  src={mascotte_v1}
+                  width={90}
+                  alt="mascotte_v1"
+                />
+
+                  {/* SVG background */}
+
+
+                  {/* Two lines of centered text */}
+                  <div className=" flex flex-col items-center h-full justify-center text-center text-primary px-[10px]">
+
+                    <span className="text-sm leading-tight">
+                      Prêt à apprendre et partager ?
+                    </span>
+
+                    <input
+                      id="name"
+                      name="name"
+                      type="text"
+                      autoComplete="given-name"
+                      required
+                      className="mt-2 block rounded-[100px] border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      placeholder="Chercher un cours"
+                    />
+                  </div>
+                </div>
             </div>
+
           </>
         )}
-      </div>
-      <Link
-        href="/"
-        className="border-b-1 text-[#1A3A60] font-semibold
-"
-      >
-        Tes prochains cours
-      </Link>
-      {/* Cours */}
-      <p className="text-center text-[#1A3A60] pt-5">
-        Tu n’as pas encore réservé de cours
-      </p>
-      <div className="pt-5">
-        <CardCarousel items={demo} />
+        <Link
+          href="/">
+          <Heading as="h4" underlined={true}>
+            Tes prochains cours
+          </Heading>
+        </Link>
+        {/* Cours */}
+        <p className="text-center text-primary pt-5">
+          Tu n’as pas encore réservé de cours
+        </p>
+        <div className="pt-5">
+          <CardCarousel items={demo} />
+        </div>
+
       </div>
     </div>
   );
