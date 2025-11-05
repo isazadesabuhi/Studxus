@@ -185,7 +185,7 @@ export default function AddressPicker({ onAddressSelect }: AddressPickerProps) {
     <div ref={containerRef} className="w-full space-y-2">
       <label
         htmlFor="address"
-        className="block text-sm font-medium text-gray-700"
+        className="block text-sm font-medium text-gray-700 text-left"
       >
         Adresse
       </label>

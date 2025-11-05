@@ -42,7 +42,9 @@ export default function ReservationPage() {
   const [step, setStep] = useState(1);
   const [course, setCourse] = useState<CourseDetail | null>(null);
   const [sessions, setSessions] = useState<CourseSession[]>([]);
-  const [selectedSession, setSelectedSession] = useState<CourseSession | null>(null);
+  const [selectedSession, setSelectedSession] = useState<CourseSession | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -83,7 +85,9 @@ export default function ReservationPage() {
         setCourse(courseData.course);
 
         // Fetch sessions
-        const sessionsResponse = await fetch(`/api/courses/${courseId}/sessions`);
+        const sessionsResponse = await fetch(
+          `/api/courses/${courseId}/sessions`
+        );
         if (!sessionsResponse.ok) {
           throw new Error("Erreur lors du chargement des sessions");
         }
@@ -197,9 +201,7 @@ export default function ReservationPage() {
       }
 
       // Redirect to confirmation page
-      router.push(
-        `/cours/reserver/confirmation?bookingId=${data.booking.id}`
-      );
+      router.push(`/cours/reserver/confirmation?bookingId=${data.booking.id}`);
     } catch (err: any) {
       alert(err.message || "Erreur lors de la réservation");
     }
@@ -282,4 +284,3 @@ export default function ReservationPage() {
     </main>
   );
 }
-
