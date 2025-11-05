@@ -279,7 +279,7 @@ function SignupForm() {
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-gray-700 text-left"
                 >
                   Quel est ton e-mail ?
                 </label>
@@ -303,7 +303,7 @@ function SignupForm() {
                 <div>
                   <label
                     htmlFor="name"
-                    className="block text-sm font-medium text-gray-700"
+                    className="block text-sm font-medium text-gray-700 text-left"
                   >
                     Quel est ton prénom ?
                   </label>
@@ -326,7 +326,7 @@ function SignupForm() {
                 <div>
                   <label
                     htmlFor="surname"
-                    className="block text-sm font-medium text-gray-700"
+                    className="block text-sm font-medium text-gray-700 text-left"
                   >
                     Quel est ton nom ?
                   </label>

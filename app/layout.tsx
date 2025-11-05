@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import Navbar from "@/components/NavBar";
 const inter = Inter({ subsets: ["latin"] });
 import motif_jeune from "@/public/motif_jaune.png";
-import path from "path";
 import TabBar from "@/components/TabBar";
 
 export default function RootLayout({
@@ -21,36 +20,33 @@ export default function RootLayout({
       <body
         className={`${inter.className} flex flex-col items-center min-h-screen pb-10`}
       >
+        {/* Navbar - hidden on home page */}
         <div
-          className={`w-full max-w-[450px] xs:mx-auto relative" ${
+          className={`w-full max-w-[450px] xs:mx-auto relative ${
             pathname === "/" ? "hidden" : "block"
           }`}
         >
           <Navbar />
         </div>
 
+        {/* Main content with motif_jeune background for all pages */}
         <div
-          className={`relative ${
-            pathname === "/"
-              ? "hidden"
-              : "block bg-repeat w-full bg-[length:280px_120px]"
-          }`}
+          className="relative block bg-repeat w-full bg-[length:280px_120px] min-h-screen max-w-[450px]"
           style={{ backgroundImage: `url(${motif_jeune.src})` }}
         >
           {/* Overlay */}
-          {<div className="absolute inset-0 bg-white/90"></div>}
+          <div className="absolute inset-0 bg-white/90"></div>
 
           {/* Content */}
           <div className="w-full sm:max-w-[450px] sm:mx-auto sm:text-center relative z-10">
             {children}
           </div>
         </div>
+
+        {/* TabBar */}
         <div className="z-99 relative max-w-[450px] w-full">
           <TabBar />
         </div>
-
-        {/* Show content normally on home page */}
-        {pathname === "/" && <div>{children}</div>}
       </body>
     </html>
   );

@@ -10,9 +10,9 @@ export default function Navbar() {
   return (
     <nav className="flex items-center justify-between px-4 py-3 bg-white shadow-md">
       {/* Left: Burger Icon */}
-      <button className="p-2 rounded-md hover:bg-gray-100">
+      {/* <button className="p-2 rounded-md hover:bg-gray-100">
         <Menu className="h-6 w-6 text-gray-700" />
-      </button>
+      </button> */}
 
       {/* Center: Logo */}
       <div className="flex justify-center flex-1">

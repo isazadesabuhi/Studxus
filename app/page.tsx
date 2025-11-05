@@ -80,7 +80,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
+    <div className="min-h-screen flex items-center justify-center p-6">
       <div className="max-w-md w-full space-y-8 text-center">
         <div>
           <h2 className="mt-6 text-2xl font-extrabold text-gray-900">
@@ -102,7 +102,7 @@ export default function Home() {
           // --- START BUTTON ---
           <div className="flex justify-center mt-8">
             <Button onClick={() => setShowForm(true)} variant="primary">
-              Continuer avec mon e-mail
+              Commencer
             </Button>
           </div>
         ) : (
@@ -112,7 +112,7 @@ export default function Home() {
             className={`mt-8 space-y-6 transform transition-all duration-1000 ease-in-out 
               ${showForm ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}
           >
-            <div className="bg-[#D4EEFF] rounded-t-[4px] border-b-1">
+            <div className="rounded-t-[4px] border-b-1">
               <label htmlFor="email" className="sr-only">
                 Adresse email
               </label>
