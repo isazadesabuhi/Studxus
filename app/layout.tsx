@@ -31,7 +31,7 @@ export default function RootLayout({
 
         {/* Main content with motif_jeune background for all pages */}
         <div
-          className="relative block bg-repeat w-full bg-[length:280px_120px] min-h-screen max-w-[450px]"
+          className="relative block bg-repeat w-full bg-[length:280px_120px] pt-16 min-h-screen max-w-[450px]"
           style={{ backgroundImage: `url(${motif_jeune.src})` }}
         >
           {/* Overlay */}

@@ -10,6 +10,7 @@ import type { User } from "@supabase/supabase-js";
 import mascotte_v1 from "@/public/mascotte_v1.png";
 import vague from "@/public/wave2.png"; // ton image de vague bleue
 import Heading from "@/components/Heading";
+import { UserProfile } from "../types/UserProfile";
 
 
 const demo = [
@@ -65,20 +66,7 @@ const demo = [
   // add more…
 ];
 
-interface UserProfile {
-  id: string;
-  email: string;
-  name: string;
-  surname: string;
-  user_type: "Professeur" | "Etudiant";
-  address?: string;
-  city?: string;
-  country?: string;
-  latitude?: number;
-  longitude?: number;
-  postal_code?: string;
-  created_at: string;
-}
+
 
 export default function Profile() {
   const [user, setUser] = useState<User | null>(null);
@@ -160,7 +148,11 @@ export default function Profile() {
                       type="text"
                       autoComplete="given-name"
                       required
-                      className="mt-2 block rounded-[100px] border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      className="mt-2 block 
+                      rounded-[100px] border
+                       border-gray-300 px-3 py-2
+                       placeholder:text-xs 
+                        text-gray-900 placeholder-gray-400 focus:border-primary focus:ring-primary sm:text-xs"
                       placeholder="Chercher un cours"
                     />
                   </div>

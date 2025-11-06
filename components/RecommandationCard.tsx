@@ -66,7 +66,7 @@ export default function CourseCard(props: CourseCardProps) {
           <svg
             viewBox="0 0 24 24"
             className={join(
-              "h-8 w-8 drop-shadow-sm",
+              "h-6 w-6 drop-shadow-sm",
               liked ? "fill-white" : "fill-transparent",
               "stroke-white stroke-[2]"
             )}
@@ -76,10 +76,10 @@ export default function CourseCard(props: CourseCardProps) {
         </button>
 
         <div className="">
-          <Heading as="h3" >
+          <Heading as="h3" color="white" >
             {title}
           </Heading>
-          <Heading as="h4" >
+          <Heading as="h5" color="white">
             {subtitle}
           </Heading>
         </div>

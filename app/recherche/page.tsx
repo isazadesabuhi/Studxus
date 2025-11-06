@@ -156,7 +156,7 @@ export default function SearchPage() {
   }
 
   return (
-    <div className="flex flex-col justify-center px-4 pb-20">
+    <div className="flex flex-col justify-center px-4 pb-20  bg-gray-50">
       {/* Search Bar */}
       <div className="mb-4">
         <input
@@ -166,7 +166,7 @@ export default function SearchPage() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Rechercher un cours..."
-          className="w-full mt-2 block rounded-[100px] border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          className="w-full placeholder:text-sm  mt-2 block rounded-[100px] border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
         />
       </div>
 
@@ -176,7 +176,7 @@ export default function SearchPage() {
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+          className="flex-1 rounded-lg border text-primary border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-primary"
         >
           <option value="all">Toutes les catégories</option>
           {categories.map((category) => (
@@ -190,7 +190,7 @@ export default function SearchPage() {
         <select
           value={selectedLevel}
           onChange={(e) => setSelectedLevel(e.target.value)}
-          className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+          className="flex-1 rounded-lg border text-primary border-gray-300 px-3 py-2 text-sm focus:border-primary focus:ring-primary"
         >
           <option value="all">Tous les niveaux</option>
           {levels.map((level) => (

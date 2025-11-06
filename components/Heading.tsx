@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 
 type HeadingProps = {
-    as?: "h1" | "h2" | "h3" | "h4";
+    as?: "h1" | "h2" | "h3" | "h4"| "h5";
     color?: "primary" | "secondary" | "white" | "gray";
     align?: "left" | "center" | "right";
     underlined?: boolean;
@@ -26,7 +26,8 @@ export default function Heading({
         h1: "text-3xl sm:text-4xl mb-4",
         h2: "text-2xl sm:text-3xl mb-3",
         h3: "text-xl sm:text-2xl mb-2",
-        h4: "text-l sm:text-xl mb-1",
+        h4: "text-lg sm:text-xl mb-1",
+        h5: "text-sm sm:text-lg mb-1",
     };
 
     const colors = {
