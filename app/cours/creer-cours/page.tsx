@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import CourseFormStep1 from "@/components/CourseFormStep1";
@@ -13,13 +13,15 @@ export default function CreateCoursePage() {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
 
   const [formData, setFormData] = useState({
     title: "",
     shortDesc: "",
     description: "",
     maxParticipants: 5,
-    category: "Informatique",
+    category: "",
 
     // Champs utilisés dans Step 2
     date: "",
@@ -29,6 +31,42 @@ export default function CreateCoursePage() {
     level: "Tous niveaux",
     price: 10,
   });
+
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      setCategoriesLoading(true);
+      try {
+        const response = await fetch("/api/users/interests", {
+          method: "GET",
+          headers: { Accept: "application/json" },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch categories");
+        }
+
+        const data = await response.json();
+        const availableCategories = data?.available_interests || [];
+        setCategories(availableCategories);
+
+        // Set first category as default if available
+        if (availableCategories.length > 0 && !formData.category) {
+          setFormData((prev) => ({
+            ...prev,
+            category: availableCategories[0],
+          }));
+        }
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+        setError("Impossible de charger les catégories");
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const nextStep = () => setStep((prev) => Math.min(prev + 1, 4));
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
@@ -110,11 +148,20 @@ export default function CreateCoursePage() {
         </div>
       )}
 
+      {/* Show loading state for categories */}
+      {categoriesLoading && step === 1 && (
+        <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+          <p className="text-sm text-gray-600">Chargement des catégories...</p>
+        </div>
+      )}
+
       {step === 1 && (
         <CourseFormStep1
           data={formData}
           onNext={nextStep}
           onUpdate={updateFormData}
+          categories={categories}
+          categoriesLoading={categoriesLoading}
         />
       )}
       {step === 2 && (
