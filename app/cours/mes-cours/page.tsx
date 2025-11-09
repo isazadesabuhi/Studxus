@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import CourseCard, { type Course } from "@/components/CourseCard";
@@ -57,7 +57,8 @@ interface Booking {
   } | null;
 }
 
-export default function MyCoursesPage() {
+// Create a separate component that uses useSearchParams
+function MyCoursesContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<TabKey>(
@@ -83,7 +84,7 @@ export default function MyCoursesPage() {
         } = await supabase.auth.getUser();
 
         if (userError || !user) {
-          router.push("/"); // Redirect to login if not authenticated
+          router.push("/");
           return;
         }
 
@@ -142,8 +143,6 @@ export default function MyCoursesPage() {
 
   const handleEdit = (id: string) => {
     console.log("Edit course:", id);
-    // TODO: Implement edit functionality
-    // router.push(`/cours/modifier/${id}`);
   };
 
   const handleDelete = async (id: string) => {
@@ -158,7 +157,6 @@ export default function MyCoursesPage() {
         throw new Error("Session expirée");
       }
 
-      // TODO: Implement DELETE endpoint
       const response = await fetch(`/api/courses/${id}`, {
         method: "DELETE",
         headers: {
@@ -170,7 +168,6 @@ export default function MyCoursesPage() {
         throw new Error("Échec de la suppression");
       }
 
-      // Remove from state
       setCourses(courses.filter((c) => c.id !== id));
       alert("Cours supprimé avec succès");
     } catch (err: any) {
@@ -178,7 +175,6 @@ export default function MyCoursesPage() {
     }
   };
 
-  // Transform API data to CourseCard format
   const transformToCourseCard = (apiCourse: APICourse): Course => {
     return {
       id: apiCourse.id,
@@ -187,7 +183,7 @@ export default function MyCoursesPage() {
       wednesday: `Max participants: ${apiCourse.maxParticipants}`,
       level: apiCourse.level,
       price: `${apiCourse.pricePerHour}€/h`,
-      image: "/vba.jpg", // Default image
+      image: "/vba.jpg",
     };
   };
 
@@ -253,8 +249,6 @@ export default function MyCoursesPage() {
     return `${hours}h${minutes}`;
   };
 
-  // Afficher toutes les réservations (pending, confirmed, paid)
-  // Exclure seulement cancelled et completed
   const reservedBookings = bookings.filter(
     (b) => b && b.status && b.status !== "cancelled" && b.status !== "completed"
   );
@@ -296,7 +290,6 @@ export default function MyCoursesPage() {
       {/* Content */}
       <div className="p-4">
         {activeTab === "reserved" ? (
-          /* Reserved Bookings */
           reservedBookings.length === 0 ? (
             <div className="text-center py-10">
               <p className="text-gray-600 mb-4">
@@ -384,8 +377,7 @@ export default function MyCoursesPage() {
               ))}
             </div>
           )
-        ) : /* Programmed Courses (courses created by user) */
-        courses.length === 0 ? (
+        ) : courses.length === 0 ? (
           <div className="text-center py-10">
             <p className="text-gray-600 mb-4">
               Vous n'avez pas encore créé de cours
@@ -407,7 +399,6 @@ export default function MyCoursesPage() {
                   onEdit={handleEdit}
                 />
 
-                {/* Additional course info */}
                 <div className="mt-2 px-4 py-2 bg-gray-50 rounded-lg text-sm">
                   <p className="text-gray-700">
                     <span className="font-semibold">Catégorie:</span>{" "}
@@ -419,7 +410,6 @@ export default function MyCoursesPage() {
                   </p>
                 </div>
 
-                {/* Delete button */}
                 <button
                   onClick={() => handleDelete(course.id)}
                   className="mt-2 w-full text-red-600 text-sm py-2 border border-red-600 rounded-full hover:bg-red-50"
@@ -432,7 +422,6 @@ export default function MyCoursesPage() {
         )}
       </div>
 
-      {/* Floating Create Button (only for programmed tab) */}
       {activeTab === "programmed" && courses.length > 0 && (
         <div className="fixed bottom-20 left-0 right-0 mx-auto max-w-[450px]">
           <div className="pointer-events-none absolute inset-0 h-32 bg-gradient-to-t from-white via-white/90 to-transparent"></div>
@@ -448,5 +437,26 @@ export default function MyCoursesPage() {
         </div>
       )}
     </main>
+  );
+}
+
+// Loading fallback component
+function MyCoursesLoading() {
+  return (
+    <main className="relative mx-auto max-w-[450px] p-4">
+      <div className="text-center py-10">
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        <p className="mt-4 text-gray-600">Chargement...</p>
+      </div>
+    </main>
+  );
+}
+
+// Main exported component wrapped in Suspense
+export default function MyCoursesPage() {
+  return (
+    <Suspense fallback={<MyCoursesLoading />}>
+      <MyCoursesContent />
+    </Suspense>
   );
 }

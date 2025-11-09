@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Image from "next/image";
@@ -30,7 +30,8 @@ interface BookingDetail {
   } | null;
 }
 
-export default function ConfirmationPage() {
+// Create a separate component that uses useSearchParams
+function ConfirmationContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const bookingId = searchParams.get("bookingId");
@@ -105,7 +106,9 @@ export default function ConfirmationPage() {
       "novembre",
       "décembre",
     ];
-    return `${days[date.getDay()]} ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+    return `${days[date.getDay()]} ${date.getDate()} ${
+      months[date.getMonth()]
+    } ${date.getFullYear()}`;
   };
 
   const formatTime = (timeString: string) => {
@@ -128,7 +131,9 @@ export default function ConfirmationPage() {
     return (
       <main className="mx-auto max-w-screen-sm bg-white min-h-screen">
         <div className="p-6 text-center">
-          <p className="text-red-600 mb-4">{error || "Réservation introuvable"}</p>
+          <p className="text-red-600 mb-4">
+            {error || "Réservation introuvable"}
+          </p>
           <button
             onClick={() => router.push("/cours")}
             className="px-4 py-2 bg-blue-900 text-white rounded-lg"
@@ -170,7 +175,9 @@ export default function ConfirmationPage() {
 
         {/* Summary */}
         <div className="bg-white border-2 border-gray-200 rounded-lg p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Récapitulatif</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">
+            Récapitulatif
+          </h2>
           <div className="space-y-3">
             <div className="flex justify-between">
               <span className="text-gray-600">Intitulé du cours:</span>
@@ -270,3 +277,23 @@ export default function ConfirmationPage() {
   );
 }
 
+// Loading fallback component
+function ConfirmationLoading() {
+  return (
+    <main className="mx-auto max-w-screen-sm bg-white min-h-screen">
+      <div className="p-6 text-center">
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        <p className="mt-4 text-gray-600">Chargement...</p>
+      </div>
+    </main>
+  );
+}
+
+// Main exported component wrapped in Suspense
+export default function ConfirmationPage() {
+  return (
+    <Suspense fallback={<ConfirmationLoading />}>
+      <ConfirmationContent />
+    </Suspense>
+  );
+}
