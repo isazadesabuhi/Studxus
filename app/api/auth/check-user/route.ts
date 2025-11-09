@@ -1,12 +1,20 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-// ⚠️ CRITICAL: Use service_role key, NOT anon key
-// This should ONLY be used in server-side code (API routes)
-// NEVER expose service_role key to the frontend
+// Check if environment variables are present
+if (
+  !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  !process.env.SUPABASE_SERVICE_ROLE_KEY
+) {
+  console.error("Missing environment variables:", {
+    url: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+    key: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+  });
+}
+
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!, // 🔑 Service role key
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
   {
     auth: {
       autoRefreshToken: false,
@@ -15,16 +23,11 @@ const supabaseAdmin = createClient(
   }
 );
 
-/**
- * Check if a user exists by email
- * Uses service role to safely query auth.users
- */
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { email } = body;
 
-    // Validate input
     if (!email || typeof email !== "string") {
       return NextResponse.json(
         { error: "Email is required and must be a string" },
@@ -32,7 +35,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Basic email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json(
@@ -41,18 +43,20 @@ export async function POST(req: Request) {
       );
     }
 
-    // Query auth.users using service role (has permission)
     const { data, error } = await supabaseAdmin.auth.admin.listUsers();
 
     if (error) {
-      console.error("Error checking user:", error);
+      console.error("Supabase error:", error);
       return NextResponse.json(
-        { error: "Failed to check user existence" },
+        {
+          error: "Failed to check user existence",
+          details:
+            process.env.NODE_ENV === "development" ? error.message : undefined,
+        },
         { status: 500 }
       );
     }
 
-    // Check if user exists with this email
     const userExists = data.users.some(
       (user) => user.email?.toLowerCase() === email.toLowerCase()
     );
@@ -64,13 +68,16 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("Unexpected error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        error: "Internal server error",
+        details:
+          process.env.NODE_ENV === "development" ? String(error) : undefined,
+      },
       { status: 500 }
     );
   }
 }
 
-// Alternative: GET method for query parameter approach
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
@@ -83,7 +90,6 @@ export async function GET(req: Request) {
       );
     }
 
-    // Basic email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json(
@@ -92,18 +98,20 @@ export async function GET(req: Request) {
       );
     }
 
-    // Query auth.users using service role
     const { data, error } = await supabaseAdmin.auth.admin.listUsers();
 
     if (error) {
-      console.error("Error checking user:", error);
+      console.error("Supabase error:", error);
       return NextResponse.json(
-        { error: "Failed to check user existence" },
+        {
+          error: "Failed to check user existence",
+          details:
+            process.env.NODE_ENV === "development" ? error.message : undefined,
+        },
         { status: 500 }
       );
     }
 
-    // Check if user exists
     const userExists = data.users.some(
       (user) => user.email?.toLowerCase() === email.toLowerCase()
     );
@@ -115,7 +123,11 @@ export async function GET(req: Request) {
   } catch (error) {
     console.error("Unexpected error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        error: "Internal server error",
+        details:
+          process.env.NODE_ENV === "development" ? String(error) : undefined,
+      },
       { status: 500 }
     );
   }
