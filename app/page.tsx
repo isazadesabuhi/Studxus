@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import Button from "../components/Buttons";
+import mascotte3 from "@/public/mascotte3.svg";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -94,10 +95,22 @@ export default function Home() {
             alt="Logo"
           />
           <h2 className="mt-6 font-normal text-gray-900">
-            Ton réseau pour apprendre et partager
+            {showForm ? (
+              <>
+                Incription/Connexion <br /> Merci de renseigner ton e-mail
+              </>
+            ) : (
+              "Ton réseau pour apprendre et partager"
+            )}
           </h2>
         </div>
-
+        {!showForm && (
+          <Image
+            src={mascotte3}
+            alt="Mascotte"
+            className="mx-auto h-50 w-auto"
+          />
+        )}
         {!showForm ? (
           // --- START BUTTON ---
           <div className="flex justify-center mt-8">
