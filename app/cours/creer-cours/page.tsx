@@ -177,13 +177,12 @@ export default function CreateCoursePage() {
       {step === 3 && (
         <CourseFormStep3
           data={formData}
-          onNext={nextStep}
           onPrev={prevStep}
           onUpdate={updateFormData}
           onSubmit={handleCourseSubmit}
         />
       )}
-      {step === 4 && <CourseFormRecap data={formData} />}
+      {step === 4 && <CourseFormRecap />}
     </main>
   );
 }

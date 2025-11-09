@@ -36,7 +36,6 @@ export default function CourseCard({ course, onDetails, onEdit }: Props) {
     level = "Débutant",
     price = "0€",
     image = vba,
-    category = "Non catégorisé",
     teacherName = "Enseignant",
     rating = 4.0,
     distance = 0,

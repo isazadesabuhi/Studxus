@@ -1,4 +1,3 @@
-import { useState } from "react";
 import ProgressBar from "./ProgressBar";
 
 interface Props {
@@ -9,12 +8,12 @@ interface Props {
   categoriesLoading: boolean;
 }
 
-export default function CourseFormStep1({ 
-  data, 
-  onNext, 
+export default function CourseFormStep1({
+  data,
+  onNext,
   onUpdate,
   categories,
-  categoriesLoading 
+  categoriesLoading,
 }: Props) {
   return (
     <div>
@@ -24,7 +23,9 @@ export default function CourseFormStep1({
         Définissez le sujet de votre cours
       </h2>
 
-      <label className="block text-sm font-semibold mb-1">Intitulé du cours</label>
+      <label className="block text-sm font-semibold mb-1">
+        Intitulé du cours
+      </label>
       <input
         type="text"
         value={data.title}

@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 
-export default function CourseFormRecap({ data }: { data: any }) {
+export default function CourseFormRecap() {
   const router = useRouter();
 
   return (

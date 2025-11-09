@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode, ComponentType } from "react";
+import type { ComponentType } from "react";
 import { Search, BookOpen, MessageSquare, User2 } from "lucide-react";
 
 type IconType = ComponentType<{
@@ -11,12 +11,7 @@ type IconType = ComponentType<{
   strokeWidth?: number;
 }>;
 
-type TabBarProps = {
-  title?: string;
-  children?: ReactNode;
-};
-
-export default function TabBar({ title, children }: TabBarProps) {
+export default function TabBar() {
   const pathname = usePathname();
 
   const itemBase =
@@ -33,7 +28,12 @@ export default function TabBar({ title, children }: TabBarProps) {
   }[] = [
     { id: "circle-star", label: "Accueil", icon: null, href: "/accueil" },
     { id: "recherche", label: "Recherche", icon: Search, href: "/recherche" },
-    { id: "courses", label: "Mes cours", icon: BookOpen, href: "/cours/mes-cours" },
+    {
+      id: "courses",
+      label: "Mes cours",
+      icon: BookOpen,
+      href: "/cours/mes-cours",
+    },
     {
       id: "messages",
       label: "Messages",

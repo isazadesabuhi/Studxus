@@ -108,12 +108,12 @@ export async function GET(
       conversation: {
         id: conversation.id,
         otherUser: {
-          id: otherUser?.user.id,
-          email: otherUser?.user.email,
-          name: otherUser?.user.user_metadata?.name,
-          surname: otherUser?.user.user_metadata?.surname,
-          fullName: `${otherUser?.user.user_metadata?.name || ""} ${
-            otherUser?.user.user_metadata?.surname || ""
+          id: otherUser?.user?.id ?? null,
+          email: otherUser?.user?.email ?? null,
+          name: otherUser?.user?.user_metadata?.name ?? null,
+          surname: otherUser?.user?.user_metadata?.surname ?? null,
+          fullName: `${otherUser?.user?.user_metadata?.name || ""} ${
+            otherUser?.user?.user_metadata?.surname || ""
           }`.trim(),
         },
       },
