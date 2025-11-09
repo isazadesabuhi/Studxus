@@ -1,7 +1,7 @@
 // components/Button.tsx
 import React, { ButtonHTMLAttributes, ReactNode } from "react";
 
-type ButtonVariant = "primary" | "secondary" | "alternative";
+type ButtonVariant = "primary" | "secondary" | "alternative" | "ghost";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
@@ -25,6 +25,7 @@ const Button: React.FC<ButtonProps> = ({
     primary: "bg-[#1A3A60] text-[#FAB818] border-transparent",
     secondary: "bg-white text-primary border-2 border-primary",
     alternative: "bg-alternative text-black border-transparent",
+    ghost: "bg-transparent hover:bg-gray-100",
   };
 
   return (

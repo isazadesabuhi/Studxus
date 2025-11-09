@@ -119,7 +119,10 @@ export default function MyCoursesPage() {
             console.log("Bookings fetched:", bookingsData.bookings);
             setBookings(bookingsData.bookings || []);
           } else {
-            console.error("Failed to fetch bookings:", await bookingsResponse.text());
+            console.error(
+              "Failed to fetch bookings:",
+              await bookingsResponse.text()
+            );
           }
         }
       } catch (err: any) {
@@ -217,7 +220,15 @@ export default function MyCoursesPage() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    const days = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+    const days = [
+      "Dimanche",
+      "Lundi",
+      "Mardi",
+      "Mercredi",
+      "Jeudi",
+      "Vendredi",
+      "Samedi",
+    ];
     const months = [
       "janvier",
       "février",
@@ -232,7 +243,9 @@ export default function MyCoursesPage() {
       "novembre",
       "décembre",
     ];
-    return `${days[date.getDay()]} ${date.getDate()} ${months[date.getMonth()]}`;
+    return `${days[date.getDay()]} ${date.getDate()} ${
+      months[date.getMonth()]
+    }`;
   };
 
   const formatTime = (timeString: string) => {
@@ -355,7 +368,12 @@ export default function MyCoursesPage() {
                         )}
                         <div className="flex items-center gap-2 mt-2">
                           <span className="text-xs text-gray-500">
-                            Statut: {booking.status === "paid" ? "Payé" : booking.status === "pending" ? "En attente" : booking.status}
+                            Statut:{" "}
+                            {booking.status === "paid"
+                              ? "Payé"
+                              : booking.status === "pending"
+                              ? "En attente"
+                              : booking.status}
                           </span>
                         </div>
                       </div>
@@ -366,53 +384,51 @@ export default function MyCoursesPage() {
               ))}
             </div>
           )
+        ) : /* Programmed Courses (courses created by user) */
+        courses.length === 0 ? (
+          <div className="text-center py-10">
+            <p className="text-gray-600 mb-4">
+              Vous n'avez pas encore créé de cours
+            </p>
+            <button
+              onClick={() => router.push("/cours/creer-cours")}
+              className="inline-flex items-center justify-center rounded-full bg-slate-900 px-6 py-3 text-sm font-bold text-amber-400 hover:bg-slate-800"
+            >
+              Créer mon premier cours
+            </button>
+          </div>
         ) : (
-          /* Programmed Courses (courses created by user) */
-          courses.length === 0 ? (
-            <div className="text-center py-10">
-              <p className="text-gray-600 mb-4">
-                Vous n'avez pas encore créé de cours
-              </p>
-              <button
-                onClick={() => router.push("/cours/creer-cours")}
-                className="inline-flex items-center justify-center rounded-full bg-slate-900 px-6 py-3 text-sm font-bold text-amber-400 hover:bg-slate-800"
-              >
-                Créer mon premier cours
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-4">
-              {courses.map((course) => (
-                <div key={course.id} className="relative">
-                  <CourseCard
-                    course={transformToCourseCard(course)}
-                    onDetails={handleDetails}
-                    onEdit={handleEdit}
-                  />
+          <div className="grid grid-cols-1 gap-4">
+            {courses.map((course) => (
+              <div key={course.id} className="relative">
+                <CourseCard
+                  course={transformToCourseCard(course)}
+                  onDetails={handleDetails}
+                  onEdit={handleEdit}
+                />
 
-                  {/* Additional course info */}
-                  <div className="mt-2 px-4 py-2 bg-gray-50 rounded-lg text-sm">
-                    <p className="text-gray-700">
-                      <span className="font-semibold">Catégorie:</span>{" "}
-                      {course.category}
-                    </p>
-                    <p className="text-gray-700">
-                      <span className="font-semibold">Créé le:</span>{" "}
-                      {new Date(course.createdAt).toLocaleDateString("fr-FR")}
-                    </p>
-                  </div>
-
-                  {/* Delete button */}
-                  <button
-                    onClick={() => handleDelete(course.id)}
-                    className="mt-2 w-full text-red-600 text-sm py-2 border border-red-600 rounded-full hover:bg-red-50"
-                  >
-                    Supprimer ce cours
-                  </button>
+                {/* Additional course info */}
+                <div className="mt-2 px-4 py-2 bg-gray-50 rounded-lg text-sm">
+                  <p className="text-gray-700">
+                    <span className="font-semibold">Catégorie:</span>{" "}
+                    {course.category}
+                  </p>
+                  <p className="text-gray-700">
+                    <span className="font-semibold">Créé le:</span>{" "}
+                    {new Date(course.createdAt).toLocaleDateString("fr-FR")}
+                  </p>
                 </div>
-              ))}
-            </div>
-          )
+
+                {/* Delete button */}
+                <button
+                  onClick={() => handleDelete(course.id)}
+                  className="mt-2 w-full text-red-600 text-sm py-2 border border-red-600 rounded-full hover:bg-red-50"
+                >
+                  Supprimer ce cours
+                </button>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 

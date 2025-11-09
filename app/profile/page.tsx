@@ -8,7 +8,6 @@ import type { User } from "@supabase/supabase-js";
 import {
   ArrowLeft,
   Share2,
-  HelpCircle,
   Pencil,
   CalendarCheck2,
   FolderClosed,
@@ -145,7 +144,7 @@ export default function ProfilePage() {
                   {profile.email}
                 </li>
                 <li className="flex items-center gap-2">
-                  {profile.telephone ? (
+                  {/* {profile.telephone ? (
                     <>
                       <CheckCircle className="text-yellow-400 w-5 h-5" />
                       Téléphone vérifié : {profile.telephone}
@@ -155,7 +154,7 @@ export default function ProfilePage() {
                       <BanIcon className="text-red-400 w-5 h-5" />
                       Téléphone non renseigné
                     </>
-                  )}
+                  )} */}
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle className="text-yellow-400 w-5 h-5" />

@@ -17,6 +17,12 @@ interface AddressData {
   postalCode: string;
 }
 
+interface Option {
+  id: string;
+  label: string;
+  icon?: string;
+}
+
 // Dynamically import AddressPicker to avoid SSR issues with Mapbox
 const AddressPicker = dynamic(() => import("@/components/AddressPicker"), {
   ssr: false,
@@ -407,22 +413,22 @@ function SignupForm() {
               <div className="space-y-3 mt-4">
                 {serverInterests?.map((interest) => (
                   <label
-                    key={interest}
+                    key={interest.id}
                     className={`flex items-center gap-3 cursor-pointer rounded-xl border px-4 py-3 transition-all ${
-                      selectedInterests.includes(interest)
+                      selectedInterests.includes(interest.label)
                         ? "bg-blue-100 border-blue-500"
                         : "bg-white border-gray-300 hover:border-gray-400"
                     }`}
                   >
                     <input
                       type="checkbox"
-                      value={interest}
-                      checked={selectedInterests.includes(interest)}
-                      onChange={() => toggleInterest(interest)}
+                      value={interest.label}
+                      checked={selectedInterests.includes(interest.label)}
+                      onChange={() => toggleInterest(interest.label)}
                       className="h-5 w-5 accent-blue-600"
                     />
                     <span className="text-gray-800 font-medium">
-                      {interest}
+                      {interest.label}
                     </span>
                   </label>
                 ))}

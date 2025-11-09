@@ -64,7 +64,9 @@ export default function ReservationStep1({
       "nov.",
       "déc.",
     ];
-    return `${days[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]}`;
+    return `${days[date.getDay()]}, ${date.getDate()} ${
+      months[date.getMonth()]
+    }`;
   };
 
   const formatTime = (timeString: string) => {
@@ -108,8 +110,10 @@ export default function ReservationStep1({
           ) : (
             sessions.slice(0, 6).map((session) => {
               const isSelected = selectedSession?.id === session.id;
-              const dateFormatted = formatDate(session.session_date);
-              const timeFormatted = `${formatTime(session.start_time)} - ${formatTime(session.end_time)}`;
+              const dateFormatted = formatDate(session.sessionDate);
+              const timeFormatted = `${formatTime(
+                session.startTime
+              )} - ${formatTime(session.endTime)}`;
 
               return (
                 <div
@@ -154,8 +158,7 @@ export default function ReservationStep1({
           <div className="flex items-center gap-2 text-sm text-gray-700">
             <MapPin className="w-4 h-4" />
             <span>
-              {selectedSession.location ||
-                "5 rue François Dauphin, 69002 Lyon"}
+              {selectedSession.location || "5 rue François Dauphin, 69002 Lyon"}
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-700">
@@ -191,7 +194,10 @@ export default function ReservationStep1({
         <textarea
           value={formData.messageToInstructor}
           onChange={(e) =>
-            onFormDataChange({ ...formData, messageToInstructor: e.target.value })
+            onFormDataChange({
+              ...formData,
+              messageToInstructor: e.target.value,
+            })
           }
           placeholder="Bonjour, j'aimerais en savoir plus sur..."
           className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 min-h-[120px] resize-none"
@@ -214,4 +220,3 @@ export default function ReservationStep1({
     </div>
   );
 }
-
