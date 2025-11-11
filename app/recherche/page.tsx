@@ -20,7 +20,7 @@ interface APICourse {
   maxParticipants: number;
   createdAt: string;
   updatedAt: string;
-  coordinates: [number, number]; 
+  coordinates: [number, number];
   author: {
     id: string;
     name: string;
@@ -61,8 +61,15 @@ export default function SearchPage() {
         }
 
         const data = await response.json();
-        setCourses(data.courses || []);
-        setFilteredCourses(data.courses || []);
+        // Attendre toutes les promesses retournées par map()
+        const courses = await Promise.all(
+          data.courses.map(async (course: APICourse) => {
+            const c = await fetchSessions(course);
+            return c;
+          })
+        );
+        setCourses(courses || []);
+        setFilteredCourses(courses || []);
       } catch (err: any) {
         console.error("Error fetching courses:", err);
         setError(err.message || "Une erreur s'est produite");
@@ -73,6 +80,50 @@ export default function SearchPage() {
 
     fetchAllCourses();
   }, []);
+
+
+
+  const fetchSessions = async (course: APICourse) => {
+    if (!course) return;
+
+    try {
+      const response = await fetch(`/api/courses/${course.id}/sessions`);
+      if (!response.ok) throw new Error("Erreur lors du fetch des sessions");
+
+      const data = await response.json();
+
+      // ✅ On récupère la première session
+      const session = data.sessions?.[0];
+
+      if (session?.location) {
+        // 🗺️ On géocode l'adresse pour obtenir les coordonnées
+        const geoRes = await fetch(
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+            session.location
+          )}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}`
+        );
+
+        const geoData = await geoRes.json();
+
+        if (geoData?.features?.[0]?.center) {
+          const [lon, lat] = geoData.features[0].center;
+          course.coordinates = [lon, lat];
+        } else {
+          console.warn("Aucune coordonnée trouvée pour :", session.location);
+          // fallback sur un point par défaut
+          course.coordinates = [4.83207, 45.75770];
+        }
+      } else {
+        // Pas d'adresse connue
+        course.coordinates = [4.83207, 45.75770];
+      }
+
+      return course;
+    } catch (err) {
+      console.error("Error fetching sessions:", err);
+      return null;
+    }
+  };
 
   // Filter courses based on search query, category, and level
   useEffect(() => {
@@ -135,7 +186,7 @@ export default function SearchPage() {
     };
   };
 
-    const [viewport, setViewport] = React.useState({
+  const [viewport, setViewport] = React.useState({
     longitude: 4.8357,
     latitude: 45.7640,
     zoom: 13,
@@ -214,35 +265,37 @@ export default function SearchPage() {
         </select>
       </div>
 
-       <div className="relative w-full h-[40vh] rounded-xl overflow-hidden">
-      <Map
-        mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
-        initialViewState={viewport}
-        mapStyle="mapbox://styles/mapbox/streets-v12"
-        style={{ width: "100%", height: "100%" }}
-      >
-        <NavigationControl position="bottom-right" />
+      <div className="relative w-full h-[40vh] rounded-xl overflow-hidden">
+        <Map
+          mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
+          initialViewState={viewport}
+          mapStyle="mapbox://styles/mapbox/streets-v12"
+          style={{ width: "100%", height: "100%" }}
+        >
+          <NavigationControl position="bottom-right" />
 
-        {courses.map((course) => (
-          <Marker
-            key={course.id}
-            longitude={4.823198077821605}
-            latitude={45.77942902070231}
-          >
-            <div className="flex flex-col items-center">
-              <img
-                src="/marker-map.png"
-                alt={course.title}
-                className="w-8 h-8"
-              />
-              <span className="bg-slate-900 text-white text-xs font-semibold px-2 py-1 rounded-full mt-1 shadow">
-                {course.pricePerHour} €
-              </span>
-            </div>
-          </Marker>
-        ))}
-      </Map>
-    </div>
+          {courses.map((course) => (
+            <Marker
+              key={course.id}
+              longitude={course.coordinates[0]}
+              latitude={course.coordinates[1]}
+            >
+              <div 
+              onClick={() => handleDetails(course.id)}
+              className="flex flex-col items-center">
+                <img
+                  src="/marker-map.png"
+                  alt={course.title}
+                  className="w-8 h-8"
+                />
+                <span className="bg-slate-900 text-white text-xs font-semibold px-2 py-1 rounded-full mt-1 shadow">
+                  {course.pricePerHour} €
+                </span>
+              </div>
+            </Marker>
+          ))}
+        </Map>
+      </div>
 
 
       {/* Results Count */}
@@ -254,17 +307,17 @@ export default function SearchPage() {
         {(searchQuery ||
           selectedCategory !== "all" ||
           selectedLevel !== "all") && (
-          <button
-            onClick={() => {
-              setSearchQuery("");
-              setSelectedCategory("all");
-              setSelectedLevel("all");
-            }}
-            className="text-sm text-blue-900 underline"
-          >
-            Réinitialiser les filtres
-          </button>
-        )}
+            <button
+              onClick={() => {
+                setSearchQuery("");
+                setSelectedCategory("all");
+                setSelectedLevel("all");
+              }}
+              className="text-sm text-blue-900 underline"
+            >
+              Réinitialiser les filtres
+            </button>
+          )}
       </div>
 
       {/* Course Cards */}

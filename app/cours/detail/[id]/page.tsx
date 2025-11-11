@@ -83,6 +83,8 @@ export default function CourseDetailPage() {
         const data = await response.json();
         setCourse(data.course);
 
+        console.log("Fetched course:", data.course);
+
         // Check if current user is the course owner
         if (user && data.course.userId === user.id) {
           setIsOwner(true);
