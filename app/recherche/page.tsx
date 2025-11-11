@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import CourseCard, { type Course } from "@/components/CourseCard";
 
+import Map, { Marker, NavigationControl } from "react-map-gl/mapbox";
+import "mapbox-gl/dist/mapbox-gl.css";
+import React from "react";
+
 interface APICourse {
   id: string;
   userId: string;
@@ -16,6 +20,7 @@ interface APICourse {
   maxParticipants: number;
   createdAt: string;
   updatedAt: string;
+  coordinates: [number, number]; 
   author: {
     id: string;
     name: string;
@@ -132,6 +137,12 @@ export default function SearchPage() {
   };
   console.log(courses);
 
+    const [viewport, setViewport] = React.useState({
+    longitude: 4.8357,
+    latitude: 45.7640,
+    zoom: 13,
+  });
+
   if (loading) {
     return (
       <div className="flex flex-col justify-center items-center min-h-[400px]">
@@ -172,8 +183,10 @@ export default function SearchPage() {
         />
       </div>
 
+
+
       {/* Filters */}
-      <div className="mb-4 flex flex-col sm:flex-row gap-3">
+      <div className="mb-4 flex flex-row gap-3">
         {/* Category Filter */}
         <select
           value={selectedCategory}
@@ -202,6 +215,37 @@ export default function SearchPage() {
           ))}
         </select>
       </div>
+
+       <div className="relative w-full h-[40vh] rounded-xl overflow-hidden">
+      <Map
+        mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
+        initialViewState={viewport}
+        mapStyle="mapbox://styles/mapbox/streets-v12"
+        style={{ width: "100%", height: "100%" }}
+      >
+        <NavigationControl position="bottom-right" />
+
+        {courses.map((course) => (
+          <Marker
+            key={course.id}
+            longitude={4.823198077821605}
+            latitude={45.77942902070231}
+          >
+            <div className="flex flex-col items-center">
+              <img
+                src="/marker-map.png"
+                alt={course.title}
+                className="w-8 h-8"
+              />
+              <span className="bg-slate-900 text-white text-xs font-semibold px-2 py-1 rounded-full mt-1 shadow">
+                {course.pricePerHour} €
+              </span>
+            </div>
+          </Marker>
+        ))}
+      </Map>
+    </div>
+
 
       {/* Results Count */}
       <div className="mb-4 flex items-center justify-between">
