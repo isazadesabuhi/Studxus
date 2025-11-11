@@ -186,7 +186,6 @@ export default function SearchPage() {
       image: "/vba.jpg", // Default image
     };
   };
-  console.log(courses);
 
   const [viewport, setViewport] = React.useState({
     longitude: 4.8357,

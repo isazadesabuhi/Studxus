@@ -49,7 +49,6 @@ export default function CourseCard({ course, onDetails, onEdit }: Props) {
 
   // Available days of week
   const weekDays = ["Lu", "Ma", "Me", "Je", "Ve", "Sa", "Di"];
-  console.log(course);
   return (
     <div className="w-full rounded-3xl border-2 border-slate-300 bg-gradient-to-br from-sky-100 to-blue-50 p-4 shadow-md">
       <div className="flex items-start gap-4">
