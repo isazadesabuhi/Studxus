@@ -17,6 +17,12 @@ interface AddressData {
   postalCode: string;
 }
 
+interface Option {
+  id: string;
+  label: string;
+  icon?: string;
+}
+
 // Dynamically import AddressPicker to avoid SSR issues with Mapbox
 const AddressPicker = dynamic(() => import("@/components/AddressPicker"), {
   ssr: false,
@@ -39,7 +45,6 @@ function SignupForm() {
     userType: "Professeur" as "Professeur" | "Etudiant",
   });
   const [addressData, setAddressData] = useState<AddressData | null>(null);
-  const [selected, setSelected] = useState<Set<string>>(new Set()); // interests
   const [errors, setErrors] = useState<Record<string, string>>({}); // NEW
 
   // --- UX state -------------------------------------------------------------
@@ -124,14 +129,21 @@ function SignupForm() {
       const res = await fetch("/api/users/interests", {
         method: "GET",
         headers: { Accept: "application/json" },
-        // credentials: "include", // uncomment if your API needs cookies/session
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      // Expecting `data` to be an array of { id, label, icon? } (you'll shape it later)
-      setServerInterests(data?.available_interests);
+
+      // Transform the array of strings into Option objects
+      const formattedInterests: Option[] = (
+        data?.available_interests || []
+      ).map((interest: string) => ({
+        id: interest.toLowerCase().replace(/\s+/g, "-"), // Create an ID from the label
+        label: interest,
+      }));
+
+      setServerInterests(formattedInterests);
     } catch (err: any) {
-      setInterestsError("Impossible de charger les centres d’intérêt.");
+      setInterestsError("Impossible de charger les centres d'intérêt.");
       console.error("loadInterests error:", err);
     } finally {
       setInterestsLoading(false);
@@ -407,22 +419,22 @@ function SignupForm() {
               <div className="space-y-3 mt-4">
                 {serverInterests?.map((interest) => (
                   <label
-                    key={interest}
+                    key={interest.id}
                     className={`flex items-center gap-3 cursor-pointer rounded-xl border px-4 py-3 transition-all ${
-                      selectedInterests.includes(interest)
+                      selectedInterests.includes(interest.label)
                         ? "bg-blue-100 border-blue-500"
                         : "bg-white border-gray-300 hover:border-gray-400"
                     }`}
                   >
                     <input
                       type="checkbox"
-                      value={interest}
-                      checked={selectedInterests.includes(interest)}
-                      onChange={() => toggleInterest(interest)}
+                      value={interest.label}
+                      checked={selectedInterests.includes(interest.label)}
+                      onChange={() => toggleInterest(interest.label)}
                       className="h-5 w-5 accent-blue-600"
                     />
                     <span className="text-gray-800 font-medium">
-                      {interest}
+                      {interest.label}
                     </span>
                   </label>
                 ))}

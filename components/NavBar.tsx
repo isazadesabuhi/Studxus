@@ -9,7 +9,7 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-4 py-3 bg-white/90 backdrop-blur-md shadow-md">
       {/* Center: Logo */}
       <div className="flex justify-center flex-1">
-        <Link href="/">
+        <Link href="/accueil">
           <Image
             src={logo}
             alt="Main Logo"

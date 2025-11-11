@@ -44,7 +44,11 @@ export default function RootLayout({
         </div>
 
         {/* TabBar */}
-        <div className="z-99 relative max-w-[450px] w-full">
+        <div
+          className={`z-99 relative max-w-[450px] w-full ${
+            pathname === "/" ? "hidden" : "block"
+          }`}
+        >
           <TabBar />
         </div>
       </body>

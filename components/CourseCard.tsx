@@ -12,6 +12,7 @@ export type Course = {
   level: string;
   price: string;
   image?: string;
+  teacher?: string;
 
   // New fields from API
   category?: string;
@@ -36,7 +37,6 @@ export default function CourseCard({ course, onDetails, onEdit }: Props) {
     level = "Débutant",
     price = "0€",
     image = vba,
-    category = "Non catégorisé",
     teacherName = "Enseignant",
     rating = 4.0,
     distance = 0,
@@ -49,7 +49,7 @@ export default function CourseCard({ course, onDetails, onEdit }: Props) {
 
   // Available days of week
   const weekDays = ["Lu", "Ma", "Me", "Je", "Ve", "Sa", "Di"];
-
+  console.log(course);
   return (
     <div className="w-full rounded-3xl border-2 border-slate-300 bg-gradient-to-br from-sky-100 to-blue-50 p-4 shadow-md">
       <div className="flex items-start gap-4">
@@ -70,7 +70,11 @@ export default function CourseCard({ course, onDetails, onEdit }: Props) {
             <div className="h-6 w-6 overflow-hidden rounded-full bg-white">
               {/* Placeholder avatar - you can replace with actual teacher image */}
               <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-400 to-blue-600 text-xs text-white font-bold">
-                {teacherName.charAt(0).toUpperCase()}
+                {course.teacher
+                  ?.split(" ")
+                  .map((word) => word[0])
+                  .join("")
+                  .toUpperCase()}
               </div>
             </div>
             <div className="flex items-center gap-0.5">

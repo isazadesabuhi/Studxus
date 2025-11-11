@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 
-export default function CourseFormRecap({ data }: { data: any }) {
+export default function CourseFormRecap() {
   const router = useRouter();
 
   return (
@@ -15,7 +15,7 @@ export default function CourseFormRecap({ data }: { data: any }) {
       </p>
 
       <button
-        onClick={() => router.push("/cours")}
+        onClick={() => router.push("/cours/enseignes")}
         className="w-full bg-blue-900 text-white py-3 rounded-xl font-semibold"
       >
         Afficher mes cours

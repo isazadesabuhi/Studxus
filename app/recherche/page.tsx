@@ -162,7 +162,7 @@ export default function SearchPage() {
   );
 
   // Available levels
-  const levels = ["Tous niveaux", "Débutant", "Intermédiaire", "Avancé"];
+  const levels = ["Débutant", "Intermédiaire", "Avancé"];
 
   const handleDetails = (id: string) => {
     router.push(`/cours/detail/${id}`);
@@ -178,6 +178,7 @@ export default function SearchPage() {
     return {
       id: apiCourse.id,
       title: apiCourse.title,
+      teacher: apiCourse.author?.fullName || "Enseignant",
       schedule: apiCourse.shortDescription || apiCourse.description,
       wednesday: `Par ${apiCourse.author?.fullName || "Anonyme"}`,
       level: apiCourse.level,
@@ -185,6 +186,7 @@ export default function SearchPage() {
       image: "/vba.jpg", // Default image
     };
   };
+  console.log(courses);
 
   const [viewport, setViewport] = React.useState({
     longitude: 4.8357,

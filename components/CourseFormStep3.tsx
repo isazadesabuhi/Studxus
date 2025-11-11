@@ -3,12 +3,17 @@ import ProgressBar from "./ProgressBar";
 interface Props {
   data: any;
   onPrev: () => void;
-  onNext: () => void;
+  // onNext: () => void;
   onUpdate: (updates: any) => void;
   onSubmit: (shouldSubmit: boolean) => void; // New prop to trigger submission
 }
 
-export default function CourseFormStep3({ data, onPrev, onNext, onUpdate, onSubmit }: Props) {
+export default function CourseFormStep3({
+  data,
+  onPrev,
+  onUpdate,
+  onSubmit,
+}: Props) {
   const handleSubmit = () => {
     // Send true to parent to trigger course creation
     onSubmit(true);
@@ -28,13 +33,15 @@ export default function CourseFormStep3({ data, onPrev, onNext, onUpdate, onSubm
         onChange={(e) => onUpdate({ level: e.target.value })}
         className="w-full border rounded-lg p-2 mb-4"
       >
-        <option>Tous niveaux</option>
+        {/* <option>Tous niveaux</option> */}
         <option>Débutant</option>
         <option>Intermédiaire</option>
         <option>Avancé</option>
       </select>
 
-      <label className="block text-sm font-semibold mb-2">Prix par heure (€)</label>
+      <label className="block text-sm font-semibold mb-2">
+        Prix par heure (€)
+      </label>
       <div className="flex items-center justify-center gap-4 mb-4">
         <button
           onClick={() => onUpdate({ price: Math.max(1, data.price - 1) })}

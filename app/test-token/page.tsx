@@ -94,7 +94,7 @@ export default function TestTokenPage() {
                 <li>Copy the token above</li>
                 <li>Open Postman</li>
                 <li>Go to the Authorization tab</li>
-                <li>Select "Bearer Token" type</li>
+                <li>Select Bearer Token type</li>
                 <li>Paste the token</li>
               </ol>
             </div>

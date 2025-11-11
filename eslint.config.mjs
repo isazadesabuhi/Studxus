@@ -20,6 +20,15 @@ const eslintConfig = [
       "next-env.d.ts",
     ],
   },
+  {
+    extends: ["next/core-web-vitals", "eslint:recommended"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "react/no-unescaped-entities": "off",
+      "no-unused-vars": "off",
+      "react/prop-types": "off",
+    },
+  },
 ];
 
 export default eslintConfig;

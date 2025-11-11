@@ -77,14 +77,13 @@ export async function POST(req: Request) {
     let conversationId: string;
 
     // Check if conversation exists (either direction)
-    const { data: existingConversations, error: convError } =
-      await supabaseAdmin
-        .from("conversations")
-        .select("id")
-        .or(
-          `and(user1_id.eq.${user.id},user2_id.eq.${recipientId}),and(user1_id.eq.${recipientId},user2_id.eq.${user.id})`
-        )
-        .single();
+    const { data: existingConversations } = await supabaseAdmin
+      .from("conversations")
+      .select("id")
+      .or(
+        `and(user1_id.eq.${user.id},user2_id.eq.${recipientId}),and(user1_id.eq.${recipientId},user2_id.eq.${user.id})`
+      )
+      .single();
 
     if (existingConversations) {
       conversationId = existingConversations.id;
@@ -255,15 +254,17 @@ export async function GET(req: Request) {
 
         return {
           id: conv.id,
-          otherUser: {
-            id: otherUser?.user.id,
-            email: otherUser?.user.email,
-            name: otherUser?.user.user_metadata?.name,
-            surname: otherUser?.user.user_metadata?.surname,
-            fullName: `${otherUser?.user.user_metadata?.name || ""} ${
-              otherUser?.user.user_metadata?.surname || ""
-            }`.trim(),
-          },
+          otherUser: otherUser?.user
+            ? {
+                id: otherUser.user.id,
+                email: otherUser.user.email,
+                name: otherUser.user.user_metadata?.name,
+                surname: otherUser.user.user_metadata?.surname,
+                fullName: `${otherUser.user.user_metadata?.name || ""} ${
+                  otherUser.user.user_metadata?.surname || ""
+                }`.trim(),
+              }
+            : null,
           lastMessage: lastMessage
             ? {
                 id: lastMessage.id,

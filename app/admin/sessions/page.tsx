@@ -128,7 +128,9 @@ export default function ManageSessionsPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Erreur lors de la création de la session");
+        throw new Error(
+          data.error || "Erreur lors de la création de la session"
+        );
       }
 
       setMessage(`✅ Session créée avec succès !`);
@@ -145,18 +147,18 @@ export default function ManageSessionsPage() {
     }
   };
 
-  const deleteSession = async (sessionId: string) => {
-    if (!confirm("Êtes-vous sûr de vouloir supprimer cette session ?")) {
-      return;
-    }
+  // const deleteSession = async (sessionId: string) => {
+  //   if (!confirm("Êtes-vous sûr de vouloir supprimer cette session ?")) {
+  //     return;
+  //   }
 
-    try {
-      // Note: You'll need to create a DELETE endpoint for sessions
-      setMessage("Fonctionnalité de suppression à venir");
-    } catch (err: any) {
-      setError(err.message);
-    }
-  };
+  //   try {
+  //     // Note: You'll need to create a DELETE endpoint for sessions
+  //     setMessage("Fonctionnalité de suppression à venir");
+  //   } catch (err: any) {
+  //     setError(err.message);
+  //   }
+  // };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -175,7 +177,9 @@ export default function ManageSessionsPage() {
       "nov.",
       "déc.",
     ];
-    return `${days[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]}`;
+    return `${days[date.getDay()]}, ${date.getDate()} ${
+      months[date.getMonth()]
+    }`;
   };
 
   return (
@@ -191,7 +195,9 @@ export default function ManageSessionsPage() {
           📅 Gérer les Sessions
         </h1>
         <p className="text-gray-600 text-sm mt-2">
-          Créez des sessions pour vos cours afin qu'ils puissent être réservés
+          {
+            "Créez des sessions pour vos cours afin qu'ils puissent être réservés"
+          }
         </p>
       </div>
 
@@ -217,7 +223,9 @@ export default function ManageSessionsPage() {
       {/* Create Session Form */}
       {selectedCourseId && (
         <div className="bg-gray-50 p-6 rounded-lg border-2 border-gray-200 mb-6">
-          <h2 className="text-xl font-semibold mb-4">Créer une Nouvelle Session</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            Créer une Nouvelle Session
+          </h2>
 
           <form onSubmit={createSession} className="space-y-4">
             <div>
@@ -379,18 +387,17 @@ export default function ManageSessionsPage() {
       {courses.length === 0 && (
         <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
           <p className="text-yellow-800 text-sm">
-            ⚠️ Vous n'avez pas encore créé de cours.{" "}
+            ⚠️{"Vous n'avez pas encore créé de cours."}
             <button
               onClick={() => router.push("/cours/creer-cours")}
               className="underline font-semibold"
             >
               Créez un cours
-            </button>{" "}
-            d'abord.
+            </button>
+            {"d'abord."}
           </p>
         </div>
       )}
     </main>
   );
 }
-

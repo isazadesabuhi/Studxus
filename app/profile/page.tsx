@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Card from "@/components/Card";
@@ -8,7 +9,6 @@ import type { User } from "@supabase/supabase-js";
 import {
   ArrowLeft,
   Share2,
-  HelpCircle,
   Pencil,
   CalendarCheck2,
   FolderClosed,
@@ -17,7 +17,6 @@ import {
   LogOut,
   CheckCircle,
   CirclePlus,
-  BanIcon,
 } from "lucide-react";
 
 import avatar from "@/public/avatar.svg";
@@ -26,8 +25,6 @@ import { useEffect, useState } from "react";
 import { UserProfile } from "../types/UserProfile";
 
 export default function ProfilePage() {
-
-  const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
 
   const router = useRouter();
@@ -40,8 +37,6 @@ export default function ProfilePage() {
         router.push("/");
         return;
       }
-
-      setUser(userData.user);
 
       // Try to fetch profile from API
       try {
@@ -66,7 +61,6 @@ export default function ProfilePage() {
 
     load();
   }, [router]);
-
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -120,7 +114,7 @@ export default function ProfilePage() {
               </div>
 
               <h1 className="mt-4 text-2xl font-extrabold tracking-tight">
-                {profile.name}
+                {profile.name} {profile.surname}
               </h1>
 
               <button className="mt-3 inline-flex items-center gap-2 rounded-full border border-neutral-200 px-4 py-2 text-sm font-medium shadow-sm hover:bg-neutral-50 active:scale-[0.98]">
@@ -129,11 +123,12 @@ export default function ProfilePage() {
               </button>
             </section>
 
-
             {/* --- Vérification du profil --- */}
             <section className="mt-6   ">
-              <p className="w-full h-0.5 my-4 border-t-2 border-primary" ></p>
-              <Heading as="h4" className="text-2xl text-primary font-semibold">Vérifiez votre profil</Heading>
+              <p className="w-full h-0.5 my-4 border-t-2 border-primary"></p>
+              <Heading as="h4" className="text-2xl text-primary font-semibold">
+                Vérifiez votre profil
+              </Heading>
 
               <ul className="space-y-2 text-sm text-gray-700">
                 <li className="flex items-center gap-2">
@@ -145,7 +140,7 @@ export default function ProfilePage() {
                   {profile.email}
                 </li>
                 <li className="flex items-center gap-2">
-                  {profile.telephone ? (
+                  {/* {profile.telephone ? (
                     <>
                       <CheckCircle className="text-yellow-400 w-5 h-5" />
                       Téléphone vérifié : {profile.telephone}
@@ -155,20 +150,21 @@ export default function ProfilePage() {
                       <BanIcon className="text-red-400 w-5 h-5" />
                       Téléphone non renseigné
                     </>
-                  )}
+                  )} */}
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle className="text-yellow-400 w-5 h-5" />
                   {profile.address}
-
                 </li>
               </ul>
             </section>
 
             {/* --- Fiabilité --- */}
             <section className="mt-6    pb-10">
-              <p className="w-full h-0.5 my-4 border-t-2 border-primary" ></p>
-              <Heading as="h4" className="text-2xl text-primary font-semibold">Votre fiabilité</Heading>
+              <p className="w-full h-0.5 my-4 border-t-2 border-primary"></p>
+              <Heading as="h4" className="text-2xl text-primary font-semibold">
+                Votre fiabilité
+              </Heading>
 
               <ul className="space-y-2 text-sm text-gray-700">
                 <li className="flex items-start gap-2">
@@ -184,19 +180,24 @@ export default function ProfilePage() {
 
             {/* Quick actions grid */}
             <section className="mt-6 grid grid-cols-2 gap-4 sm:gap-5">
-              <Card
-                icon={<CalendarCheck2 className="h-7 w-7" aria-hidden />}
-                label={
-                  <>
-                    Mes réservations
-                    <br /> de cours
-                  </>
-                }
-              />
-              <Card
-                icon={<FolderClosed className="h-7 w-7" aria-hidden />}
-                label={<>Mes annonces</>}
-              />
+              <Link className="w-full" href="/cours/reserves">
+                <Card
+                  icon={<CalendarCheck2 className="h-7 w-7" aria-hidden />}
+                  label={
+                    <>
+                      Mes réservations
+                      <br /> de cours
+                    </>
+                  }
+                />
+              </Link>
+              <Link className="" href="/cours/enseignes">
+                <Card
+                  icon={<FolderClosed className="h-7 w-7" aria-hidden />}
+                  label={<>Mes annonces</>}
+                />
+              </Link>
+              <Link href="/cgu-confidentialite" >
               <Card
                 icon={<ShieldCheck className="h-7 w-7" aria-hidden />}
                 label={
@@ -207,13 +208,17 @@ export default function ProfilePage() {
                   </>
                 }
               />
+              </Link>
+              <Link href="/securite">
               <Card
                 icon={<Lock className="h-7 w-7" aria-hidden />}
                 label={<>Sécurité</>}
               />
+              </Link>
             </section>
           </div>
-        </>)}
+        </>
+      )}
     </main>
   );
 }
