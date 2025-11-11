@@ -109,6 +109,10 @@ export default function Profile() {
     load();
   }, [router]);
 
+  const handleClick = () => {
+    router.push("/recherche");
+  };
+
   // Loading state
   if (loading) {
     return (
@@ -141,13 +145,13 @@ export default function Profile() {
     return (
       <div className="min-h-screen max-w-[450px] bg-gray-50 flex flex-col justify-center p-4">
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
-          <p className="text-yellow-800 mb-2">Profil introuvable</p>
+          {/* <p className="text-yellow-800 mb-2">Profil introuvable</p>
           <button
             onClick={() => router.push("/")}
             className="text-sm text-yellow-700 underline"
           >
             Retour à l'accueil
-          </button>
+          </button> */}
         </div>
       </div>
     );
@@ -187,11 +191,13 @@ export default function Profile() {
                 autoComplete="given-name"
                 required
                 className="mt-2 block 
-                  rounded-[100px] border
-                   border-gray-300 px-3 py-2
-                   placeholder:text-xs 
-                    text-gray-900 placeholder-gray-400 focus:border-primary focus:ring-primary sm:text-xs"
+        rounded-[100px] border
+        border-gray-300 px-3 py-2
+        placeholder:text-xs 
+        text-gray-900 placeholder-gray-400
+        focus:border-primary focus:ring-primary sm:text-xs"
                 placeholder="Chercher un cours"
+                onClick={handleClick} // 👈 redirect on click
               />
             </div>
           </div>

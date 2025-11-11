@@ -82,7 +82,7 @@ export async function POST(req: Request) {
     }
 
     // Validate level if provided
-    const validLevels = ["Tous niveaux", "Débutant", "Intermédiaire", "Avancé"];
+    const validLevels = ["Débutant", "Intermédiaire", "Avancé"];
     if (level && !validLevels.includes(level)) {
       return NextResponse.json(
         {

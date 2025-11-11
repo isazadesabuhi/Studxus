@@ -283,7 +283,7 @@ function MyCoursesContent() {
               : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
           }`}
         >
-          Programmés
+          Enseignés
         </button>
       </div>
 

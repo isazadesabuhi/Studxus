@@ -160,7 +160,7 @@ export default function CourseDetailPage() {
       }
 
       alert("Cours supprimé avec succès");
-      router.push("/cours");
+      router.push("/cours/mes-cours");
     } catch (err: any) {
       alert(err.message || "Erreur lors de la suppression");
     }

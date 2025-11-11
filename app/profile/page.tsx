@@ -16,7 +16,6 @@ import {
   LogOut,
   CheckCircle,
   CirclePlus,
-  BanIcon,
 } from "lucide-react";
 
 import avatar from "@/public/avatar.svg";
@@ -25,7 +24,6 @@ import { useEffect, useState } from "react";
 import { UserProfile } from "../types/UserProfile";
 
 export default function ProfilePage() {
-
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
 
@@ -65,7 +63,6 @@ export default function ProfilePage() {
 
     load();
   }, [router]);
-
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -119,7 +116,7 @@ export default function ProfilePage() {
               </div>
 
               <h1 className="mt-4 text-2xl font-extrabold tracking-tight">
-                {profile.name}
+                {profile.name} {profile.surname}
               </h1>
 
               <button className="mt-3 inline-flex items-center gap-2 rounded-full border border-neutral-200 px-4 py-2 text-sm font-medium shadow-sm hover:bg-neutral-50 active:scale-[0.98]">
@@ -128,11 +125,12 @@ export default function ProfilePage() {
               </button>
             </section>
 
-
             {/* --- Vérification du profil --- */}
             <section className="mt-6   ">
-              <p className="w-full h-0.5 my-4 border-t-2 border-primary" ></p>
-              <Heading as="h4" className="text-2xl text-primary font-semibold">Vérifiez votre profil</Heading>
+              <p className="w-full h-0.5 my-4 border-t-2 border-primary"></p>
+              <Heading as="h4" className="text-2xl text-primary font-semibold">
+                Vérifiez votre profil
+              </Heading>
 
               <ul className="space-y-2 text-sm text-gray-700">
                 <li className="flex items-center gap-2">
@@ -159,15 +157,16 @@ export default function ProfilePage() {
                 <li className="flex items-center gap-2">
                   <CheckCircle className="text-yellow-400 w-5 h-5" />
                   {profile.address}
-
                 </li>
               </ul>
             </section>
 
             {/* --- Fiabilité --- */}
             <section className="mt-6    pb-10">
-              <p className="w-full h-0.5 my-4 border-t-2 border-primary" ></p>
-              <Heading as="h4" className="text-2xl text-primary font-semibold">Votre fiabilité</Heading>
+              <p className="w-full h-0.5 my-4 border-t-2 border-primary"></p>
+              <Heading as="h4" className="text-2xl text-primary font-semibold">
+                Votre fiabilité
+              </Heading>
 
               <ul className="space-y-2 text-sm text-gray-700">
                 <li className="flex items-start gap-2">
@@ -212,7 +211,8 @@ export default function ProfilePage() {
               />
             </section>
           </div>
-        </>)}
+        </>
+      )}
     </main>
   );
 }

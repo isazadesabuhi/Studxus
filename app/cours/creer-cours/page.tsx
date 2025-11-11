@@ -28,7 +28,7 @@ export default function CreateCoursePage() {
     startTime: "",
     endTime: "",
 
-    level: "Tous niveaux",
+    level: "Débutant",
     price: 10,
   });
 

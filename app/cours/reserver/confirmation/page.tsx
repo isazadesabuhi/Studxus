@@ -135,7 +135,7 @@ function ConfirmationContent() {
             {error || "Réservation introuvable"}
           </p>
           <button
-            onClick={() => router.push("/cours")}
+            onClick={() => router.push("/cours/mes-cours")}
             className="px-4 py-2 bg-blue-900 text-white rounded-lg"
           >
             Retour aux cours
