@@ -21,7 +21,7 @@ export default function Home() {
       } = await supabase.auth.getUser();
 
       if (user) {
-        router.push("/accueil");
+        router.push("/");
       }
     };
 

@@ -45,7 +45,6 @@ function SignupForm() {
     userType: "Professeur" as "Professeur" | "Etudiant",
   });
   const [addressData, setAddressData] = useState<AddressData | null>(null);
-  const [selected, setSelected] = useState<Set<string>>(new Set()); // interests
   const [errors, setErrors] = useState<Record<string, string>>({}); // NEW
 
   // --- UX state -------------------------------------------------------------
@@ -130,14 +129,21 @@ function SignupForm() {
       const res = await fetch("/api/users/interests", {
         method: "GET",
         headers: { Accept: "application/json" },
-        // credentials: "include", // uncomment if your API needs cookies/session
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      // Expecting `data` to be an array of { id, label, icon? } (you'll shape it later)
-      setServerInterests(data?.available_interests);
+
+      // Transform the array of strings into Option objects
+      const formattedInterests: Option[] = (
+        data?.available_interests || []
+      ).map((interest: string) => ({
+        id: interest.toLowerCase().replace(/\s+/g, "-"), // Create an ID from the label
+        label: interest,
+      }));
+
+      setServerInterests(formattedInterests);
     } catch (err: any) {
-      setInterestsError("Impossible de charger les centres d’intérêt.");
+      setInterestsError("Impossible de charger les centres d'intérêt.");
       console.error("loadInterests error:", err);
     } finally {
       setInterestsLoading(false);
