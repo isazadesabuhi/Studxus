@@ -136,7 +136,7 @@ export default function Profile() {
 
 
                   {/* Two lines of centered text */}
-                  <div className=" flex flex-col items-center h-full justify-center text-center text-primary px-[10px]">
+                  <div className=" flex flex-col items-center h-full w-full justify-center text-center text-primary px-[10px]">
 
                     <span className="text-sm leading-tight">
                       Prêt à apprendre et partager ?
