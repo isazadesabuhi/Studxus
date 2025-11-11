@@ -8,7 +8,7 @@ import Image from "next/image";
 import vba from "@/public/vba.jpg";
 import { MapPin, BarChart3, Clock, ChevronRight } from "lucide-react";
 
-type TabKey = "reserved" | "programmed";
+type TabKey = "reserved" | "enseignes";
 
 interface APICourse {
   id: string;
@@ -276,9 +276,9 @@ function MyCoursesContent() {
           Réservés
         </button>
         <button
-          onClick={() => setActiveTab("programmed")}
+          onClick={() => setActiveTab("enseignes")}
           className={`flex-1 py-3 text-sm font-medium ${
-            activeTab === "programmed"
+            activeTab === "enseignes"
               ? "text-gray-900 border-b-2 border-gray-900"
               : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
           }`}
@@ -422,7 +422,7 @@ function MyCoursesContent() {
         )}
       </div>
 
-      {activeTab === "programmed" && courses.length > 0 && (
+      {activeTab === "enseignes" && courses.length > 0 && (
         <div className="fixed bottom-20 left-0 right-0 mx-auto max-w-[450px]">
           <div className="pointer-events-none absolute inset-0 h-32 bg-gradient-to-t from-white via-white/90 to-transparent"></div>
 
