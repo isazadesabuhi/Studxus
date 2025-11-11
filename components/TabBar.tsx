@@ -32,7 +32,7 @@ export default function TabBar() {
       id: "courses",
       label: "Mes cours",
       icon: BookOpen,
-      href: "/cours/mes-cours",
+      href: "/cours/reserves",
     },
     {
       id: "messages",

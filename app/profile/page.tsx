@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Card from "@/components/Card";
@@ -24,7 +25,6 @@ import { useEffect, useState } from "react";
 import { UserProfile } from "../types/UserProfile";
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
 
   const router = useRouter();
@@ -37,8 +37,6 @@ export default function ProfilePage() {
         router.push("/");
         return;
       }
-
-      setUser(userData.user);
 
       // Try to fetch profile from API
       try {
@@ -182,19 +180,24 @@ export default function ProfilePage() {
 
             {/* Quick actions grid */}
             <section className="mt-6 grid grid-cols-2 gap-4 sm:gap-5">
-              <Card
-                icon={<CalendarCheck2 className="h-7 w-7" aria-hidden />}
-                label={
-                  <>
-                    Mes réservations
-                    <br /> de cours
-                  </>
-                }
-              />
-              <Card
-                icon={<FolderClosed className="h-7 w-7" aria-hidden />}
-                label={<>Mes annonces</>}
-              />
+              <Link className="w-full" href="/cours/reserves">
+                <Card
+                  icon={<CalendarCheck2 className="h-7 w-7" aria-hidden />}
+                  label={
+                    <>
+                      Mes réservations
+                      <br /> de cours
+                    </>
+                  }
+                />
+              </Link>
+              <Link className="" href="/cours/enseignes">
+                <Card
+                  icon={<FolderClosed className="h-7 w-7" aria-hidden />}
+                  label={<>Mes annonces</>}
+                />
+              </Link>
+              <Link href="/cgu-confidentialite" >
               <Card
                 icon={<ShieldCheck className="h-7 w-7" aria-hidden />}
                 label={
@@ -205,10 +208,13 @@ export default function ProfilePage() {
                   </>
                 }
               />
+              </Link>
+              <Link href="/securite">
               <Card
                 icon={<Lock className="h-7 w-7" aria-hidden />}
                 label={<>Sécurité</>}
               />
+              </Link>
             </section>
           </div>
         </>
