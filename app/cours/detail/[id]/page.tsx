@@ -92,7 +92,7 @@ export default function CourseDetailPage() {
         const sessionsResponse = await fetch(`/api/courses/${id}/sessions`);
         if (sessionsResponse.ok) {
           const sessionsData = await sessionsResponse.json();
-          setSessions(sessionsData.sessions || []);
+          setSessions(sessionsData.sessions);
           if (sessionsData.sessions && sessionsData.sessions.length > 0) {
             setSelectedSessionId(sessionsData.sessions[0].id);
           }
@@ -199,6 +199,7 @@ export default function CourseDetailPage() {
       </main>
     );
   }
+    console.log(sessions)
 
   return (
     <main className="mx-auto max-w-screen-sm bg-white rounded-lg shadow-sm">
@@ -353,7 +354,7 @@ export default function CourseDetailPage() {
               <h3 className="font-semibold text-gray-900 mb-4">
                 Prochaines dates
               </h3>
-              {sessions.length === 0 ? (
+              {sessions.length == 0 ? (
                 <div className="text-center py-10 text-gray-500">
                   <p>Aucune session disponible pour ce cours</p>
                 </div>
