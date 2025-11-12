@@ -68,6 +68,7 @@ export default function SearchPage() {
             return c;
           })
         );
+        console.log("Fetched courses with sessions:", courses);
         setCourses(courses || []);
         setFilteredCourses(courses || []);
       } catch (err: any) {

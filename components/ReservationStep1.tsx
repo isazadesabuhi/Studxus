@@ -47,7 +47,10 @@ export default function ReservationStep1({
   onFormDataChange,
   onNext,
 }: ReservationStep1Props) {
+
+  console.log("ReservationStep1 render",selectedSession);
   const formatDate = (dateString: string) => {
+    console.log(dateString);
     const date = new Date(dateString);
     const days = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
     const months = [
@@ -70,6 +73,7 @@ export default function ReservationStep1({
   };
 
   const formatTime = (timeString: string) => {
+    console.log(timeString);
     const [hours, minutes] = timeString.split(":");
     return `${hours}h${minutes}`;
   };
@@ -109,11 +113,14 @@ export default function ReservationStep1({
             </p>
           ) : (
             sessions.slice(0, 6).map((session) => {
+              console.log("session", session);
               const isSelected = selectedSession?.id === session.id;
-              const dateFormatted = formatDate(session.sessionDate);
+              console.log("isSelected", isSelected);
+              const dateFormatted = formatDate(session.session_date);
+              console.log("dateFormatted", dateFormatted);
               const timeFormatted = `${formatTime(
-                session.startTime
-              )} - ${formatTime(session.endTime)}`;
+                session.start_time
+              )} - ${formatTime(session.end_time)}`;
 
               return (
                 <div

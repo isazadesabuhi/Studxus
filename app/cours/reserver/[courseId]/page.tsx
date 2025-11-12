@@ -107,6 +107,8 @@ export default function ReservationPage() {
               endTime: session.end_time,
               location: session.location,
             });
+            console.log("Preselected session:", session);
+            console.log("Preselected session:", selectedSession);
           }
         }
       } catch (err: any) {
