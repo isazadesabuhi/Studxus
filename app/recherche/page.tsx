@@ -20,7 +20,6 @@ interface APICourse {
   maxParticipants: number;
   createdAt: string;
   updatedAt: string;
-  coordinates: [number, number]; 
   author: {
     id: string;
     name: string;
@@ -28,6 +27,8 @@ interface APICourse {
     fullName: string;
     email: string;
     userType: string;
+    latitude?: number;
+    longitude?: number;
   } | null;
 }
 
@@ -135,13 +136,40 @@ export default function SearchPage() {
       image: "/vba.jpg", // Default image
     };
   };
-  console.log(courses);
 
-    const [viewport, setViewport] = React.useState({
-    longitude: 4.8357,
-    latitude: 45.7640,
-    zoom: 13,
-  });
+  // Calculate map center based on courses with valid coordinates
+  const calculateMapCenter = () => {
+    const coursesWithCoordinates = filteredCourses.filter(
+      (course) =>
+        course.author?.latitude != null && course.author?.longitude != null
+    );
+
+    if (coursesWithCoordinates.length === 0) {
+      // Default to Lyon
+      return { longitude: 4.8357, latitude: 45.764, zoom: 13 };
+    }
+
+    // Calculate average position
+    const avgLat =
+      coursesWithCoordinates.reduce(
+        (sum, course) => sum + (course.author?.latitude || 0),
+        0
+      ) / coursesWithCoordinates.length;
+    const avgLng =
+      coursesWithCoordinates.reduce(
+        (sum, course) => sum + (course.author?.longitude || 0),
+        0
+      ) / coursesWithCoordinates.length;
+
+    return { longitude: avgLng, latitude: avgLat, zoom: 12 };
+  };
+
+  const [viewport, setViewport] = React.useState(calculateMapCenter());
+
+  // Update viewport when filtered courses change
+  useEffect(() => {
+    setViewport(calculateMapCenter());
+  }, [filteredCourses]);
 
   if (loading) {
     return (
@@ -169,7 +197,7 @@ export default function SearchPage() {
   }
 
   return (
-    <div className="flex flex-col justify-center px-4 pb-20  bg-gray-50">
+    <div className="flex flex-col justify-center px-4 pb-20 bg-gray-50">
       {/* Search Bar */}
       <div className="mb-4">
         <input
@@ -179,11 +207,9 @@ export default function SearchPage() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Rechercher un cours..."
-          className="w-full placeholder:text-sm  mt-2 block rounded-[100px] border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          className="w-full placeholder:text-sm mt-2 block rounded-[100px] border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
         />
       </div>
-
-
 
       {/* Filters */}
       <div className="mb-4 flex flex-row gap-3">
@@ -216,36 +242,47 @@ export default function SearchPage() {
         </select>
       </div>
 
-       <div className="relative w-full h-[40vh] rounded-xl overflow-hidden">
-      <Map
-        mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
-        initialViewState={viewport}
-        mapStyle="mapbox://styles/mapbox/streets-v12"
-        style={{ width: "100%", height: "100%" }}
-      >
-        <NavigationControl position="bottom-right" />
+      {/* Map with professor locations */}
+      <div className="relative w-full h-[40vh] rounded-xl overflow-hidden mb-4">
+        <Map
+          mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
+          initialViewState={viewport}
+          mapStyle="mapbox://styles/mapbox/streets-v12"
+          style={{ width: "100%", height: "100%" }}
+        >
+          <NavigationControl position="bottom-right" />
 
-        {courses.map((course) => (
-          <Marker
-            key={course.id}
-            longitude={4.823198077821605}
-            latitude={45.77942902070231}
-          >
-            <div className="flex flex-col items-center">
-              <img
-                src="/marker-map.png"
-                alt={course.title}
-                className="w-8 h-8"
-              />
-              <span className="bg-slate-900 text-white text-xs font-semibold px-2 py-1 rounded-full mt-1 shadow">
-                {course.pricePerHour} €
-              </span>
-            </div>
-          </Marker>
-        ))}
-      </Map>
-    </div>
+          {filteredCourses.map((course) => {
+            // Only show marker if professor has valid coordinates
+            if (!course.author?.latitude || !course.author?.longitude) {
+              return null;
+            }
 
+            return (
+              <Marker
+                key={course.id}
+                longitude={course.author.longitude}
+                latitude={course.author.latitude}
+                onClick={(e) => {
+                  e.originalEvent.stopPropagation();
+                  router.push(`/cours/detail/${course.id}`);
+                }}
+              >
+                <div className="flex flex-col items-center cursor-pointer hover:scale-110 transition-transform">
+                  <img
+                    src="/marker-map.png"
+                    alt={course.title}
+                    className="w-8 h-8"
+                  />
+                  <span className="bg-slate-900 text-white text-xs font-semibold px-2 py-1 rounded-full mt-1 shadow whitespace-nowrap">
+                    {course.pricePerHour} €
+                  </span>
+                </div>
+              </Marker>
+            );
+          })}
+        </Map>
+      </div>
 
       {/* Results Count */}
       <div className="mb-4 flex items-center justify-between">
@@ -302,6 +339,14 @@ export default function SearchPage() {
                   Max: {course.maxParticipants} participants
                 </span>
               </div>
+              {/* Show professor location info if available */}
+              {course.author?.latitude && course.author?.longitude && (
+                <div className="mt-1 px-4">
+                  <span className="text-xs text-gray-400">
+                    📍 Professeur localisé
+                  </span>
+                </div>
+              )}
             </div>
           ))}
         </div>

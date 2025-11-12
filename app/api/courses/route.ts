@@ -212,31 +212,63 @@ export async function GET(req: Request) {
       );
     }
 
-    // Format response with author information
-    const formattedCourses = courses.map((course) => ({
-      id: course.id,
-      userId: course.user_id,
-      title: course.title,
-      description: course.description,
-      shortDescription: course.short_description,
-      category: course.category,
-      level: course.level,
-      pricePerHour: course.price_per_hour,
-      maxParticipants: course.max_participants,
-      createdAt: course.created_at,
-      updatedAt: course.updated_at,
-      // Author information
-      author: course.profiles
-        ? {
-            id: course.profiles.id,
-            name: course.profiles.name,
-            surname: course.profiles.surname,
-            fullName: `${course.profiles.name} ${course.profiles.surname}`,
-            email: course.profiles.email,
-            userType: course.profiles.user_type,
-          }
-        : null,
-    }));
+    // Fetch user metadata (including coordinates) for each unique author
+    const authorIds = [...new Set(courses.map((c) => c.user_id))];
+    const authorsWithMetadata = await Promise.all(
+      authorIds.map(async (authorId) => {
+        const { data: userData, error: userError } =
+          await supabaseAdmin.auth.admin.getUserById(authorId);
+
+        if (userError || !userData) {
+          return { id: authorId, metadata: null };
+        }
+
+        return {
+          id: authorId,
+          metadata: {
+            latitude: userData.user.user_metadata?.latitude || null,
+            longitude: userData.user.user_metadata?.longitude || null,
+          },
+        };
+      })
+    );
+
+    // Create a map of author metadata
+    const authorMetadataMap = new Map(
+      authorsWithMetadata.map((author) => [author.id, author.metadata])
+    );
+
+    // Format response with author information including coordinates
+    const formattedCourses = courses.map((course) => {
+      const authorMetadata = authorMetadataMap.get(course.user_id);
+
+      return {
+        id: course.id,
+        userId: course.user_id,
+        title: course.title,
+        description: course.description,
+        shortDescription: course.short_description,
+        category: course.category,
+        level: course.level,
+        pricePerHour: course.price_per_hour,
+        maxParticipants: course.max_participants,
+        createdAt: course.created_at,
+        updatedAt: course.updated_at,
+        // Author information with coordinates
+        author: course.profiles
+          ? {
+              id: course.profiles.id,
+              name: course.profiles.name,
+              surname: course.profiles.surname,
+              fullName: `${course.profiles.name} ${course.profiles.surname}`,
+              email: course.profiles.email,
+              userType: course.profiles.user_type,
+              latitude: authorMetadata?.latitude || null,
+              longitude: authorMetadata?.longitude || null,
+            }
+          : null,
+      };
+    });
 
     return NextResponse.json({
       success: true,
