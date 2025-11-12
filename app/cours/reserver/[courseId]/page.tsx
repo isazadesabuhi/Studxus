@@ -26,9 +26,9 @@ interface CourseDetail {
 
 interface CourseSession {
   id: string;
-  sessionDate: string;
-  startTime: string;
-  endTime: string;
+  session_date: string; // ← snake_case comme l'API
+  start_time: string; // ← snake_case comme l'API
+  end_time: string; // ← snake_case comme l'API
   location: string | null;
 }
 
@@ -102,9 +102,9 @@ export default function ReservationPage() {
           if (session) {
             setSelectedSession({
               id: session.id,
-              sessionDate: session.session_date,
-              startTime: session.start_time,
-              endTime: session.end_time,
+              session_date: session.session_date, // ← utiliser snake_case
+              start_time: session.start_time, // ← utiliser snake_case
+              end_time: session.end_time, // ← utiliser snake_case
               location: session.location,
             });
           }

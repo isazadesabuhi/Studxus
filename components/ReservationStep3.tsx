@@ -10,9 +10,9 @@ interface CourseDetail {
 
 interface CourseSession {
   id: string;
-  sessionDate: string;
-  startTime: string;
-  endTime: string;
+  session_date: string; // ← snake_case
+  start_time: string; // ← snake_case
+  end_time: string; // ← snake_case
 }
 
 interface ReservationStep3Props {
@@ -94,7 +94,9 @@ export default function ReservationStep3({
       "novembre",
       "décembre",
     ];
-    return `${days[date.getDay()]} ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+    return `${days[date.getDay()]} ${date.getDate()} ${
+      months[date.getMonth()]
+    } ${date.getFullYear()}`;
   };
 
   const formatTime = (timeString: string) => {
@@ -199,8 +201,8 @@ export default function ReservationStep3({
           date de réservation.
         </p>
         <p>
-          Vos données de paiement sont sécurisées et cryptées. Nous ne
-          stockons pas vos informations de carte bancaire complètes.
+          Vos données de paiement sont sécurisées et cryptées. Nous ne stockons
+          pas vos informations de carte bancaire complètes.
         </p>
       </div>
 
@@ -213,14 +215,14 @@ export default function ReservationStep3({
         <div className="flex justify-between text-sm">
           <span className="text-gray-600">Date:</span>
           <span className="font-medium text-gray-900">
-            {formatDate(selectedSession.sessionDate)}
+            {formatDate(selectedSession.session_date)}
           </span>
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-gray-600">Horaires:</span>
           <span className="font-medium text-gray-900">
-            {formatTime(selectedSession.startTime)} -{" "}
-            {formatTime(selectedSession.endTime)}
+            {formatTime(selectedSession.start_time)} -{" "}
+            {formatTime(selectedSession.end_time)}
           </span>
         </div>
         <div className="border-t border-gray-200 pt-2 mt-2 flex justify-between">
@@ -254,4 +256,3 @@ export default function ReservationStep3({
     </div>
   );
 }
-

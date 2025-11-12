@@ -20,9 +20,9 @@ interface CourseDetail {
 
 interface CourseSession {
   id: string;
-  sessionDate: string;
-  startTime: string;
-  endTime: string;
+  session_date: string; // ← snake_case
+  start_time: string; // ← snake_case
+  end_time: string; // ← snake_case
   location: string | null;
 }
 
@@ -110,10 +110,10 @@ export default function ReservationStep1({
           ) : (
             sessions.slice(0, 6).map((session) => {
               const isSelected = selectedSession?.id === session.id;
-              const dateFormatted = formatDate(session.sessionDate);
+              const dateFormatted = formatDate(session.session_date);
               const timeFormatted = `${formatTime(
-                session.startTime
-              )} - ${formatTime(session.endTime)}`;
+                session.start_time
+              )} - ${formatTime(session.end_time)}`;
 
               return (
                 <div
@@ -168,8 +168,8 @@ export default function ReservationStep1({
           <div className="flex items-center gap-2 text-sm text-gray-700">
             <Clock className="w-4 h-4" />
             <span>
-              {formatTime(selectedSession.startTime)} -{" "}
-              {formatTime(selectedSession.endTime)}
+              {formatTime(selectedSession.start_time)} -{" "}
+              {formatTime(selectedSession.end_time)}
             </span>
           </div>
         </div>
