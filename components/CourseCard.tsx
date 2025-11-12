@@ -21,15 +21,22 @@ export type Course = {
   distance?: number;
   days?: string[]; // e.g., ["Lu", "Ma", "Me", "Je", "Ve", "Sa", "Di"]
   timeSlot?: string; // e.g., "18h-19h"
+  userId?: string; // ID of the course owner
 };
 
 type Props = {
   course: Course;
   onDetails?: (id: string) => void;
   onEdit?: (id: string) => void;
+  currentUserId?: string; // ID of the currently logged-in user
 };
 
-export default function CourseCard({ course, onDetails, onEdit }: Props) {
+export default function CourseCard({
+  course,
+  onDetails,
+  onEdit,
+  currentUserId,
+}: Props) {
   // Default values
   const {
     id,
@@ -42,6 +49,7 @@ export default function CourseCard({ course, onDetails, onEdit }: Props) {
     distance = 0,
     days = [],
     timeSlot = "Horaire à définir",
+    userId, // Course owner ID
   } = course;
 
   // Extract numeric price for display
@@ -49,7 +57,10 @@ export default function CourseCard({ course, onDetails, onEdit }: Props) {
 
   // Available days of week
   const weekDays = ["Lu", "Ma", "Me", "Je", "Ve", "Sa", "Di"];
-  console.log(course);
+
+  // Check if current user is the owner of this course
+  const isOwner = currentUserId && userId && currentUserId === userId;
+
   return (
     <div className="w-full rounded-3xl border-2 border-slate-300 bg-gradient-to-br from-sky-100 to-blue-50 p-4 shadow-md">
       <div className="flex items-start gap-4">
@@ -135,18 +146,29 @@ export default function CourseCard({ course, onDetails, onEdit }: Props) {
 
       {/* Action Buttons */}
       <div className="mt-4 flex gap-2">
-        <button
-          onClick={() => onDetails?.(id)}
-          className="flex-1 rounded-full border-2 border-slate-800 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors"
-        >
-          Plus de détails
-        </button>
-        {onEdit && (
+        {isOwner ? (
+          // Show both buttons for course owner
+          <>
+            <button
+              onClick={() => onDetails?.(id)}
+              className="flex-1 rounded-full border-2 border-slate-800 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors"
+            >
+              Plus de détails
+            </button>
+            <button
+              onClick={() => onEdit?.(id)}
+              className="flex-1 rounded-full bg-slate-800 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 transition-colors"
+            >
+              Modifier
+            </button>
+          </>
+        ) : (
+          // Show only details button for other users' courses
           <button
-            onClick={() => onEdit(id)}
-            className="flex-1 rounded-full bg-slate-800 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 transition-colors"
+            onClick={() => onDetails?.(id)}
+            className="w-full rounded-full border-2 border-slate-800 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors"
           >
-            Modifier
+            Plus de détails
           </button>
         )}
       </div>

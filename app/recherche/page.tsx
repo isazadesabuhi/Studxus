@@ -7,6 +7,7 @@ import CourseCard, { type Course } from "@/components/CourseCard";
 import Map, { Marker, NavigationControl } from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
 import React from "react";
+import { supabase } from "@/lib/supabase";
 
 interface APICourse {
   id: string;
@@ -41,6 +42,20 @@ export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedLevel, setSelectedLevel] = useState<string>("all");
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  // Fetch current user
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        setCurrentUserId(user.id);
+      }
+    };
+    fetchCurrentUser();
+  }, []);
 
   // Fetch all courses on mount
   useEffect(() => {
@@ -48,6 +63,16 @@ export default function SearchPage() {
       try {
         setLoading(true);
         setError(null);
+
+        const {
+          data: { user },
+          error: userError,
+        } = await supabase.auth.getUser();
+
+        if (userError || !user) {
+          router.push("/");
+          return;
+        }
 
         // Fetch all courses (no userId filter)
         const response = await fetch("/api/courses", {
@@ -73,7 +98,7 @@ export default function SearchPage() {
     };
 
     fetchAllCourses();
-  }, []);
+  }, [router]);
 
   // Filter courses based on search query, category, and level
   useEffect(() => {
@@ -134,6 +159,7 @@ export default function SearchPage() {
       level: apiCourse.level,
       price: `${apiCourse.pricePerHour}€/h`,
       image: "/vba.jpg", // Default image
+      userId: apiCourse.userId, // Pass the course owner ID
     };
   };
 
@@ -331,6 +357,7 @@ export default function SearchPage() {
                 course={transformToCourseCard(course)}
                 onDetails={handleDetails}
                 onEdit={handleEdit}
+                currentUserId={currentUserId || undefined}
               />
               {/* Additional info badge */}
               <div className="mt-2 flex items-center justify-between px-4">
