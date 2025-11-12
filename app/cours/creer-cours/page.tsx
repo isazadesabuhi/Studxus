@@ -15,6 +15,7 @@ export default function CreateCoursePage() {
   const [error, setError] = useState<string | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [createdCourseId, setCreatedCourseId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -23,11 +24,13 @@ export default function CreateCoursePage() {
     maxParticipants: 5,
     category: "",
 
-    // Champs utilisés dans Step 2
+    // Session details - Step 2
     date: "",
     startTime: "",
     endTime: "",
+    location: "5 rue François Dauphin, 69002 Lyon",
 
+    // Pricing - Step 3
     level: "Débutant",
     price: 10,
   });
@@ -91,8 +94,8 @@ export default function CreateCoursePage() {
         throw new Error("Vous devez être connecté pour créer un cours");
       }
 
-      // Prepare the request body according to the API schema
-      const requestBody = {
+      // Step 1: Create the course
+      const courseRequestBody = {
         title: formData.title,
         description: formData.description,
         shortDescription: formData.shortDesc,
@@ -102,23 +105,60 @@ export default function CreateCoursePage() {
         maxParticipants: formData.maxParticipants,
       };
 
-      // Make POST request to /api/courses
-      const response = await fetch("/api/courses", {
+      const courseResponse = await fetch("/api/courses", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${sessionData.session.access_token}`,
         },
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify(courseRequestBody),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!courseResponse.ok) {
+        const errorData = await courseResponse.json();
         throw new Error(errorData.error || "Échec de la création du cours");
       }
 
-      const result = await response.json();
-      console.log("Course created successfully:", result);
+      const courseResult = await courseResponse.json();
+      const courseId = courseResult.course.id;
+      setCreatedCourseId(courseId);
+
+      console.log("Course created successfully:", courseResult);
+
+      // Step 2: Create a session for the course if date/time are provided
+      if (formData.date && formData.startTime && formData.endTime) {
+        const sessionRequestBody = {
+          sessionDate: formData.date,
+          startTime: formData.startTime,
+          endTime: formData.endTime,
+          maxParticipants: formData.maxParticipants,
+          location: formData.location || null,
+        };
+
+        const sessionResponse = await fetch(
+          `/api/courses/${courseId}/sessions`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${sessionData.session.access_token}`,
+            },
+            body: JSON.stringify(sessionRequestBody),
+          }
+        );
+
+        if (!sessionResponse.ok) {
+          const sessionErrorData = await sessionResponse.json();
+          console.error("Session creation failed:", sessionErrorData);
+          // Don't throw error - course is created, session creation is optional
+          setError(
+            "Cours créé mais échec de la création de la session. Vous pouvez ajouter une session plus tard."
+          );
+        } else {
+          const sessionResult = await sessionResponse.json();
+          console.log("Session created successfully:", sessionResult);
+        }
+      }
 
       // Move to success screen
       nextStep();

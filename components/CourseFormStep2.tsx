@@ -7,6 +7,7 @@ interface CourseFormStep2Props {
     date?: string;
     startTime?: string;
     endTime?: string;
+    location?: string;
   };
   onPrev: () => void;
   onNext: () => void;
@@ -14,6 +15,12 @@ interface CourseFormStep2Props {
 }
 
 export default function CourseFormStep2({ data, onPrev, onNext, onUpdate }: CourseFormStep2Props) {
+  // Get today's date in YYYY-MM-DD format for min attribute
+  const today = new Date().toISOString().split('T')[0];
+
+  // Validate that all required fields are filled
+  const canProceed = data.date && data.startTime && data.endTime;
+
   return (
     <div className="p-4 max-w-md mx-auto">
       {/* ✅ Barre de progression */}
@@ -26,38 +33,42 @@ export default function CourseFormStep2({ data, onPrev, onNext, onUpdate }: Cour
       {/* Sélection de date */}
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Date du cours
+          Date du cours *
         </label>
         <input
           type="date"
           value={data.date || ""}
           onChange={(e) => onUpdate("date", e.target.value)}
+          min={today}
+          required
           className="w-full border border-gray-300 rounded-lg p-2 text-gray-800 focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
         />
       </div>
 
       {/* Heures de début et de fin */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Heure de début
+            Heure de début *
           </label>
           <input
             type="time"
             value={data.startTime || ""}
             onChange={(e) => onUpdate("startTime", e.target.value)}
+            required
             className="w-full border border-gray-300 rounded-lg p-2 text-gray-800 focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
           />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Heure de fin
+            Heure de fin *
           </label>
           <input
             type="time"
             value={data.endTime || ""}
             onChange={(e) => onUpdate("endTime", e.target.value)}
+            required
             className="w-full border border-gray-300 rounded-lg p-2 text-gray-800 focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
           />
         </div>
@@ -76,7 +87,12 @@ export default function CourseFormStep2({ data, onPrev, onNext, onUpdate }: Cour
         <button
           type="button"
           onClick={onNext}
-          className="bg-blue-900 text-white px-6 py-2 rounded-full hover:bg-blue-800"
+          disabled={!canProceed}
+          className={`px-6 py-2 rounded-full transition-all ${
+            canProceed
+              ? "bg-blue-900 text-white hover:bg-blue-800"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+          }`}
         >
           Suivant →
         </button>
