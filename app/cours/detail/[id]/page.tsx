@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Image from "next/image";
@@ -53,15 +53,11 @@ export default function CourseDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [isOwner, setIsOwner] = useState(false);
-
-  interface UserBooking {
-    id: string;
-    course_session_id: string;
-    status: string;
-  }
-
-  // Add this state variable with other useState declarations (around line 40)
-  const [userBookings, setUserBookings] = useState<UserBooking[]>([]);
+  const [showContactForm, setShowContactForm] = useState(false);
+  const [contactSubject, setContactSubject] = useState("");
+  const [contactMessage, setContactMessage] = useState("");
+  const [contactError, setContactError] = useState<string | null>(null);
+  const [contactLoading, setContactLoading] = useState(false);
 
   // Fetch course details and check ownership
   useEffect(() => {
@@ -103,38 +99,9 @@ export default function CourseDetailPage() {
         const sessionsResponse = await fetch(`/api/courses/${id}/sessions`);
         if (sessionsResponse.ok) {
           const sessionsData = await sessionsResponse.json();
-          setSessions(sessionsData.sessions);
+          setSessions(sessionsData.sessions || []);
           if (sessionsData.sessions && sessionsData.sessions.length > 0) {
             setSelectedSessionId(sessionsData.sessions[0].id);
-          }
-        }
-
-        // NEW: Fetch user's bookings for this course
-        if (user) {
-          const { data: sessionData } = await supabase.auth.getSession();
-          if (sessionData.session) {
-            const bookingsResponse = await fetch("/api/bookings", {
-              headers: {
-                Authorization: `Bearer ${sessionData.session.access_token}`,
-              },
-            });
-            if (bookingsResponse.ok) {
-              const bookingsData = await bookingsResponse.json();
-              // Filter bookings for this course that are active
-              const courseBookings = (bookingsData.bookings || [])
-                .filter(
-                  (b: any) =>
-                    b.courseId === id &&
-                    b.status !== "cancelled" &&
-                    b.status !== "completed"
-                )
-                .map((b: any) => ({
-                  id: b.id,
-                  course_session_id: b.courseSessionId,
-                  status: b.status,
-                }));
-              setUserBookings(courseBookings);
-            }
           }
         }
       } catch (err: any) {
@@ -165,16 +132,6 @@ export default function CourseDetailPage() {
     if (!selectedSessionId) {
       alert("Veuillez sélectionner une date pour réserver");
       setActive("date");
-      return;
-    }
-
-    // NEW: Check if already booked
-    const isAlreadyBooked = userBookings.some(
-      (booking) => booking.course_session_id === selectedSessionId
-    );
-
-    if (isAlreadyBooked) {
-      alert("Vous avez déjà réservé cette session");
       return;
     }
 
@@ -210,7 +167,7 @@ export default function CourseDetailPage() {
       }
 
       alert("Cours supprimé avec succès");
-      router.push("/cours/reserves");
+      router.push("/cours");
     } catch (err: any) {
       alert(err.message || "Erreur lors de la suppression");
     }
@@ -224,7 +181,78 @@ export default function CourseDetailPage() {
     }
 
     // TODO: Implement messaging functionality
-    alert(`Contacter ${course?.author?.fullName} - Fonctionnalité à venir !`);
+    if (!course?.author?.id) {
+      alert("Impossible de contacter cet enseignant pour le moment");
+      return;
+    }
+
+    setContactError(null);
+    setShowContactForm(true);
+  };
+
+  const handleSubmitContact = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!course?.author?.id) {
+      setContactError("Impossible de trouver l'enseignant du cours");
+      return;
+    }
+
+    if (!contactMessage.trim()) {
+      setContactError("Veuillez écrire un message avant d'envoyer");
+      return;
+    }
+
+    try {
+      setContactLoading(true);
+      setContactError(null);
+
+      const { data: sessionData } = await supabase.auth.getSession();
+
+      if (!sessionData.session) {
+        setContactError("Votre session a expiré. Veuillez vous reconnecter.");
+        return;
+      }
+
+      const response = await fetch("/api/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionData.session.access_token}`,
+        },
+        body: JSON.stringify({
+          recipientId: course.author.id,
+          subject: contactSubject.trim() ? contactSubject.trim() : null,
+          message: contactMessage.trim(),
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        const errorMessage = data?.error || "Échec de l'envoi du message";
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+      const conversationId = data?.message?.conversation_id;
+
+      setContactMessage("");
+      setContactSubject("");
+      setShowContactForm(false);
+
+      if (conversationId) {
+        router.push(`/message/${conversationId}`);
+      } else {
+        router.push("/message");
+      }
+    } catch (err: any) {
+      console.error("Error sending message:", err);
+      setContactError(
+        err?.message || "Une erreur est survenue lors de l'envoi du message"
+      );
+    } finally {
+      setContactLoading(false);
+    }
   };
 
   if (loading) {
@@ -249,7 +277,6 @@ export default function CourseDetailPage() {
       </main>
     );
   }
-  console.log(sessions);
 
   return (
     <main className="mx-auto max-w-screen-sm bg-white rounded-lg shadow-sm">
@@ -310,7 +337,7 @@ export default function CourseDetailPage() {
               {course.author?.userType || "Enseignant"}
             </p>
           </div>
-          {!isOwner && (
+          {!isOwner && course.author?.id && (
             <button
               onClick={handleContactTeacher}
               className="text-blue-900 border border-blue-900 rounded-full px-3 py-1 text-sm hover:bg-blue-100"
@@ -321,25 +348,61 @@ export default function CourseDetailPage() {
         </div>
 
         {/* --- Owner Actions --- */}
-        {isOwner && (
-          <div className="mb-6 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <p className="text-sm text-yellow-800 mb-2">
-              ✏️ Vous êtes le propriétaire de ce cours
-            </p>
-            <div className="flex gap-2">
-              <button
-                onClick={handleEditCourse}
-                className="flex-1 text-blue-900 border border-blue-900 rounded-full px-4 py-2 text-sm font-medium hover:bg-blue-50"
-              >
-                Modifier
-              </button>
-              <button
-                onClick={handleDeleteCourse}
-                className="flex-1 text-red-600 border border-red-600 rounded-full px-4 py-2 text-sm font-medium hover:bg-red-50"
-              >
-                Supprimer
-              </button>
-            </div>
+        {!isOwner && showContactForm && (
+          <div className="mb-6 p-4 border border-blue-100 rounded-lg bg-blue-50">
+            <form className="space-y-3" onSubmit={handleSubmitContact}>
+              <div>
+                <label className="block text-sm font-medium text-blue-900 mb-1">
+                  Sujet (optionnel)
+                </label>
+                <input
+                  type="text"
+                  value={contactSubject}
+                  onChange={(event) => setContactSubject(event.target.value)}
+                  placeholder={`Message à ${course.author?.fullName}`}
+                  className="w-full px-3 py-2 border border-blue-200 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-blue-900 mb-1">
+                  Message
+                </label>
+                <textarea
+                  value={contactMessage}
+                  onChange={(event) => setContactMessage(event.target.value)}
+                  placeholder="Présentez-vous et expliquez votre demande"
+                  rows={4}
+                  className="w-full px-3 py-2 border border-blue-200 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              {contactError && (
+                <p className="text-sm text-red-600">{contactError}</p>
+              )}
+
+              <div className="flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowContactForm(false);
+                    setContactMessage("");
+                    setContactSubject("");
+                    setContactError(null);
+                  }}
+                  className="px-3 py-2 text-sm text-blue-900 hover:underline"
+                  disabled={contactLoading}
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  disabled={contactLoading}
+                  className="px-4 py-2 bg-blue-900 text-white rounded-full text-sm font-medium hover:bg-blue-800 disabled:opacity-60"
+                >
+                  {contactLoading ? "Envoi..." : "Envoyer"}
+                </button>
+              </div>
+            </form>
           </div>
         )}
 
@@ -404,7 +467,7 @@ export default function CourseDetailPage() {
               <h3 className="font-semibold text-gray-900 mb-4">
                 Prochaines dates
               </h3>
-              {sessions.length == 0 ? (
+              {sessions.length === 0 ? (
                 <div className="text-center py-10 text-gray-500">
                   <p>Aucune session disponible pour ce cours</p>
                 </div>
@@ -444,29 +507,20 @@ export default function CourseDetailPage() {
                     const isFull =
                       session.current_participants >= session.max_participants;
 
-                    // NEW: Check if user already booked this session
-                    const isAlreadyBooked = userBookings.some(
-                      (booking) => booking.course_session_id === session.id
-                    );
-
                     return (
                       <div
                         key={session.id}
                         className={`flex items-center justify-between p-4 border-2 rounded-lg ${
-                          isAlreadyBooked
-                            ? "border-green-500 bg-green-50 opacity-75"
-                            : isSelected
+                          isSelected
                             ? "border-blue-900 bg-blue-50"
                             : "border-gray-200"
                         } ${
-                          isFull || isAlreadyBooked
+                          isFull
                             ? "opacity-50"
                             : "cursor-pointer hover:border-gray-300"
                         }`}
                         onClick={() =>
-                          !isFull &&
-                          !isAlreadyBooked &&
-                          setSelectedSessionId(session.id)
+                          !isFull && setSelectedSessionId(session.id)
                         }
                       >
                         <div className="flex-1">
@@ -484,27 +538,18 @@ export default function CourseDetailPage() {
                               {session.max_participants})
                             </p>
                           )}
-                          {isAlreadyBooked && (
-                            <p className="text-sm text-green-600 mt-1">
-                              ✓ Déjà réservé
-                            </p>
-                          )}
                         </div>
                         <button
                           className={`px-4 py-2 rounded-lg font-medium ${
-                            isAlreadyBooked
-                              ? "bg-green-200 text-green-700 cursor-not-allowed"
-                              : isSelected
+                            isSelected
                               ? "bg-blue-900 text-white"
                               : isFull
                               ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                               : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                           }`}
-                          disabled={isFull || isAlreadyBooked}
+                          disabled={isFull}
                         >
-                          {isAlreadyBooked
-                            ? "Réservé"
-                            : isFull
+                          {isFull
                             ? "Complet"
                             : isSelected
                             ? "Sélectionné"
