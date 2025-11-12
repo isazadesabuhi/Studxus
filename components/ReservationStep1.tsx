@@ -120,7 +120,7 @@ export default function ReservationStep1({
                   key={session.id}
                   className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-all ${
                     isSelected
-                      ? "border-blue-900 bg-blue-50"
+                      ? "border-primary bg-blue-50"
                       : "border-gray-200 hover:border-gray-300"
                   }`}
                   onClick={() => onSessionSelect(session)}
@@ -139,7 +139,7 @@ export default function ReservationStep1({
                   <button
                     className={`px-4 py-2 rounded-lg font-medium ${
                       isSelected
-                        ? "bg-blue-900 text-white"
+                        ? "bg-primary text-white"
                         : "bg-gray-200 text-gray-700"
                     }`}
                   >
@@ -179,7 +179,7 @@ export default function ReservationStep1({
       <div className="bg-white border border-gray-200 rounded-lg p-4">
         <div className="flex justify-between items-center">
           <span className="font-medium text-gray-900">Prix total</span>
-          <span className="text-xl font-bold text-blue-900">
+          <span className="text-xl font-bold text-primary">
             {totalPrice.toFixed(2)}€
           </span>
         </div>
@@ -211,7 +211,7 @@ export default function ReservationStep1({
         disabled={!canProceed}
         className={`w-full py-4 rounded-lg font-semibold text-white transition-all ${
           canProceed
-            ? "bg-blue-900 hover:bg-blue-800"
+            ? "bg-primary hover:bg-blue-800"
             : "bg-gray-300 cursor-not-allowed"
         }`}
       >

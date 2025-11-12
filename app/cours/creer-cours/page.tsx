@@ -144,7 +144,7 @@ export default function CreateCoursePage() {
       {/* Show loading overlay when submitting */}
       {isSubmitting && (
         <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-sm text-blue-600">Création du cours en cours...</p>
+          <p className="text-sm text-primary">Création du cours en cours...</p>
         </div>
       )}
 

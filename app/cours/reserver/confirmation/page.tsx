@@ -136,7 +136,7 @@ function ConfirmationContent() {
           </p>
           <button
             onClick={() => router.push("/cours/reserves")}
-            className="px-4 py-2 bg-blue-900 text-white rounded-lg"
+            className="px-4 py-2 bg-primary text-white rounded-lg"
           >
             Retour aux cours
           </button>
@@ -268,7 +268,7 @@ function ConfirmationContent() {
         {/* Action Button */}
         <button
           onClick={() => router.push("/cours/reserves?tab=reserved")}
-          className="w-full py-4 bg-blue-900 text-white rounded-lg font-semibold hover:bg-blue-800 transition-all"
+          className="w-full py-4 bg-primary text-white rounded-lg font-semibold hover:bg-blue-800 transition-all"
         >
           Afficher mes cours
         </button>

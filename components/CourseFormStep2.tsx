@@ -76,7 +76,7 @@ export default function CourseFormStep2({ data, onPrev, onNext, onUpdate }: Cour
         <button
           type="button"
           onClick={onNext}
-          className="bg-blue-900 text-white px-6 py-2 rounded-full hover:bg-blue-800"
+          className="bg-primary text-white px-6 py-2 rounded-full hover:bg-blue-800"
         >
           Suivant →
         </button>

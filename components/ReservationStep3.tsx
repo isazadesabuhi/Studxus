@@ -181,7 +181,7 @@ export default function ReservationStep3({
           onChange={(e) =>
             onFormDataChange({ ...formData, saveCard: e.target.checked })
           }
-          className="w-5 h-5 text-blue-900 border-gray-300 rounded focus:ring-blue-500"
+          className="w-5 h-5 text-primary border-gray-300 rounded focus:ring-blue-500"
         />
         <label htmlFor="saveCard" className="text-sm text-gray-700">
           Enregistrer cette carte bancaire
@@ -225,7 +225,7 @@ export default function ReservationStep3({
         </div>
         <div className="border-t border-gray-200 pt-2 mt-2 flex justify-between">
           <span className="font-semibold text-gray-900">Total:</span>
-          <span className="text-xl font-bold text-blue-900">
+          <span className="text-xl font-bold text-primary">
             {course.pricePerHour.toFixed(2)}€
           </span>
         </div>
@@ -244,7 +244,7 @@ export default function ReservationStep3({
           disabled={!isFormValid}
           className={`flex-1 py-4 rounded-lg font-semibold text-white transition-all ${
             isFormValid
-              ? "bg-blue-900 hover:bg-blue-800"
+              ? "bg-primary hover:bg-blue-800"
               : "bg-gray-300 cursor-not-allowed"
           }`}
         >

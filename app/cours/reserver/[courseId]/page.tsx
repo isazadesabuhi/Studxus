@@ -225,7 +225,7 @@ export default function ReservationPage() {
           <p className="text-red-600 mb-4">{error || "Cours introuvable"}</p>
           <button
             onClick={() => router.back()}
-            className="px-4 py-2 bg-blue-900 text-white rounded-lg"
+            className="px-4 py-2 bg-primary text-white rounded-lg"
           >
             Retour
           </button>

@@ -173,7 +173,7 @@ export default function ConversationsPage() {
         >
           Non lues
           {conversations.filter((c) => c.unreadCount > 0).length > 0 && (
-            <span className="ml-1 px-1.5 text-xs bg-blue-900 text-white rounded-full">
+            <span className="ml-1 px-1.5 text-xs bg-primary text-white rounded-full">
               {conversations.filter((c) => c.unreadCount > 0).length}
             </span>
           )}

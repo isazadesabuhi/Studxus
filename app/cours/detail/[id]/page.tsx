@@ -194,7 +194,7 @@ export default function CourseDetailPage() {
         <p className="text-red-600 mb-4">{error || "Cours introuvable"} 😕</p>
         <button
           onClick={() => router.push("/search")}
-          className="px-4 py-2 bg-blue-900 text-white rounded-lg"
+          className="px-4 py-2 bg-primary text-white rounded-lg"
         >
           Retour à la recherche
         </button>
@@ -208,7 +208,7 @@ export default function CourseDetailPage() {
       <div className="p-4">
         <button
           onClick={() => router.back()}
-          className="text-blue-900 font-semibold mb-3"
+          className="text-primary font-semibold mb-3"
         >
           ← Retour
         </button>
@@ -220,7 +220,7 @@ export default function CourseDetailPage() {
             className="w-20 h-20 rounded-lg object-cover"
           />
           <div>
-            <h1 className="text-2xl font-bold text-blue-900">{course.title}</h1>
+            <h1 className="text-2xl font-bold text-primary">{course.title}</h1>
             <p className="text-gray-700 text-sm mt-1">
               {course.shortDescription || course.description}
             </p>
@@ -231,21 +231,21 @@ export default function CourseDetailPage() {
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div className="bg-blue-50 p-3 rounded-lg">
             <p className="text-xs text-gray-600">Prix</p>
-            <p className="text-lg font-bold text-blue-900">
+            <p className="text-lg font-bold text-primary">
               {course.pricePerHour}€/h
             </p>
           </div>
           <div className="bg-blue-50 p-3 rounded-lg">
             <p className="text-xs text-gray-600">Niveau</p>
-            <p className="text-lg font-bold text-blue-900">{course.level}</p>
+            <p className="text-lg font-bold text-primary">{course.level}</p>
           </div>
           <div className="bg-blue-50 p-3 rounded-lg">
             <p className="text-xs text-gray-600">Catégorie</p>
-            <p className="text-lg font-bold text-blue-900">{course.category}</p>
+            <p className="text-lg font-bold text-primary">{course.category}</p>
           </div>
           <div className="bg-blue-50 p-3 rounded-lg">
             <p className="text-xs text-gray-600">Places</p>
-            <p className="text-lg font-bold text-blue-900">
+            <p className="text-lg font-bold text-primary">
               Max {course.maxParticipants}
             </p>
           </div>
@@ -254,7 +254,7 @@ export default function CourseDetailPage() {
         {/* --- Enseignant --- */}
         <div className="flex items-center justify-between bg-blue-50 p-3 rounded-lg mb-6">
           <div>
-            <p className="font-semibold text-blue-900">
+            <p className="font-semibold text-primary">
               {course.author?.fullName || "Anonyme"}
             </p>
             <p className="text-sm text-gray-600">
@@ -264,7 +264,7 @@ export default function CourseDetailPage() {
           {!isOwner && (
             <button
               onClick={handleContactTeacher}
-              className="text-blue-900 border border-blue-900 rounded-full px-3 py-1 text-sm hover:bg-blue-100"
+              className="text-primary border border-primary rounded-full px-3 py-1 text-sm hover:bg-blue-100"
             >
               Contacter
             </button>
@@ -280,7 +280,7 @@ export default function CourseDetailPage() {
             <div className="flex gap-2">
               <button
                 onClick={handleEditCourse}
-                className="flex-1 text-blue-900 border border-blue-900 rounded-full px-4 py-2 text-sm font-medium hover:bg-blue-50"
+                className="flex-1 text-primary border border-blue-900 rounded-full px-4 py-2 text-sm font-medium hover:bg-blue-50"
               >
                 Modifier
               </button>
@@ -335,7 +335,7 @@ export default function CourseDetailPage() {
               <p className="mb-4 whitespace-pre-line">{course.description}</p>
 
               <div className="mt-6 pt-4 border-t border-gray-200">
-                <h3 className="font-semibold text-blue-900 mb-2">
+                <h3 className="font-semibold text-primary mb-2">
                   Informations complémentaires
                 </h3>
                 <div className="space-y-2 text-sm">
@@ -392,7 +392,7 @@ export default function CourseDetailPage() {
                         key={session.id}
                         className={`flex items-center justify-between p-4 border-2 rounded-lg ${
                           isSelected
-                            ? "border-blue-900 bg-blue-50"
+                            ? "border-primary bg-blue-50"
                             : "border-gray-200"
                         } ${isFull ? "opacity-50" : "cursor-pointer hover:border-gray-300"}`}
                         onClick={() => !isFull && setSelectedSessionId(session.id)}
@@ -416,7 +416,7 @@ export default function CourseDetailPage() {
                         <button
                           className={`px-4 py-2 rounded-lg font-medium ${
                             isSelected
-                              ? "bg-blue-900 text-white"
+                              ? "bg-primary text-white"
                               : isFull
                               ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                               : "bg-gray-200 text-gray-700 hover:bg-gray-300"
@@ -446,7 +446,7 @@ export default function CourseDetailPage() {
               disabled={!selectedSessionId}
               className={`w-full py-3 rounded-full font-semibold transition-all ${
                 selectedSessionId
-                  ? "bg-blue-900 text-white hover:bg-blue-800"
+                  ? "bg-primary text-white hover:bg-blue-800"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
             >

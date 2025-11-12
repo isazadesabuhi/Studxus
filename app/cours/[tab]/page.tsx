@@ -206,7 +206,7 @@ function MyCoursesContent({ activeTab }: { activeTab: TabKey }) {
             </p>
             <button
               onClick={() => router.push("/recherche")}
-              className="rounded-full bg-blue-900 px-6 py-3 text-sm font-bold text-white hover:bg-blue-800"
+              className="rounded-full bg-primary px-6 py-3 text-sm font-bold text-white hover:bg-blue-800"
             >
               Rechercher des cours
             </button>
@@ -223,7 +223,7 @@ function MyCoursesContent({ activeTab }: { activeTab: TabKey }) {
                 }
               >
                 {booking.session && (
-                  <p className="font-semibold text-blue-900 mb-1">
+                  <p className="font-semibold text-primary mb-1">
                     {formatDate(booking.session.sessionDate)}
                   </p>
                 )}

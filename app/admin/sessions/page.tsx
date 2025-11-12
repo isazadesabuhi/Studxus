@@ -315,7 +315,7 @@ export default function ManageSessionsPage() {
               className={`w-full py-3 rounded-lg font-semibold text-white transition-all ${
                 loading
                   ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-900 hover:bg-blue-800"
+                  : "bg-primary-900 hover:bg-blue-800"
               }`}
             >
               {loading ? "Création..." : "Créer la Session"}

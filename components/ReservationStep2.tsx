@@ -50,7 +50,7 @@ export default function ReservationStep2({
               key={method.id}
               className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
                 isSelected
-                  ? "border-blue-900 bg-blue-50"
+                  ? "border-primary bg-blue-50"
                   : "border-gray-200 hover:border-gray-300"
               }`}
               onClick={() =>
@@ -61,7 +61,7 @@ export default function ReservationStep2({
                 <div
                   className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                     isSelected
-                      ? "border-blue-900 bg-blue-900"
+                      ? "border-primary bg-primary"
                       : "border-gray-300"
                   }`}
                 >
@@ -92,7 +92,7 @@ export default function ReservationStep2({
           disabled={!canProceed}
           className={`flex-1 py-4 rounded-lg font-semibold text-white transition-all ${
             canProceed
-              ? "bg-blue-900 hover:bg-blue-800"
+              ? "bg-primary hover:bg-blue-800"
               : "bg-gray-300 cursor-not-allowed"
           }`}
         >

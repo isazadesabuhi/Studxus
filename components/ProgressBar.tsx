@@ -19,7 +19,7 @@ export default function ProgressBar({ step, totalSteps = 3 }: ProgressBarProps) 
                   isCompleted
                     ? "bg-yellow-400 border-yellow-400 text-white"
                     : isActive
-                    ? "bg-blue-900 border-blue-900 text-white"
+                    ? "bg-primary border-primary text-white"
                     : "bg-gray-200 border-gray-300 text-gray-500"
                 }`}
             >

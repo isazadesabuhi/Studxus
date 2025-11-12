@@ -19,7 +19,7 @@ export default function CourseFormStep1({
     <div>
       {/* Barre de progression */}
       <ProgressBar step={1} />
-      <h2 className="text-xl font-bold mb-4 text-blue-900">
+      <h2 className="text-xl font-bold mb-4 text-primary">
         Définissez le sujet de votre cours
       </h2>
 
@@ -94,7 +94,7 @@ export default function CourseFormStep1({
         className={`w-full py-3 rounded-xl font-semibold transition-all ${
           categoriesLoading || !data.category
             ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-            : "bg-blue-900 text-white hover:bg-blue-800"
+            : "bg-primary text-white hover:bg-blue-800"
         }`}
       >
         {categoriesLoading ? "Chargement..." : "Suivant"}

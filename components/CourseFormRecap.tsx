@@ -16,7 +16,7 @@ export default function CourseFormRecap() {
 
       <button
         onClick={() => router.push("/cours/enseignes")}
-        className="w-full bg-blue-900 text-white py-3 rounded-xl font-semibold"
+        className="w-full bg-primary text-white py-3 rounded-xl font-semibold"
       >
         Afficher mes cours
       </button>

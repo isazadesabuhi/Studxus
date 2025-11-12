@@ -226,7 +226,7 @@ export default function ConversationDetailPage() {
   }
 
   return (
-    <main className="mx-auto max-w-screen-sm bg-white min-h-screen flex flex-col mb-64">
+    <main className="mx-auto max-w-screen-sm bg-white min-h-screen flex flex-col">
       {/* Header */}
       <div className="border-b border-gray-200 px-4 py-3 bg-white sticky top-0 z-10">
         <div className="flex items-center gap-3">
@@ -270,7 +270,7 @@ export default function ConversationDetailPage() {
               <div
                 className={`max-w-[75%] rounded-2xl px-4 py-2 ${
                   message.isSentByMe
-                    ? "bg-blue-900 text-white"
+                    ? "bg-primary text-white"
                     : "bg-gray-100 text-gray-900"
                 }`}
               >
@@ -314,7 +314,7 @@ export default function ConversationDetailPage() {
           <button
             type="submit"
             disabled={sending || !newMessage.trim()}
-            className="px-4 py-3 bg-blue-900 text-white rounded-full hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="px-4 py-3 bg-primary text-white rounded-full hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
             {sending ? (
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
