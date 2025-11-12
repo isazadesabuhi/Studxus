@@ -46,11 +46,22 @@ export default function CourseDetailPage() {
   const [active, setActive] = useState<TabKey>("description");
   const [course, setCourse] = useState<CourseDetail | null>(null);
   const [sessions, setSessions] = useState<CourseSession[]>([]);
-  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [isOwner, setIsOwner] = useState(false);
+
+  interface UserBooking {
+    id: string;
+    course_session_id: string;
+    status: string;
+  }
+
+  // Add this state variable with other useState declarations (around line 40)
+  const [userBookings, setUserBookings] = useState<UserBooking[]>([]);
 
   // Fetch course details and check ownership
   useEffect(() => {
@@ -97,6 +108,35 @@ export default function CourseDetailPage() {
             setSelectedSessionId(sessionsData.sessions[0].id);
           }
         }
+
+        // NEW: Fetch user's bookings for this course
+        if (user) {
+          const { data: sessionData } = await supabase.auth.getSession();
+          if (sessionData.session) {
+            const bookingsResponse = await fetch("/api/bookings", {
+              headers: {
+                Authorization: `Bearer ${sessionData.session.access_token}`,
+              },
+            });
+            if (bookingsResponse.ok) {
+              const bookingsData = await bookingsResponse.json();
+              // Filter bookings for this course that are active
+              const courseBookings = (bookingsData.bookings || [])
+                .filter(
+                  (b: any) =>
+                    b.courseId === id &&
+                    b.status !== "cancelled" &&
+                    b.status !== "completed"
+                )
+                .map((b: any) => ({
+                  id: b.id,
+                  course_session_id: b.courseSessionId,
+                  status: b.status,
+                }));
+              setUserBookings(courseBookings);
+            }
+          }
+        }
       } catch (err: any) {
         console.error("Error fetching course:", err);
         setError(err.message || "Une erreur s'est produite");
@@ -125,6 +165,16 @@ export default function CourseDetailPage() {
     if (!selectedSessionId) {
       alert("Veuillez sélectionner une date pour réserver");
       setActive("date");
+      return;
+    }
+
+    // NEW: Check if already booked
+    const isAlreadyBooked = userBookings.some(
+      (booking) => booking.course_session_id === selectedSessionId
+    );
+
+    if (isAlreadyBooked) {
+      alert("Vous avez déjà réservé cette session");
       return;
     }
 
@@ -199,7 +249,7 @@ export default function CourseDetailPage() {
       </main>
     );
   }
-    console.log(sessions)
+  console.log(sessions);
 
   return (
     <main className="mx-auto max-w-screen-sm bg-white rounded-lg shadow-sm">
@@ -362,7 +412,15 @@ export default function CourseDetailPage() {
                 <div className="space-y-3">
                   {sessions.map((session) => {
                     const date = new Date(session.session_date);
-                    const days = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+                    const days = [
+                      "Dim",
+                      "Lun",
+                      "Mar",
+                      "Mer",
+                      "Jeu",
+                      "Ven",
+                      "Sam",
+                    ];
                     const months = [
                       "janv.",
                       "févr.",
@@ -386,15 +444,30 @@ export default function CourseDetailPage() {
                     const isFull =
                       session.current_participants >= session.max_participants;
 
+                    // NEW: Check if user already booked this session
+                    const isAlreadyBooked = userBookings.some(
+                      (booking) => booking.course_session_id === session.id
+                    );
+
                     return (
                       <div
                         key={session.id}
                         className={`flex items-center justify-between p-4 border-2 rounded-lg ${
-                          isSelected
+                          isAlreadyBooked
+                            ? "border-green-500 bg-green-50 opacity-75"
+                            : isSelected
                             ? "border-blue-900 bg-blue-50"
                             : "border-gray-200"
-                        } ${isFull ? "opacity-50" : "cursor-pointer hover:border-gray-300"}`}
-                        onClick={() => !isFull && setSelectedSessionId(session.id)}
+                        } ${
+                          isFull || isAlreadyBooked
+                            ? "opacity-50"
+                            : "cursor-pointer hover:border-gray-300"
+                        }`}
+                        onClick={() =>
+                          !isFull &&
+                          !isAlreadyBooked &&
+                          setSelectedSessionId(session.id)
+                        }
                       >
                         <div className="flex-1">
                           <p className="font-semibold text-gray-900">
@@ -411,18 +484,31 @@ export default function CourseDetailPage() {
                               {session.max_participants})
                             </p>
                           )}
+                          {isAlreadyBooked && (
+                            <p className="text-sm text-green-600 mt-1">
+                              ✓ Déjà réservé
+                            </p>
+                          )}
                         </div>
                         <button
                           className={`px-4 py-2 rounded-lg font-medium ${
-                            isSelected
+                            isAlreadyBooked
+                              ? "bg-green-200 text-green-700 cursor-not-allowed"
+                              : isSelected
                               ? "bg-blue-900 text-white"
                               : isFull
                               ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                               : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                           }`}
-                          disabled={isFull}
+                          disabled={isFull || isAlreadyBooked}
                         >
-                          {isFull ? "Complet" : isSelected ? "Sélectionné" : "Réserver"}
+                          {isAlreadyBooked
+                            ? "Réservé"
+                            : isFull
+                            ? "Complet"
+                            : isSelected
+                            ? "Sélectionné"
+                            : "Réserver"}
                         </button>
                       </div>
                     );

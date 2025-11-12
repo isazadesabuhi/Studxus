@@ -10,6 +10,9 @@ import mascotte_v1 from "@/public/mascotte_v1.png";
 import vague from "@/public/wave2.png";
 import Heading from "@/components/Heading";
 import { UserProfile } from "../types/UserProfile";
+import vba from "@/public/vba.jpg";
+import { MapPin, BarChart3, Clock, ChevronRight } from "lucide-react";
+import { useRef } from "react";
 
 const demo = [
   {
@@ -63,11 +66,36 @@ const demo = [
   },
 ];
 
+interface Booking {
+  id: string;
+  courseId: string;
+  courseSessionId: string;
+  status: string;
+  paymentStatus: string;
+  amount: number;
+  createdAt: string;
+  paidAt: string | null;
+  course: {
+    id: string;
+    title: string;
+    level: string;
+    author: { fullName: string } | null;
+  } | null;
+  session: {
+    sessionDate: string;
+    startTime: string;
+    endTime: string;
+    location: string | null;
+  } | null;
+}
+
 export default function Profile() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const scrollerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -97,6 +125,22 @@ export default function Profile() {
           } else {
             throw new Error("Impossible de charger le profil");
           }
+
+          // Fetch bookings
+          const bookingsResponse = await fetch("/api/bookings", {
+            headers: {
+              Authorization: `Bearer ${session.session.access_token}`,
+            },
+          });
+          if (bookingsResponse.ok) {
+            const bookingsData = await bookingsResponse.json();
+            // Filter only active bookings
+            const activeBookings = (bookingsData.bookings || []).filter(
+              (b: Booking) =>
+                b.status !== "cancelled" && b.status !== "completed"
+            );
+            setBookings(activeBookings);
+          }
         }
       } catch (err: any) {
         console.error("Error fetching profile:", err);
@@ -111,6 +155,51 @@ export default function Profile() {
 
   const handleClick = () => {
     router.push("/recherche");
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const days = [
+      "Dimanche",
+      "Lundi",
+      "Mardi",
+      "Mercredi",
+      "Jeudi",
+      "Vendredi",
+      "Samedi",
+    ];
+    const months = [
+      "janvier",
+      "février",
+      "mars",
+      "avril",
+      "mai",
+      "juin",
+      "juillet",
+      "août",
+      "septembre",
+      "octobre",
+      "novembre",
+      "décembre",
+    ];
+    return `${days[date.getDay()]} ${date.getDate()} ${
+      months[date.getMonth()]
+    }`;
+  };
+
+  const formatTime = (timeString: string) => {
+    const [h, m] = timeString.split(":");
+    return `${h}h${m}`;
+  };
+
+  const scrollBy = (dir: "left" | "right") => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const amount = el.clientWidth * 0.9;
+    el.scrollBy({
+      left: dir === "left" ? -amount : amount,
+      behavior: "smooth",
+    });
   };
 
   // Loading state
@@ -144,15 +233,7 @@ export default function Profile() {
   if (!profile) {
     return (
       <div className="min-h-screen max-w-[450px] bg-gray-50 flex flex-col justify-center p-4">
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
-          {/* <p className="text-yellow-800 mb-2">Profil introuvable</p>
-          <button
-            onClick={() => router.push("/")}
-            className="text-sm text-yellow-700 underline"
-          >
-            Retour à l'accueil
-          </button> */}
-        </div>
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center"></div>
       </div>
     );
   }
@@ -176,9 +257,6 @@ export default function Profile() {
           <div className="flex flex-row w-full space-x-0 z-10">
             <Image src={mascotte_v1} width={90} alt="mascotte_v1" />
 
-            {/* SVG background */}
-
-            {/* Two lines of centered text */}
             <div className=" flex flex-col items-center h-full justify-center text-center text-primary px-[10px]">
               <span className="text-sm leading-tight">
                 Prêt à apprendre et partager ?
@@ -197,21 +275,110 @@ export default function Profile() {
         text-gray-900 placeholder-gray-400
         focus:border-primary focus:ring-primary sm:text-xs"
                 placeholder="Chercher un cours"
-                onClick={handleClick} // 👈 redirect on click
+                onClick={handleClick}
               />
             </div>
           </div>
         </div>
 
-        <Link href="/">
+        <div className="flex items-center justify-between mb-3 mt-5">
           <Heading as="h4" underlined={true}>
             Tes prochains cours
           </Heading>
-        </Link>
-        {/* Cours */}
-        <p className="text-center text-primary pt-5">
-          Tu n'as pas encore réservé de cours
-        </p>
+          {bookings.length > 0 && (
+            <div className="flex gap-2">
+              <button
+                onClick={() => scrollBy("left")}
+                className="rounded-full border px-3 py-2 text-sm hover:bg-gray-50"
+                aria-label="Précédent"
+              >
+                ←
+              </button>
+              <button
+                onClick={() => scrollBy("right")}
+                className="rounded-full border px-3 py-2 text-sm hover:bg-gray-50"
+                aria-label="Suivant"
+              >
+                →
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Reserved Courses */}
+        {bookings.length === 0 ? (
+          <p className="text-center text-primary pt-5">
+            Tu n'as pas encore réservé de cours
+          </p>
+        ) : (
+          <div
+            ref={scrollerRef}
+            className="flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2"
+          >
+            {bookings.map((booking) => (
+              <div
+                key={booking.id}
+                className="snap-start shrink-0 w-[280px]"
+                onClick={() =>
+                  booking.courseId &&
+                  router.push(`/cours/detail/${booking.courseId}`)
+                }
+              >
+                <div className="bg-blue-50 rounded-lg p-4 cursor-pointer hover:bg-blue-100 transition-all h-full">
+                  {booking.session && (
+                    <p className="font-semibold text-blue-900 mb-1">
+                      {formatDate(booking.session.sessionDate)}
+                    </p>
+                  )}
+                  <div className="flex items-start gap-3">
+                    <Image
+                      src={vba}
+                      alt={booking.course?.title || "Course"}
+                      width={60}
+                      height={60}
+                      className="rounded-lg object-cover"
+                    />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900 mb-1">
+                        {booking.course?.title || "Cours (chargement...)"}
+                      </h3>
+                      <div className="text-sm text-gray-700 space-y-1">
+                        {booking.course?.level && (
+                          <div className="flex items-center gap-2">
+                            <BarChart3 className="w-4 h-4" />
+                            <span>{booking.course.level}</span>
+                          </div>
+                        )}
+                        {booking.session && (
+                          <>
+                            <div className="flex items-center gap-2">
+                              <Clock className="w-4 h-4" />
+                              <span>
+                                {formatTime(booking.session.startTime)} -{" "}
+                                {formatTime(booking.session.endTime)}
+                              </span>
+                            </div>
+                            {booking.session.location && (
+                              <div className="flex items-center gap-2">
+                                <MapPin className="w-4 h-4" />
+                                <span className="text-xs">
+                                  {booking.session.location}
+                                </span>
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Recommendations */}
         <div className="pt-5">
           <CardCarousel items={demo} />
         </div>
