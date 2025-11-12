@@ -226,7 +226,7 @@ export default function ConversationDetailPage() {
   }
 
   return (
-    <main className="mx-auto max-w-screen-sm bg-white min-h-screen flex flex-col ">
+    <main className="mx-auto max-w-screen-sm bg-white min-h-screen flex flex-col pb-5">
       {/* Header */}
       <div className="border-b border-gray-200 px-4 py-3 bg-white sticky top-0 z-10">
         <div className="flex items-center gap-3">
