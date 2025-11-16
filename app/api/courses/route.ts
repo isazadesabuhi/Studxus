@@ -55,7 +55,6 @@ export async function POST(req: Request) {
       sessionDate,
       startTime,
       endTime,
-      sessions,
     } = body;
 
     // Validate required fields
@@ -138,7 +137,6 @@ export async function POST(req: Request) {
           pricePerHour !== undefined ? Number(pricePerHour) : null,
         max_participants:
           maxParticipants !== undefined ? Number(maxParticipants) : 5,
-        sessions: sessions || [],
       })
       .select()
       .single();
@@ -163,8 +161,7 @@ export async function POST(req: Request) {
           end_time: endTime,
           max_participants:
             maxParticipants !== undefined ? Number(maxParticipants) : 5,
-          sessions: sessions || [],
-        })
+          })
         .select()
         .single();
 
@@ -198,7 +195,6 @@ export async function POST(req: Request) {
           maxParticipants: course.max_participants,
           createdAt: course.created_at,
           updatedAt: course.updated_at,
-          sessions: course.sessions || [],
         },
       },
       { status: 201 }
