@@ -272,7 +272,6 @@ export async function GET(req: Request) {
               id: booking.courses.id,
               title: booking.courses.title,
               description: booking.courses.description,
-              shortDescription: booking.courses.short_description,
               level: booking.courses.level,
               pricePerHour: parseFloat(booking.courses.price_per_hour || 0),
               author: booking.courses.profiles && typeof booking.courses.profiles === 'object' && !Array.isArray(booking.courses.profiles)

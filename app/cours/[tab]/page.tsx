@@ -13,7 +13,6 @@ interface APICourse {
   userId: string;
   title: string;
   description: string;
-  shortDescription: string;
   category: string;
   level: string;
   pricePerHour: number;
@@ -56,7 +55,6 @@ interface Booking {
   userId: string;
   title: string;
   description: string;
-  shortDescription: string;
   category: string;
   level: string;
   pricePerHour: number;

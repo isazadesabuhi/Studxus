@@ -75,7 +75,6 @@ export async function GET(
       userId: course.user_id,
       title: course.title,
       description: course.description,
-      shortDescription: course.short_description,
       category: course.category,
       level: course.level,
       pricePerHour: course.price_per_hour,
@@ -178,7 +177,6 @@ export async function PATCH(
     const {
       title,
       description,
-      shortDescription,
       category,
       level,
       pricePerHour,
@@ -189,8 +187,6 @@ export async function PATCH(
     const updateData: any = {};
     if (title !== undefined) updateData.title = title;
     if (description !== undefined) updateData.description = description;
-    if (shortDescription !== undefined)
-      updateData.short_description = shortDescription;
     if (category !== undefined) updateData.category = category;
     if (level !== undefined) updateData.level = level;
     if (pricePerHour !== undefined)
@@ -222,7 +218,6 @@ export async function PATCH(
         userId: updatedCourse.user_id,
         title: updatedCourse.title,
         description: updatedCourse.description,
-        shortDescription: updatedCourse.short_description,
         category: updatedCourse.category,
         level: updatedCourse.level,
         pricePerHour: updatedCourse.price_per_hour,

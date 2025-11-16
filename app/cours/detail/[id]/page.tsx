@@ -13,7 +13,6 @@ interface CourseDetail {
   userId: string;
   title: string;
   description: string;
-  shortDescription: string;
   category: string;
   level: string;
   pricePerHour: number;
@@ -297,9 +296,7 @@ export default function CourseDetailPage() {
           />
           <div>
             <h1 className="text-2xl font-bold text-blue-900">{course.title}</h1>
-            <p className="text-gray-700 text-sm mt-1">
-              {course.shortDescription || course.description}
-            </p>
+            <p className="text-gray-700 text-sm mt-1">{course.description}</p>
           </div>
         </div>
 

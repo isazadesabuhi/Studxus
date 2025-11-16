@@ -47,7 +47,6 @@ export async function POST(req: Request) {
     const {
       title,
       description,
-      shortDescription,
       category,
       level,
       pricePerHour,
@@ -130,7 +129,6 @@ export async function POST(req: Request) {
         user_id: user.id,
         title: title,
         description: description || null,
-        short_description: shortDescription || null,
         category: category || null,
         level: level || null,
         price_per_hour:
@@ -188,7 +186,6 @@ export async function POST(req: Request) {
           userId: course.user_id,
           title: course.title,
           description: course.description,
-          shortDescription: course.short_description,
           category: course.category,
           level: course.level,
           pricePerHour: course.price_per_hour,
@@ -295,7 +292,6 @@ export async function GET(req: Request) {
         userId: course.user_id,
         title: course.title,
         description: course.description,
-        shortDescription: course.short_description,
         category: course.category,
         level: course.level,
         pricePerHour: course.price_per_hour,

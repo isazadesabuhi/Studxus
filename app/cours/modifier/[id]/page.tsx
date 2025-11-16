@@ -8,7 +8,6 @@ const levelOptions = ["Débutant", "Intermédiaire", "Avancé"];
 
 interface CourseFormData {
   title: string;
-  shortDescription: string;
   description: string;
   category: string;
   level: string;
@@ -23,7 +22,6 @@ export default function EditCoursePage() {
 
   const [formData, setFormData] = useState<CourseFormData>({
     title: "",
-    shortDescription: "",
     description: "",
     category: "",
     level: "Débutant",
@@ -103,7 +101,6 @@ export default function EditCoursePage() {
         setIsAuthorized(true);
         setFormData({
           title: course.title || "",
-          shortDescription: course.shortDescription || "",
           description: course.description || "",
           category: course.category || "",
           level: course.level || "Débutant",
@@ -163,7 +160,6 @@ export default function EditCoursePage() {
         },
         body: JSON.stringify({
           title: formData.title,
-          shortDescription: formData.shortDescription,
           description: formData.description,
           category: formData.category,
           level: formData.level,
@@ -247,20 +243,6 @@ export default function EditCoursePage() {
             onChange={(event) => handleInputChange("title", event.target.value)}
             className="w-full border rounded-lg p-2"
             placeholder="Ex : VBA - Excel"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold mb-1">Descriptif</label>
-          <textarea
-            value={formData.shortDescription}
-            onChange={(event) =>
-              handleInputChange("shortDescription", event.target.value)
-            }
-            className="w-full border rounded-lg p-2"
-            placeholder="Texte court (150 caractères max)"
-            maxLength={150}
             required
           />
         </div>

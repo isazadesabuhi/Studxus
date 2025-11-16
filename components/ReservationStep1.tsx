@@ -6,7 +6,6 @@ interface CourseDetail {
   id: string;
   title: string;
   description: string;
-  shortDescription: string;
   level: string;
   pricePerHour: number;
   author: {

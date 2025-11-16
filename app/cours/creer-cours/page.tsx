@@ -19,7 +19,6 @@ export default function CreateCoursePage() {
 
   const [formData, setFormData] = useState({
     title: "",
-    shortDesc: "",
     description: "",
     maxParticipants: 5,
     category: "",
@@ -98,7 +97,6 @@ export default function CreateCoursePage() {
       const courseRequestBody = {
         title: formData.title,
         description: formData.description,
-        shortDescription: formData.shortDesc,
         category: formData.category,
         level: formData.level,
         pricePerHour: formData.price,

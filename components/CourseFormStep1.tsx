@@ -34,15 +34,6 @@ export default function CourseFormStep1({
         placeholder="Ex : VBA - Excel"
       />
 
-      <label className="block text-sm font-semibold mb-1">Descriptif</label>
-      <textarea
-        value={data.shortDesc}
-        onChange={(e) => onUpdate({ shortDesc: e.target.value })}
-        className="w-full border rounded-lg p-2 mb-3"
-        placeholder="Texte court (150 caractères max)"
-        maxLength={150}
-      />
-
       <label className="block text-sm font-semibold mb-1">Description</label>
       <textarea
         value={data.description}

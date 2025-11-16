@@ -14,7 +14,6 @@ interface APICourse {
   userId: string;
   title: string;
   description: string;
-  shortDescription: string;
   category: string;
   level: string;
   pricePerHour: number;
@@ -217,7 +216,7 @@ export default function SearchPage() {
       id: apiCourse.id,
       title: apiCourse.title,
       teacher: apiCourse.author?.fullName || "Enseignant",
-      schedule: apiCourse.shortDescription || apiCourse.description,
+      schedule: apiCourse.description,
       wednesday: `Par ${apiCourse.author?.fullName || "Anonyme"}`,
       level: apiCourse.level,
       price: `${apiCourse.pricePerHour}€/h`,
