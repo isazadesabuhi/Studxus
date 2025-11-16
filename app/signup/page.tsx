@@ -236,6 +236,13 @@ function SignupForm() {
     }
   };
 
+  function normalizeInterestName(name: string) {
+    return name
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // remove accents
+      .toLowerCase();
+  }
+
   // --- UI -------------------------------------------------------------------
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
@@ -432,6 +439,14 @@ function SignupForm() {
                       checked={selectedInterests.includes(interest.label)}
                       onChange={() => toggleInterest(interest.label)}
                       className="h-5 w-5 accent-blue-600"
+                    />
+                    <Image
+                      src={`/interests/${normalizeInterestName(
+                        interest.label || ""
+                      )}.png`}
+                      alt={interest.label || "Interest Image"}
+                      width={40}
+                      height={40}
                     />
                     <span className="text-gray-800 font-medium">
                       {interest.label}
