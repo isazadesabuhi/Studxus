@@ -144,17 +144,42 @@ function MyCoursesContent({ activeTab }: { activeTab: TabKey }) {
     }
   };
 
-  const transformToCourseCard = (apiCourse: APICourse): Course => ({
-    id: apiCourse.id,
-    title: apiCourse.title,
-    schedule: `Prix: ${apiCourse.pricePerHour}€/h`,
-    wednesday: `Max participants: ${apiCourse.maxParticipants}`,
-    level: apiCourse.level,
-    price: `${apiCourse.pricePerHour}€/h`,
-    image: "/vba.jpg",
-    category: apiCourse.category,
-    teacher: apiCourse.author?.fullName,
-  });
+  const transformToCourseCard = (apiCourse: APICourse | Booking): Course => {
+    const bookingCourse =
+      "course" in apiCourse && apiCourse.course ? apiCourse.course : null;
+    const courseData = bookingCourse ?? apiCourse;
+    const pricePerHour =
+      ("pricePerHour" in (courseData as any)
+        ? (courseData as any).pricePerHour
+        : undefined) ??
+      ("pricePerHour" in apiCourse ? apiCourse.pricePerHour : undefined) ??
+      0;
+    const maxParticipants =
+      ("maxParticipants" in apiCourse ? apiCourse.maxParticipants : undefined) ??
+      (bookingCourse as any)?.maxParticipants;
+    const teacherName =
+      courseData?.author?.fullName ??
+      ("author" in apiCourse ? apiCourse.author?.fullName : undefined) ??
+      "Enseignant";
+    const courseId =
+      ("id" in courseData ? courseData.id : undefined) ??
+      ("courseId" in apiCourse ? apiCourse.courseId : undefined) ??
+      apiCourse.id;
+
+    return {
+      id: courseId,
+      title: courseData?.title ?? apiCourse.title,
+      schedule: `Prix: ${pricePerHour}€/h`,
+      wednesday: maxParticipants
+        ? `Max participants: ${maxParticipants}`
+        : undefined,
+      level: courseData?.level ?? apiCourse.level,
+      price: `${pricePerHour}€/h`,
+      image: "/vba.jpg",
+      category: courseData?.category ?? apiCourse.category,
+      teacher: teacherName,
+    };
+  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);

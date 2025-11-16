@@ -4,7 +4,6 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Card from "@/components/Card";
-import type { User } from "@supabase/supabase-js";
 
 import {
   ArrowLeft,
@@ -140,19 +139,6 @@ export default function ProfilePage() {
                   {profile.email}
                 </li>
                 <li className="flex items-center gap-2">
-                  {/* {profile.telephone ? (
-                    <>
-                      <CheckCircle className="text-yellow-400 w-5 h-5" />
-                      Téléphone vérifié : {profile.telephone}
-                    </>
-                  ) : (
-                    <>
-                      <BanIcon className="text-red-400 w-5 h-5" />
-                      Téléphone non renseigné
-                    </>
-                  )} */}
-                </li>
-                <li className="flex items-center gap-2">
                   <CheckCircle className="text-yellow-400 w-5 h-5" />
                   {profile.address}
                 </li>
@@ -197,23 +183,23 @@ export default function ProfilePage() {
                   label={<>Mes annonces</>}
                 />
               </Link>
-              <Link href="/cgu-confidentialite" >
-              <Card
-                icon={<ShieldCheck className="h-7 w-7" aria-hidden />}
-                label={
-                  <>
-                    CGU &nbsp;&
-                    <br />
-                    Confidentialité
-                  </>
-                }
-              />
+              <Link href="/cgu-confidentialite">
+                <Card
+                  icon={<ShieldCheck className="h-7 w-7" aria-hidden />}
+                  label={
+                    <>
+                      CGU &nbsp;&
+                      <br />
+                      Confidentialité
+                    </>
+                  }
+                />
               </Link>
               <Link href="/securite">
-              <Card
-                icon={<Lock className="h-7 w-7" aria-hidden />}
-                label={<>Sécurité</>}
-              />
+                <Card
+                  icon={<Lock className="h-7 w-7" aria-hidden />}
+                  label={<>Sécurité</>}
+                />
               </Link>
             </section>
           </div>
