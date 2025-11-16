@@ -52,6 +52,7 @@ export default function CourseCard({
     userId, // Course owner ID
     category,
   } = course;
+  console.log(course)
 
   // Extract numeric price for display
   const priceValue = price.replace(/[^\d]/g, "") || "0";

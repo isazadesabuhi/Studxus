@@ -52,6 +52,7 @@ export async function POST(req: Request) {
       messageToInstructor,
       cardLastFour,
       cardBrand,
+      category,
     } = body;
 
     // Validate required fields
@@ -70,10 +71,7 @@ export async function POST(req: Request) {
       .single();
 
     if (courseError || !course) {
-      return NextResponse.json(
-        { error: "Course not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Course not found" }, { status: 404 });
     }
 
     if (course.user_id === user.id) {
@@ -99,10 +97,7 @@ export async function POST(req: Request) {
     }
 
     if (session.current_participants >= session.max_participants) {
-      return NextResponse.json(
-        { error: "Session is full" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Session is full" }, { status: 400 });
     }
 
     // Check if user already has a booking for this session
@@ -131,6 +126,7 @@ export async function POST(req: Request) {
       message_to_instructor: messageToInstructor || null,
       status: paymentMethod ? "pending" : "pending",
       payment_status: paymentMethod ? "processing" : "pending",
+      category: category || null,
     };
 
     if (cardLastFour) {
@@ -217,6 +213,7 @@ export async function GET(req: Request) {
           short_description,
           level,
           price_per_hour,
+          category,
           profiles:user_id (
             id,
             name,
@@ -254,8 +251,15 @@ export async function GET(req: Request) {
 
     // Format response
     const formattedBookings = bookings?.map((booking: any) => {
-      console.log("Processing booking:", booking.id, "Course:", booking.courses, "Session:", booking.course_sessions);
-      
+      console.log(
+        "Processing booking:",
+        booking.id,
+        "Course:",
+        booking.courses,
+        "Session:",
+        booking.course_sessions
+      );
+
       return {
         id: booking.id,
         courseId: booking.course_id,
@@ -267,33 +271,45 @@ export async function GET(req: Request) {
         messageToInstructor: booking.message_to_instructor,
         createdAt: booking.created_at,
         paidAt: booking.paid_at,
-        course: booking.courses && typeof booking.courses === 'object' && !Array.isArray(booking.courses)
-          ? {
-              id: booking.courses.id,
-              title: booking.courses.title,
-              description: booking.courses.description,
-              level: booking.courses.level,
-              pricePerHour: parseFloat(booking.courses.price_per_hour || 0),
-              author: booking.courses.profiles && typeof booking.courses.profiles === 'object' && !Array.isArray(booking.courses.profiles)
-                ? {
-                    id: booking.courses.profiles.id,
-                    name: booking.courses.profiles.name,
-                    surname: booking.courses.profiles.surname,
-                    fullName: `${booking.courses.profiles.name || ''} ${booking.courses.profiles.surname || ''}`.trim(),
-                    email: booking.courses.profiles.email,
-                  }
-                : null,
-            }
-          : null,
-        session: booking.course_sessions && typeof booking.course_sessions === 'object' && !Array.isArray(booking.course_sessions)
-          ? {
-              id: booking.course_sessions.id,
-              sessionDate: booking.course_sessions.session_date,
-              startTime: booking.course_sessions.start_time,
-              endTime: booking.course_sessions.end_time,
-              location: booking.course_sessions.location,
-            }
-          : null,
+        category: booking.courses.category || null,
+        course:
+          booking.courses &&
+          typeof booking.courses === "object" &&
+          !Array.isArray(booking.courses)
+            ? {
+                id: booking.courses.id,
+                title: booking.courses.title,
+                description: booking.courses.description,
+                level: booking.courses.level,
+                pricePerHour: parseFloat(booking.courses.price_per_hour || 0),
+                author:
+                  booking.courses.profiles &&
+                  typeof booking.courses.profiles === "object" &&
+                  !Array.isArray(booking.courses.profiles)
+                    ? {
+                        id: booking.courses.profiles.id,
+                        name: booking.courses.profiles.name,
+                        surname: booking.courses.profiles.surname,
+                        fullName: `${booking.courses.profiles.name || ""} ${
+                          booking.courses.profiles.surname || ""
+                        }`.trim(),
+                        email: booking.courses.profiles.email,
+                      }
+                    : null,
+              }
+            : null,
+        session:
+          booking.course_sessions &&
+          typeof booking.course_sessions === "object" &&
+          !Array.isArray(booking.course_sessions)
+            ? {
+                id: booking.course_sessions.id,
+                sessionDate: booking.course_sessions.session_date,
+                startTime: booking.course_sessions.start_time,
+                endTime: booking.course_sessions.end_time,
+                location: booking.course_sessions.location,
+              }
+            : null,
       };
     });
 
@@ -309,4 +325,3 @@ export async function GET(req: Request) {
     );
   }
 }
-

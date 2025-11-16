@@ -4,7 +4,6 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import CourseCard, { type Course } from "@/components/CourseCard";
-import Image from "next/image";
 
 type TabKey = "reserves" | "enseignes";
 
@@ -153,6 +152,8 @@ function MyCoursesContent({ activeTab }: { activeTab: TabKey }) {
     level: apiCourse.level,
     price: `${apiCourse.pricePerHour}€/h`,
     image: "/vba.jpg",
+    category: apiCourse.category,
+    teacher: apiCourse.author?.fullName,
   });
 
   const formatDate = (dateString: string) => {
@@ -183,11 +184,6 @@ function MyCoursesContent({ activeTab }: { activeTab: TabKey }) {
     return `${days[date.getDay()]} ${date.getDate()} ${
       months[date.getMonth()]
     }`;
-  };
-
-  const formatTime = (timeString: string) => {
-    const [h, m] = timeString.split(":");
-    return `${h}h${m}`;
   };
 
   const reservedBookings = bookings.filter(
@@ -230,64 +226,6 @@ function MyCoursesContent({ activeTab }: { activeTab: TabKey }) {
           </div>
         ) : (
           <div className="space-y-4">
-            {/* {reservedBookings.map((booking) => (
-              <div
-                key={booking.id}
-                className="bg-blue-50 rounded-lg p-4 cursor-pointer hover:bg-blue-100 transition-all"
-                onClick={() =>
-                  booking.courseId &&
-                  router.push(`/cours/detail/${booking.courseId}`)
-                }
-              >
-                {booking.session && (
-                  <p className="font-semibold text-blue-900 mb-1">
-                    {formatDate(booking.session.sessionDate)}
-                  </p>
-                )}
-                <div className="flex items-start gap-3">
-                  <Image
-                    src={vba}
-                    alt={booking.course?.title || "Course"}
-                    width={60}
-                    height={60}
-                    className="rounded-lg object-cover"
-                  />
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 mb-1">
-                      {booking.course?.title || "Cours (chargement...)"}
-                    </h3>
-                    <div className="text-sm text-gray-700 space-y-1">
-                      {booking.course?.level && (
-                        <div className="flex items-center gap-2">
-                          <BarChart3 className="w-4 h-4" />
-                          <span>{booking.course.level}</span>
-                        </div>
-                      )}
-                      {booking.session && (
-                        <>
-                          <div className="flex items-center gap-2">
-                            <Clock className="w-4 h-4" />
-                            <span>
-                              {formatTime(booking.session.startTime)} -{" "}
-                              {formatTime(booking.session.endTime)}
-                            </span>
-                          </div>
-                          {booking.session.location && (
-                            <div className="flex items-center gap-2">
-                              <MapPin className="w-4 h-4" />
-                              <span className="text-xs">
-                                {booking.session.location}
-                              </span>
-                            </div>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
-                </div>
-              </div>
-            ))} */}
             {reservedBookings.map((course) => (
               <div key={course.id}>
                 <CourseCard
