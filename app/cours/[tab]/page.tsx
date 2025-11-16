@@ -5,8 +5,6 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import CourseCard, { type Course } from "@/components/CourseCard";
 import Image from "next/image";
-import vba from "@/public/vba.jpg";
-import { MapPin, BarChart3, Clock, ChevronRight } from "lucide-react";
 
 type TabKey = "reserves" | "enseignes";
 
@@ -46,12 +44,31 @@ interface Booking {
     title: string;
     level: string;
     author: { fullName: string } | null;
+    category: string;
   } | null;
   session: {
     sessionDate: string;
     startTime: string;
     endTime: string;
     location: string | null;
+    category: string;
+  } | null;
+  userId: string;
+  title: string;
+  description: string;
+  shortDescription: string;
+  category: string;
+  level: string;
+  pricePerHour: number;
+  maxParticipants: number;
+  updatedAt: string;
+  author: {
+    id: string;
+    name: string;
+    surname: string;
+    fullName: string;
+    email: string;
+    userType: string;
   } | null;
 }
 
@@ -195,6 +212,8 @@ function MyCoursesContent({ activeTab }: { activeTab: TabKey }) {
       </div>
     );
   }
+  console.log(courses);
+  console.log(reservedBookings);
 
   return (
     <div className="p-4">
@@ -213,7 +232,7 @@ function MyCoursesContent({ activeTab }: { activeTab: TabKey }) {
           </div>
         ) : (
           <div className="space-y-4">
-            {reservedBookings.map((booking) => (
+            {/* {reservedBookings.map((booking) => (
               <div
                 key={booking.id}
                 className="bg-blue-50 rounded-lg p-4 cursor-pointer hover:bg-blue-100 transition-all"
@@ -268,6 +287,25 @@ function MyCoursesContent({ activeTab }: { activeTab: TabKey }) {
                     </div>
                   </div>
                   <ChevronRight className="w-5 h-5 text-gray-400" />
+                </div>
+              </div>
+            ))} */}
+            {reservedBookings.map((course) => (
+              <div key={course.id}>
+                <CourseCard
+                  course={transformToCourseCard(course)}
+                  onDetails={handleDetails}
+                  onEdit={handleEdit}
+                />
+                <div className="mt-2 px-4 py-2 bg-gray-50 rounded-lg text-sm">
+                  <p className="text-gray-700">
+                    <span className="font-semibold">Catégorie:</span>{" "}
+                    {course.category}
+                  </p>
+                  <p className="text-gray-700">
+                    <span className="font-semibold">Créé le:</span>{" "}
+                    {new Date(course.createdAt).toLocaleDateString("fr-FR")}
+                  </p>
                 </div>
               </div>
             ))}
