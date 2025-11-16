@@ -52,6 +52,10 @@ export async function POST(req: Request) {
       level,
       pricePerHour,
       maxParticipants,
+      sessionDate,
+      startTime,
+      endTime,
+      sessions,
     } = body;
 
     // Validate required fields
@@ -76,6 +80,20 @@ export async function POST(req: Request) {
       if (isNaN(max) || max < 1 || !Number.isInteger(max)) {
         return NextResponse.json(
           { error: "Max participants must be a positive integer" },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Validate session scheduling fields
+    const hasPartialSessionFields = sessionDate || startTime || endTime;
+    if (hasPartialSessionFields) {
+      if (!sessionDate || !startTime || !endTime) {
+        return NextResponse.json(
+          {
+            error:
+              "sessionDate, startTime, and endTime must all be provided together",
+          },
           { status: 400 }
         );
       }
@@ -120,6 +138,7 @@ export async function POST(req: Request) {
           pricePerHour !== undefined ? Number(pricePerHour) : null,
         max_participants:
           maxParticipants !== undefined ? Number(maxParticipants) : 5,
+        sessions: sessions || [],
       })
       .select()
       .single();
@@ -130,6 +149,37 @@ export async function POST(req: Request) {
         { error: "Failed to create course", details: insertError.message },
         { status: 500 }
       );
+    }
+
+    let createdSession = null;
+
+    if (sessionDate && startTime && endTime) {
+      const { data: session, error: sessionError } = await supabaseUser
+        .from("course_sessions")
+        .insert({
+          course_id: course.id,
+          session_date: sessionDate,
+          start_time: startTime,
+          end_time: endTime,
+          max_participants:
+            maxParticipants !== undefined ? Number(maxParticipants) : 5,
+          sessions: sessions || [],
+        })
+        .select()
+        .single();
+
+      if (sessionError) {
+        console.error("Error creating initial course session:", sessionError);
+        return NextResponse.json(
+          {
+            error: "Course created but failed to create session schedule",
+            details: sessionError.message,
+          },
+          { status: 500 }
+        );
+      }
+
+      createdSession = session;
     }
 
     return NextResponse.json(
@@ -148,6 +198,7 @@ export async function POST(req: Request) {
           maxParticipants: course.max_participants,
           createdAt: course.created_at,
           updatedAt: course.updated_at,
+          sessions: course.sessions || [],
         },
       },
       { status: 201 }
@@ -184,7 +235,8 @@ export async function GET(req: Request) {
           surname,
           email,
           user_type
-        )
+        ),
+        course_sessions(*)
       `
       )
       .order("created_at", { ascending: false });
@@ -267,6 +319,7 @@ export async function GET(req: Request) {
               longitude: authorMetadata?.longitude || null,
             }
           : null,
+        sessions: course.course_sessions || [],
       };
     });
 

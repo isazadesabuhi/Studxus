@@ -21,6 +21,7 @@ interface APICourse {
   maxParticipants: number;
   createdAt: string;
   updatedAt: string;
+  sessions: any;
   author: {
     id: string;
     name: string;
@@ -160,6 +161,7 @@ export default function SearchPage() {
       price: `${apiCourse.pricePerHour}€/h`,
       image: "/vba.jpg", // Default image
       userId: apiCourse.userId, // Pass the course owner ID
+      sessions: apiCourse.sessions
     };
   };
 
@@ -172,7 +174,7 @@ export default function SearchPage() {
 
     if (coursesWithCoordinates.length === 0) {
       // Default to Lyon
-      return { longitude: 4.8357, latitude: 45.764, zoom: 13 };
+      return { longitude: 4.8617641, latitude: 45.7539477, zoom: 10 };
     }
 
     // Calculate average position

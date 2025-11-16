@@ -42,7 +42,8 @@ export async function GET(
           surname,
           email,
           user_type
-        )
+        ),
+        course_sessions(*)
       `
       )
       .eq("id", id)
@@ -81,6 +82,19 @@ export async function GET(
       maxParticipants: course.max_participants,
       createdAt: course.created_at,
       updatedAt: course.updated_at,
+      sessions: Array.isArray(course.course_sessions)
+        ? course.course_sessions.map((session: any) => ({
+            id: session.id,
+            sessionDate: session.session_date,
+            startTime: session.start_time,
+            endTime: session.end_time,
+            maxParticipants: session.max_participants,
+            currentParticipants: session.current_participants,
+            location: session.location,
+            createdAt: session.created_at,
+            updatedAt: session.updated_at,
+          }))
+        : [],
       // Author information
       author: course.profiles
         ? {

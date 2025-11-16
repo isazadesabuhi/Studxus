@@ -14,7 +14,7 @@ export type Course = {
   image?: string;
   teacher?: string;
 
-  // New fields from API
+  sessions?: any;
   category?: string;
   teacherName?: string;
   rating?: number;
