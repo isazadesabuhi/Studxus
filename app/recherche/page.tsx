@@ -44,6 +44,10 @@ export default function SearchPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedLevel, setSelectedLevel] = useState<string>("all");
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [currentUserLocation, setCurrentUserLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
 
   // Fetch current user
   useEffect(() => {
@@ -53,6 +57,23 @@ export default function SearchPage() {
       } = await supabase.auth.getUser();
       if (user) {
         setCurrentUserId(user.id);
+        const latitude =
+          typeof user.user_metadata?.latitude === "string"
+            ? parseFloat(user.user_metadata.latitude)
+            : user.user_metadata?.latitude;
+        const longitude =
+          typeof user.user_metadata?.longitude === "string"
+            ? parseFloat(user.user_metadata.longitude)
+            : user.user_metadata?.longitude;
+
+        if (
+          typeof latitude === "number" &&
+          typeof longitude === "number" &&
+          !Number.isNaN(latitude) &&
+          !Number.isNaN(longitude)
+        ) {
+          setCurrentUserLocation({ latitude, longitude });
+        }
       }
     };
     fetchCurrentUser();
@@ -129,8 +150,13 @@ export default function SearchPage() {
       filtered = filtered.filter((course) => course.level === selectedLevel);
     }
 
+    // Exclude courses created by the currently logged-in user
+    if (currentUserId) {
+      filtered = filtered.filter((course) => course.userId !== currentUserId);
+    }
+
     setFilteredCourses(filtered);
-  }, [searchQuery, selectedCategory, selectedLevel, courses]);
+  }, [searchQuery, selectedCategory, selectedLevel, courses, currentUserId]);
 
   // Get unique categories from courses
   const categories = Array.from(
@@ -149,8 +175,44 @@ export default function SearchPage() {
     // Only available for course owner
   };
 
+  const calculateDistanceKm = (
+    userLocation: { latitude: number; longitude: number } | null,
+    targetLat?: number | null,
+    targetLng?: number | null
+  ) => {
+    if (
+      !userLocation ||
+      targetLat == null ||
+      targetLng == null ||
+      Number.isNaN(targetLat) ||
+      Number.isNaN(targetLng)
+    ) {
+      return null;
+    }
+
+    const toRad = (value: number) => (value * Math.PI) / 180;
+    const R = 6371; // km
+    const dLat = toRad(targetLat - userLocation.latitude);
+    const dLon = toRad(targetLng - userLocation.longitude);
+    const lat1 = toRad(userLocation.latitude);
+    const lat2 = toRad(targetLat);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c;
+  };
+
   // Transform API data to CourseCard format
   const transformToCourseCard = (apiCourse: APICourse): Course => {
+    const distanceKm = calculateDistanceKm(
+      currentUserLocation,
+      apiCourse.author?.latitude ?? null,
+      apiCourse.author?.longitude ?? null
+    );
+
     return {
       id: apiCourse.id,
       title: apiCourse.title,
@@ -161,7 +223,8 @@ export default function SearchPage() {
       price: `${apiCourse.pricePerHour}€/h`,
       image: "/vba.jpg", // Default image
       userId: apiCourse.userId, // Pass the course owner ID
-      sessions: apiCourse.sessions
+      sessions: apiCourse.sessions,
+      distance: distanceKm ?? 0,
     };
   };
 
@@ -223,6 +286,7 @@ export default function SearchPage() {
       </div>
     );
   }
+  console.log(filteredCourses)
 
   return (
     <div className="flex flex-col justify-center px-4 pb-20 bg-gray-50">
