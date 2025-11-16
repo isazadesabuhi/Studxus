@@ -50,6 +50,7 @@ export default function CourseCard({
     days = [],
     timeSlot = "Horaire à définir",
     userId, // Course owner ID
+    category,
   } = course;
 
   // Extract numeric price for display
@@ -60,19 +61,30 @@ export default function CourseCard({
 
   // Check if current user is the owner of this course
   const isOwner = currentUserId && userId && currentUserId === userId;
-
+  function normalizeInterestName(name: string) {
+    return name
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // remove accents
+      .toLowerCase();
+  }
   return (
     <div className="w-full rounded-3xl border-2 border-slate-300 bg-gradient-to-br from-sky-100 to-blue-50 p-4 shadow-md">
       <div className="flex items-start gap-4">
         {/* Left: Course Image with Teacher Avatar */}
         <div className="relative flex-shrink-0">
           <div className="relative h-20 w-20 overflow-hidden rounded-2xl">
-            <Image
+            {/* <Image
               src={typeof image === "string" ? image : vba}
               alt={title}
               fill
               className="object-cover"
               sizes="96px"
+            /> */}
+            <Image
+              src={`/interests/${normalizeInterestName(category || "")}.png`}
+              alt={category || "Course Image"}
+              width={40}
+              height={40}
             />
           </div>
 

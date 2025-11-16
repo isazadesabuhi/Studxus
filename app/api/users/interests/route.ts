@@ -14,16 +14,16 @@ const supabaseAdmin = createClient(
 
 // Default available interests
 const AVAILABLE_INTERESTS = [
-  "Mathématiques",
-  "Littérature",
+  "Architecture",
   "Art",
+  "Cuisine",
+  "Histoire",
+  "Langues",
+  "Littérature",
+  "Mathématiques",
   "Programmation",
   "Sciences",
-  "Architecture",
   "Chimie",
-  "Cuisine",
-  "Langues",
-  "Histoire",
 ];
 
 // GET user's interests (or all available interests if no auth)

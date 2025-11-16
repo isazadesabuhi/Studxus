@@ -225,6 +225,7 @@ export default function SearchPage() {
       userId: apiCourse.userId, // Pass the course owner ID
       sessions: apiCourse.sessions,
       distance: distanceKm ?? 0,
+      category: apiCourse.category,
     };
   };
 
@@ -286,7 +287,7 @@ export default function SearchPage() {
       </div>
     );
   }
-  console.log(filteredCourses)
+  console.log(filteredCourses);
 
   return (
     <div className="flex flex-col justify-center px-4 pb-20 bg-gray-50">
