@@ -126,7 +126,6 @@ export async function POST(req: Request) {
       message_to_instructor: messageToInstructor || null,
       status: paymentMethod ? "pending" : "pending",
       payment_status: paymentMethod ? "processing" : "pending",
-      category: category || null,
     };
 
     if (cardLastFour) {
