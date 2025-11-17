@@ -11,7 +11,7 @@ import vague from "@/public/wave2.png";
 import Heading from "@/components/Heading";
 import { UserProfile } from "../types/UserProfile";
 import vba from "@/public/vba.jpg";
-import { MapPin, BarChart3, Clock, ChevronRight } from "lucide-react";
+import { MapPin, BarChart3, Clock, ChevronRight, Search } from "lucide-react";
 import { useRef } from "react";
 
 const demo = [
@@ -257,26 +257,24 @@ export default function Profile() {
           <div className="flex flex-row w-full space-x-0 z-10">
             <Image src={mascotte_v1} width={90} alt="mascotte_v1" />
 
-            <div className=" flex flex-col items-center h-full justify-center text-center text-primary px-[10px]">
+            <div className="flex flex-col items-center h-full justify-center text-center text-primary px-[10px]">
               <span className="text-sm leading-tight">
                 Prêt à apprendre et partager ?
               </span>
-
-              <input
-                id="name"
-                name="name"
-                type="text"
-                autoComplete="given-name"
-                required
-                className="mt-2 block 
-        rounded-[100px] border
-        border-gray-300 px-3 py-2
-        placeholder:text-xs 
-        text-gray-900 placeholder-gray-400
-        focus:border-primary focus:ring-primary sm:text-xs"
-                placeholder="Chercher un cours"
+              <div
                 onClick={handleClick}
-              />
+                className="mt-2 w-full cursor-pointer
+                    flex items-center
+                    rounded-full border border-gray-300
+                    px-4 py-2
+                    text-gray-900 text-sm
+                    placeholder:text-xs placeholder-gray-400
+                    focus-within:border-primary focus-within:ring-primary"
+              >
+                <Search className="w-4 h-4 text-gray-500" />
+
+                <span className="ml-3 text-gray-500">Chercher un cours</span>
+              </div>
             </div>
           </div>
         </div>
