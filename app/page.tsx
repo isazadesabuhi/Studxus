@@ -21,7 +21,8 @@ export default function Home() {
       } = await supabase.auth.getUser();
 
       if (user) {
-        router.push("/");
+        // Redirect authenticated users away from the landing page
+        router.replace("/accueil");
       }
     };
 
