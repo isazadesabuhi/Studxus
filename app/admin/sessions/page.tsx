@@ -35,7 +35,7 @@ export default function ManageSessionsPage() {
     startTime: "18:30",
     endTime: "19:30",
     maxParticipants: 5,
-    location: "5 rue François Dauphin, 69002 Lyon",
+    location: "",
   });
 
   // Fetch courses

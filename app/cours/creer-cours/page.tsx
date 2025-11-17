@@ -27,7 +27,7 @@ export default function CreateCoursePage() {
     date: "",
     startTime: "",
     endTime: "",
-    location: "5 rue François Dauphin, 69002 Lyon",
+    location: "",
 
     // Pricing - Step 3
     level: "Débutant",

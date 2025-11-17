@@ -248,6 +248,38 @@ export async function GET(req: Request) {
 
     console.log("Raw bookings from DB:", bookings);
 
+    // Fetch author metadata (coordinates) for each unique course author
+    const authorIds = Array.from(
+      new Set(
+        (bookings || [])
+          .map((booking: any) => booking?.courses?.profiles?.id)
+          .filter(Boolean)
+      )
+    );
+
+    const authorsWithMetadata = await Promise.all(
+      authorIds.map(async (authorId: string) => {
+        const { data: userData, error: userError } =
+          await supabaseAdmin.auth.admin.getUserById(authorId);
+
+        if (userError || !userData) {
+          return { id: authorId, metadata: null };
+        }
+
+        return {
+          id: authorId,
+          metadata: {
+            latitude: userData.user.user_metadata?.latitude || null,
+            longitude: userData.user.user_metadata?.longitude || null,
+          },
+        };
+      })
+    );
+
+    const authorMetadataMap = new Map(
+      authorsWithMetadata.map((author) => [author.id, author.metadata])
+    );
+
     // Format response
     const formattedBookings = bookings?.map((booking: any) => {
       console.log(
@@ -293,6 +325,14 @@ export async function GET(req: Request) {
                           booking.courses.profiles.surname || ""
                         }`.trim(),
                         email: booking.courses.profiles.email,
+                        latitude:
+                          authorMetadataMap.get(
+                            booking.courses.profiles.id
+                          )?.latitude || null,
+                        longitude:
+                          authorMetadataMap.get(
+                            booking.courses.profiles.id
+                          )?.longitude || null,
                       }
                     : null,
               }

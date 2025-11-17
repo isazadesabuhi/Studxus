@@ -25,6 +25,8 @@ interface APICourse {
     fullName: string;
     email: string;
     userType: string;
+    latitude?: number;
+    longitude?: number;
   } | null;
 }
 
@@ -41,7 +43,11 @@ interface Booking {
     id: string;
     title: string;
     level: string;
-    author: { fullName: string } | null;
+    author: {
+      fullName: string;
+      latitude?: number | null;
+      longitude?: number | null;
+    } | null;
     category: string;
   } | null;
   session: {
@@ -66,6 +72,8 @@ interface Booking {
     fullName: string;
     email: string;
     userType: string;
+    latitude?: number;
+    longitude?: number;
   } | null;
 }
 
@@ -75,7 +83,10 @@ function MyCoursesContent({ activeTab }: { activeTab: TabKey }) {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [currentUserLocation, setCurrentUserLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -90,6 +101,24 @@ function MyCoursesContent({ activeTab }: { activeTab: TabKey }) {
         if (userError || !user) {
           router.push("/");
           return;
+        }
+
+        const latitude =
+          typeof user.user_metadata?.latitude === "string"
+            ? parseFloat(user.user_metadata.latitude)
+            : user.user_metadata?.latitude;
+        const longitude =
+          typeof user.user_metadata?.longitude === "string"
+            ? parseFloat(user.user_metadata.longitude)
+            : user.user_metadata?.longitude;
+
+        if (
+          typeof latitude === "number" &&
+          typeof longitude === "number" &&
+          !Number.isNaN(latitude) &&
+          !Number.isNaN(longitude)
+        ) {
+          setCurrentUserLocation({ latitude, longitude });
         }
 
         // Fetch courses
@@ -144,6 +173,36 @@ function MyCoursesContent({ activeTab }: { activeTab: TabKey }) {
     }
   };
 
+  const calculateDistanceKm = (
+    userLocation: { latitude: number; longitude: number } | null,
+    targetLat?: number | null,
+    targetLng?: number | null
+  ) => {
+    if (
+      !userLocation ||
+      targetLat == null ||
+      targetLng == null ||
+      Number.isNaN(targetLat) ||
+      Number.isNaN(targetLng)
+    ) {
+      return null;
+    }
+
+    const toRad = (value: number) => (value * Math.PI) / 180;
+    const R = 6371; // km
+    const dLat = toRad(targetLat - userLocation.latitude);
+    const dLon = toRad(targetLng - userLocation.longitude);
+    const lat1 = toRad(userLocation.latitude);
+    const lat2 = toRad(targetLat);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c;
+  };
+
   const transformToCourseCard = (apiCourse: APICourse | Booking): Course => {
     const bookingCourse =
       "course" in apiCourse && apiCourse.course ? apiCourse.course : null;
@@ -155,8 +214,9 @@ function MyCoursesContent({ activeTab }: { activeTab: TabKey }) {
       ("pricePerHour" in apiCourse ? apiCourse.pricePerHour : undefined) ??
       0;
     const maxParticipants =
-      ("maxParticipants" in apiCourse ? apiCourse.maxParticipants : undefined) ??
-      (bookingCourse as any)?.maxParticipants;
+      ("maxParticipants" in apiCourse
+        ? apiCourse.maxParticipants
+        : undefined) ?? (bookingCourse as any)?.maxParticipants;
     const teacherName =
       courseData?.author?.fullName ??
       ("author" in apiCourse ? apiCourse.author?.fullName : undefined) ??
@@ -165,6 +225,11 @@ function MyCoursesContent({ activeTab }: { activeTab: TabKey }) {
       ("id" in courseData ? courseData.id : undefined) ??
       ("courseId" in apiCourse ? apiCourse.courseId : undefined) ??
       apiCourse.id;
+    const distanceKm = calculateDistanceKm(
+      currentUserLocation,
+      courseData?.author?.latitude ?? null,
+      courseData?.author?.longitude ?? null
+    );
 
     return {
       id: courseId,
@@ -178,6 +243,7 @@ function MyCoursesContent({ activeTab }: { activeTab: TabKey }) {
       image: "/vba.jpg",
       category: courseData?.category ?? apiCourse.category,
       teacher: teacherName,
+      distance: distanceKm ?? 0,
     };
   };
 

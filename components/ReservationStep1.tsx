@@ -157,7 +157,7 @@ export default function ReservationStep1({
           <div className="flex items-center gap-2 text-sm text-gray-700">
             <MapPin className="w-4 h-4" />
             <span>
-              {selectedSession.location || "5 rue François Dauphin, 69002 Lyon"}
+              {selectedSession.location}
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-700">
