@@ -139,3 +139,96 @@ export async function POST(req: Request) {
     );
   }
 }
+
+export async function PUT(req: Request) {
+  try {
+    const authHeader = req.headers.get("authorization");
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json(
+        { error: "Missing or invalid authorization header" },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabaseAdmin.auth.getUser(token);
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: "Invalid or expired token" },
+        { status: 401 }
+      );
+    }
+
+    const body = await req.json();
+    const {
+      name,
+      surname,
+      userType,
+      address,
+      city,
+      country,
+      latitude,
+      longitude,
+      postalCode,
+      interests,
+    } = body;
+
+    // Merge provided metadata with existing metadata
+    const nextMetadata = {
+      ...user.user_metadata,
+      ...(name !== undefined ? { name } : {}),
+      ...(surname !== undefined ? { surname } : {}),
+      ...(userType !== undefined ? { user_type: userType } : {}),
+      ...(address !== undefined ? { address } : {}),
+      ...(city !== undefined ? { city } : {}),
+      ...(country !== undefined ? { country } : {}),
+      ...(latitude !== undefined ? { latitude } : {}),
+      ...(longitude !== undefined ? { longitude } : {}),
+      ...(postalCode !== undefined ? { postal_code: postalCode } : {}),
+      ...(interests !== undefined ? { interests } : {}),
+    };
+
+    const { data, error } = await supabaseAdmin.auth.admin.updateUserById(
+      user.id,
+      { user_metadata: nextMetadata }
+    );
+
+    if (error || !data.user) {
+      console.error("Error updating profile:", error);
+      return NextResponse.json(
+        { error: "Failed to update profile" },
+        { status: 500 }
+      );
+    }
+
+    const updated = data.user;
+
+    return NextResponse.json({
+      id: updated.id,
+      email: updated.email,
+      name: updated.user_metadata?.name || "",
+      surname: updated.user_metadata?.surname || "",
+      user_type: updated.user_metadata?.user_type || "Etudiant",
+      address: updated.user_metadata?.address || "",
+      city: updated.user_metadata?.city || "",
+      country: updated.user_metadata?.country || "",
+      latitude: updated.user_metadata?.latitude || null,
+      longitude: updated.user_metadata?.longitude || null,
+      postal_code: updated.user_metadata?.postal_code || "",
+      interests: updated.user_metadata?.interests || [],
+      created_at: updated.created_at,
+    });
+  } catch (error) {
+    console.error("Unexpected error updating profile:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}

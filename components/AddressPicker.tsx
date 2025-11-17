@@ -33,10 +33,14 @@ interface AddressData {
 
 interface AddressPickerProps {
   onAddressSelect: (address: AddressData) => void;
+  initialValue?: string;
 }
 
-export default function AddressPicker({ onAddressSelect }: AddressPickerProps) {
-  const [query, setQuery] = useState("");
+export default function AddressPicker({
+  onAddressSelect,
+  initialValue,
+}: AddressPickerProps) {
+  const [query, setQuery] = useState(initialValue ?? "");
   const [results, setResults] = useState<MapboxGeocodeFeature[]>([]);
   const [open, setOpen] = useState(false);
   const [highlighted, setHighlighted] = useState<number>(-1);
@@ -47,6 +51,53 @@ export default function AddressPicker({ onAddressSelect }: AddressPickerProps) {
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+
+  const fetchResults = async (
+    search: string,
+    signal?: AbortSignal
+  ): Promise<void> => {
+    if (!mapboxToken) {
+      console.error("Mapbox token is not configured");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const url = new URL(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+          search
+        )}.json`
+      );
+      url.searchParams.set("access_token", mapboxToken);
+      url.searchParams.set("autocomplete", "true");
+      url.searchParams.set("limit", "8");
+      // Prioritize address-y things
+      url.searchParams.set(
+        "types",
+        "address,place,locality,neighborhood,postcode,poi"
+      );
+      // Optional: bias to Lyon/France or user's area
+      // url.searchParams.set("proximity", "4.8357,45.7640"); // [lng,lat]
+      // url.searchParams.set("country", "FR");
+
+      const res = await fetch(url.toString(), { signal });
+      const data: { features?: MapboxGeocodeFeature[] } = await res.json();
+
+      setResults(data.features ?? []);
+      setOpen(true);
+      setHighlighted(data.features && data.features.length ? 0 : -1);
+    } catch (err) {
+      if ((err as any).name !== "AbortError") {
+        console.error("Geocoding error:", err);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    setQuery(initialValue ?? "");
+  }, [initialValue]);
 
   useEffect(() => {
     // close dropdown on outside click
@@ -84,38 +135,7 @@ export default function AddressPicker({ onAddressSelect }: AddressPickerProps) {
       const controller = new AbortController();
       abortRef.current = controller;
 
-      setLoading(true);
-      try {
-        const url = new URL(
-          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-            query
-          )}.json`
-        );
-        url.searchParams.set("access_token", mapboxToken);
-        url.searchParams.set("autocomplete", "true");
-        url.searchParams.set("limit", "8");
-        // Prioritize address-y things
-        url.searchParams.set(
-          "types",
-          "address,place,locality,neighborhood,postcode,poi"
-        );
-        // Optional: bias to Lyon/France or user’s area
-        // url.searchParams.set("proximity", "4.8357,45.7640"); // [lng,lat]
-        // url.searchParams.set("country", "FR");
-
-        const res = await fetch(url.toString(), { signal: controller.signal });
-        const data: { features?: MapboxGeocodeFeature[] } = await res.json();
-
-        setResults(data.features ?? []);
-        setOpen(true);
-        setHighlighted(data.features && data.features.length ? 0 : -1);
-      } catch (err) {
-        if ((err as any).name !== "AbortError") {
-          console.error("Geocoding error:", err);
-        }
-      } finally {
-        setLoading(false);
-      }
+      fetchResults(query, controller.signal);
     }, 250);
 
     return () => {
@@ -196,7 +216,14 @@ export default function AddressPicker({ onAddressSelect }: AddressPickerProps) {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => results.length && setOpen(true)}
+          onFocus={() => {
+            if (results.length) {
+              setOpen(true);
+            } else {
+              const seed = query.trim().length ? query : "rue";
+              fetchResults(seed);
+            }
+          }}
           onKeyDown={handleKeyDown}
           placeholder="Recherchez votre adresse…"
           autoComplete="off"

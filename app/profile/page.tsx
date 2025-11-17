@@ -116,10 +116,13 @@ export default function ProfilePage() {
                 {profile.name} {profile.surname}
               </h1>
 
-              <button className="mt-3 inline-flex items-center gap-2 rounded-full border border-neutral-200 px-4 py-2 text-sm font-medium shadow-sm hover:bg-neutral-50 active:scale-[0.98]">
+              <Link
+                href="/profile/edit"
+                className="mt-3 inline-flex items-center gap-2 rounded-full border border-neutral-200 px-4 py-2 text-sm font-medium shadow-sm hover:bg-neutral-50 active:scale-[0.98]"
+              >
                 <Pencil className="h-4 w-4" />
                 Modifier le profil
-              </button>
+              </Link>
             </section>
 
             {/* --- Vérification du profil --- */}
