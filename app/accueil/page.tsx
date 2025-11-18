@@ -1,18 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
 import CardCarousel from "@/components/CardRecommandation";
-import mascotte_v1 from "@/public/mascotte_v1.png";
-import vague from "@/public/wave2.png";
 import Heading from "@/components/Heading";
-import { UserProfile } from "../types/UserProfile";
+import { supabase } from "@/lib/supabase";
+import mascotte_v1 from "@/public/mascotte_v1.png";
 import vba from "@/public/vba.jpg";
-import { MapPin, BarChart3, Clock, ChevronRight, Search, BookOpen } from "lucide-react";
-import { useRef } from "react";
+import vague from "@/public/wave2.png";
+import { BarChart3, BookOpen, ChevronRight, Clock, MapPin } from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { RefObject, useEffect, useRef, useState } from "react";
+import { UserProfile } from "../types/UserProfile";
 
 const demo = [
   {
@@ -93,10 +91,16 @@ export default function Profile() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [categories, setCategories] = useState<string[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const scrollerRef = useRef<HTMLDivElement>(null);
 
+
+  const scrollerCatRef = useRef<HTMLDivElement>(null);
+  const scrollerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -152,9 +156,44 @@ export default function Profile() {
       }
     };
 
+    const fetchCategories = async () => {
+      setCategoriesLoading(true);
+      try {
+        const response = await fetch("/api/users/interests", {
+          method: "GET",
+          headers: { Accept: "application/json" },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch categories");
+        }
+
+        const data = await response.json();
+        const availableCategories = data?.available_interests || [];
+        setCategories(availableCategories);
+        console.log("Fetched categories:", availableCategories);
+
+
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+        setError("Impossible de charger les catégories");
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+
+    fetchCategories();
+
     load();
   }, [router]);
 
+
+    const normalizeInterestName = (name: string):string  => {
+    return name
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // remove accents
+      .toLowerCase();
+  }
   const handleClick = () => {
     router.push("/recherche");
   };
@@ -193,8 +232,8 @@ export default function Profile() {
     return `${h}h${m}`;
   };
 
-  const scrollBy = (dir: "left" | "right") => {
-    const el = scrollerRef.current;
+  const scrollBy = (dir: "left" | "right",scroller:RefObject<HTMLDivElement | null>) => {
+    const el = scroller.current;
     if (!el) return;
     const amount = el.clientWidth * 0.9;
     el.scrollBy({
@@ -324,6 +363,78 @@ export default function Profile() {
           </div>
         </div>
 
+
+
+
+        <div className="flex items-center justify-between mb-3 mt-5">
+          <Heading as="h4" underlined={true}>
+            Catégories
+          </Heading>
+          {bookings.length > 0 && (
+            <div className="none flex gap-2">
+              <button
+                onClick={() => scrollBy("left",scrollerCatRef)}
+                className="rounded-full border px-3 py-2 text-sm hover:bg-gray-50"
+                aria-label="Précédent"
+              >
+                ←
+              </button>
+              <button
+                onClick={() => scrollBy("right",scrollerCatRef)}
+                className="rounded-full border px-3 py-2 text-sm hover:bg-gray-50"
+                aria-label="Suivant"
+              >
+                →
+              </button>
+            </div>
+
+
+          )}
+
+
+        </div>
+
+        {/* Reserved Courses */}
+        {categories.length === 0 ? (
+          <p className="text-center text-primary pt-5">
+            Tu n'as pas encore réservé de cours
+          </p>
+        ) : (
+          <div
+            ref={scrollerCatRef}
+            className="flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2"
+          >
+            {categories.map((category) => (
+              <div
+                key={category}
+                className="snap-start shrink-0 w-[120px]"
+                onClick={() =>
+                  router.push(`/recherche/?category=${category}`)
+                }
+              >
+                <div className="bg-blue-50 rounded-lg p-4 cursor-pointer hover:bg-blue-100 transition-all h-full">
+
+                  <div className="flex flex-col  justify-center items-center gap-3">
+                    <Image
+                      src={`/interests/${normalizeInterestName(category || "")}.png`}
+                      alt={category || "Course Image"}
+                      width={40}
+                      height={40}
+                    />
+                    <div className="flex-1">
+                      <p  className="font-medium text-sm  mb-1">
+                        {category || "Cours (chargement...)"}
+                      </p>
+                      
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+
         <div className="flex items-center justify-between mb-3 mt-5">
           <Heading as="h4" underlined={true}>
             Tes prochains cours
@@ -331,21 +442,25 @@ export default function Profile() {
           {bookings.length > 0 && (
             <div className="flex gap-2">
               <button
-                onClick={() => scrollBy("left")}
+                onClick={() => scrollBy("left",scrollerRef)}
                 className="rounded-full border px-3 py-2 text-sm hover:bg-gray-50"
                 aria-label="Précédent"
               >
                 ←
               </button>
               <button
-                onClick={() => scrollBy("right")}
+                onClick={() => scrollBy("right",scrollerRef)}
                 className="rounded-full border px-3 py-2 text-sm hover:bg-gray-50"
                 aria-label="Suivant"
               >
                 →
               </button>
             </div>
+
+
           )}
+
+
         </div>
 
         {/* Reserved Courses */}

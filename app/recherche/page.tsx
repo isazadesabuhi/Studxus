@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import CourseCard, { type Course } from "@/components/CourseCard";
 
 import Map, { Marker, NavigationControl } from "react-map-gl/mapbox";
@@ -34,22 +34,32 @@ interface APICourse {
 }
 
 export default function SearchPage() {
+
+
+  const searchParams = useSearchParams();
+  const initialCategory = searchParams.get('category') || 'all';
+
   const router = useRouter();
   const [courses, setCourses] = useState<APICourse[]>([]);
   const [filteredCourses, setFilteredCourses] = useState<APICourse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
   const [selectedLevel, setSelectedLevel] = useState<string>("all");
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [currentUserLocation, setCurrentUserLocation] = useState<{
     latitude: number;
     longitude: number;
   } | null>(null);
-
+const pathname = usePathname(); // Récupère le chemin actuel (ex: "/contact")
   // Fetch current user
   useEffect(() => {
+    if (initialCategory) {
+      // On remplace l'URL par le chemin pur (pathname) sans les paramètres
+      // { scroll: false } est important pour éviter que la page ne remonte tout en haut
+      router.replace(pathname, { scroll: false });
+    }
     const fetchCurrentUser = async () => {
       const {
         data: { user },
@@ -76,7 +86,7 @@ export default function SearchPage() {
       }
     };
     fetchCurrentUser();
-  }, []);
+  }, [initialCategory, pathname, router]);
 
   // Fetch all courses on mount
   useEffect(() => {
