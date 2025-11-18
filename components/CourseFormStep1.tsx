@@ -79,6 +79,18 @@ export default function CourseFormStep1({
         </select>
       )}
 
+       <label className="block text-sm font-semibold mb-2">Niveau</label>
+      <select
+        value={data.level}
+        onChange={(e) => onUpdate({ level: e.target.value })}
+        className="w-full border rounded-lg p-2 mb-4"
+      >
+        {/* <option>Tous niveaux</option> */}
+        <option>Débutant</option>
+        <option>Intermédiaire</option>
+        <option>Avancé</option>
+      </select>
+
       <button
         onClick={onNext}
         disabled={categoriesLoading || !data.category}
