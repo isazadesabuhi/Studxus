@@ -11,7 +11,7 @@ import vague from "@/public/wave2.png";
 import Heading from "@/components/Heading";
 import { UserProfile } from "../types/UserProfile";
 import vba from "@/public/vba.jpg";
-import { MapPin, BarChart3, Clock, ChevronRight, Search } from "lucide-react";
+import { MapPin, BarChart3, Clock, ChevronRight, Search, BookOpen } from "lucide-react";
 import { useRef } from "react";
 
 const demo = [
@@ -96,6 +96,8 @@ export default function Profile() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const scrollerRef = useRef<HTMLDivElement>(null);
+
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -182,9 +184,8 @@ export default function Profile() {
       "novembre",
       "décembre",
     ];
-    return `${days[date.getDay()]} ${date.getDate()} ${
-      months[date.getMonth()]
-    }`;
+    return `${days[date.getDay()]} ${date.getDate()} ${months[date.getMonth()]
+      }`;
   };
 
   const formatTime = (timeString: string) => {
@@ -245,35 +246,79 @@ export default function Profile() {
           Bonjour {profile.name}{" "}
         </Heading>
 
-        <div className="flex relative flex-col items-center justify-center rounded-2xl  px-4 py-6 text-center shadow-sm bg-white">
-          <div className="absolute z-0 top-0 left-0  w-50 h-full">
-            <Image
-              src={vague}
-              alt="Décor vague"
-              fill
-              className="object-cover rounded-2xl opacity-70"
-            />
-          </div>
-          <div className="flex flex-row w-full space-x-0 z-10">
-            <Image src={mascotte_v1} width={90} alt="mascotte_v1" />
+        <div className="relative w-full overflow-x-auto no-scrollbar snap-x snap-mandatory px-1">
+          <div
+            ref={scrollRef}
+            className="flex flex-row gap-4 w-max scroll-smooth"
+          >
+            <div className="flex w-70  relative flex-col items-center justify-center rounded-2xl  px-4 py-6 text-center shadow-sm bg-white">
+              <div className="absolute z-0 top-0 left-0  w-50 h-full">
+                <Image
+                  src={vague}
+                  alt="Décor vague"
+                  fill
+                  className="object-cover rounded-2xl opacity-70"
+                />
+              </div>
+              <div className="flex flex-row w-full space-x-0 z-10">
+                <Image src={mascotte_v1} width={80} alt="mascotte_v1" />
 
-            <div className="flex flex-col items-center h-full justify-center text-center text-primary px-[10px]">
-              <span className="text-sm leading-tight">
-                Prêt à apprendre et partager ?
-              </span>
-              <div
-                onClick={handleClick}
-                className="mt-2 w-full cursor-pointer
-                    flex items-center
-                    rounded-full border border-gray-300
-                    px-4 py-2
-                    text-gray-900 text-sm
-                    placeholder:text-xs placeholder-gray-400
-                    focus-within:border-primary focus-within:ring-primary"
-              >
-                <Search className="w-4 h-4 text-gray-500" />
+                {/* SVG background */}
 
-                <span className="ml-3 text-gray-500">Chercher un cours</span>
+                {/* Two lines of centered text */}
+                <div className=" flex flex-col  gap-2 items-center h-full justify-center text-center text-primary px-[10px]">
+                  <span className="text-sm leading-tight">
+                    Prêt à apprendre et partager ?
+                  </span>
+
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    autoComplete="given-name"
+                    required
+                    className="mt-2 block w-full
+        rounded-[100px] border
+        border-gray-300 px-3 py-2
+        placeholder:text-xs 
+        text-gray-900 placeholder-gray-400
+        focus:border-primary focus:ring-primary sm:text-xs"
+                    placeholder="Chercher un cours"
+                    onClick={handleClick} // 👈 redirect on click
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex w-70 relative flex-col items-center justify-center rounded-2xl  px-4 py-6 text-center shadow-sm bg-white">
+              <div className="absolute z-0 top-0 left-0  w-50 h-full">
+                <Image
+                  src={vague}
+                  alt="Décor vague"
+                  fill
+                  className="object-cover rounded-2xl opacity-70"
+                />
+              </div>
+              <div className="flex flex-row w-full space-x-0 z-10">
+                <Image src={mascotte_v1} width={80} alt="mascotte_v1" />
+
+                {/* SVG background */}
+
+                {/* Two lines of centered text */}
+
+                <div className=" flex flex-col gap-2 items-center h-full justify-center text-center text-primary px-[10px]">
+                  <span className="text-sm leading-tight">
+                    Prêt à partager et apprendre ?
+                  </span>
+
+                  <button
+                    onClick={() => router.push("/cours/enseignes")}
+                    className="inline-flex items-center gap-1  rounded-full border-primary border-2 bg-white px-2 py-2 text-xs font-bold text-primary hover:bg-blue-800"
+                  >
+                    <BookOpen className="w-4 h-4" />
+                    Proposer un cours
+                  </button>
+                </div>
               </div>
             </div>
           </div>
