@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import CourseCard, { type Course } from "@/components/CourseCard";
 
@@ -33,11 +33,9 @@ interface APICourse {
   } | null;
 }
 
-export default function SearchPage() {
-
-
+function SearchPageContent() {
   const searchParams = useSearchParams();
-  const initialCategory = searchParams.get('category') || 'all';
+  const initialCategory = searchParams.get("category") || "all";
 
   const router = useRouter();
   const [courses, setCourses] = useState<APICourse[]>([]);
@@ -45,14 +43,15 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
+  const [selectedCategory, setSelectedCategory] =
+    useState<string>(initialCategory);
   const [selectedLevel, setSelectedLevel] = useState<string>("all");
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [currentUserLocation, setCurrentUserLocation] = useState<{
     latitude: number;
     longitude: number;
   } | null>(null);
-const pathname = usePathname(); // Récupère le chemin actuel (ex: "/contact")
+  const pathname = usePathname(); // Récupère le chemin actuel (ex: "/contact")
   // Fetch current user
   useEffect(() => {
     if (initialCategory) {
@@ -455,5 +454,13 @@ const pathname = usePathname(); // Récupère le chemin actuel (ex: "/contact")
         </div>
       )}
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div>Chargement...</div>}>
+      <SearchPageContent />
+    </Suspense>
   );
 }
