@@ -147,10 +147,8 @@ export async function POST(req: Request) {
       );
     }
 
-    let createdSession = null;
-
     if (sessionDate && startTime && endTime) {
-      const { data: session, error: sessionError } = await supabaseUser
+      const { error: sessionError } = await supabaseUser
         .from("course_sessions")
         .insert({
           course_id: course.id,
@@ -159,9 +157,7 @@ export async function POST(req: Request) {
           end_time: endTime,
           max_participants:
             maxParticipants !== undefined ? Number(maxParticipants) : 5,
-          })
-        .select()
-        .single();
+        });
 
       if (sessionError) {
         console.error("Error creating initial course session:", sessionError);
@@ -173,8 +169,6 @@ export async function POST(req: Request) {
           { status: 500 }
         );
       }
-
-      createdSession = session;
     }
 
     return NextResponse.json(

@@ -52,7 +52,6 @@ export async function POST(req: Request) {
       messageToInstructor,
       cardLastFour,
       cardBrand,
-      category,
     } = body;
 
     // Validate required fields

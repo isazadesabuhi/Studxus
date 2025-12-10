@@ -33,15 +33,15 @@ function H2({ id, children }: { id: string; children: React.ReactNode }) {
   );
 }
 
-function H3({ id, children }: { id: string; children: React.ReactNode }) {
-  return (
-    <h3 id={id} className="scroll-mt-28 text-lg sm:text-xl font-semibold">
-      <a href={`#${id}`} className="no-underline hover:underline">
-        {children}
-      </a>
-    </h3>
-  );
-}
+// function H3({ id, children }: { id: string; children: React.ReactNode }) {
+//   return (
+//     <h3 id={id} className="scroll-mt-28 text-lg sm:text-xl font-semibold">
+//       <a href={`#${id}`} className="no-underline hover:underline">
+//         {children}
+//       </a>
+//     </h3>
+//   );
+// }
 
 export default function SecurityPage() {
   const lastUpdated = "11 novembre 2025";

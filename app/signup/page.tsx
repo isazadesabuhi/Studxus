@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense, use } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -120,11 +120,11 @@ function SignupForm() {
   //
   const [serverInterests, setServerInterests] = useState<Option[] | null>(null);
   const [interestsLoading, setInterestsLoading] = useState(false);
-  const [interestsError, setInterestsError] = useState("");
+  // const [interestsError, setInterestsError] = useState("");
   // NEW: GET request to fetch interests from your API
   const loadInterests = async () => {
     setInterestsLoading(true);
-    setInterestsError("");
+    // setInterestsError("");
     try {
       const res = await fetch("/api/users/interests", {
         method: "GET",
@@ -143,7 +143,7 @@ function SignupForm() {
 
       setServerInterests(formattedInterests);
     } catch (err: any) {
-      setInterestsError("Impossible de charger les centres d'intérêt.");
+      // setInterestsError("Impossible de charger les centres d'intérêt.");
       console.error("loadInterests error:", err);
     } finally {
       setInterestsLoading(false);

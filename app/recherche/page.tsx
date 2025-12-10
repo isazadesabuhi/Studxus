@@ -1,12 +1,13 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import CourseCard, { type Course } from "@/components/CourseCard";
 
 import Map, { Marker, NavigationControl } from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
 import React from "react";
+import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 
 interface APICourse {
@@ -240,7 +241,7 @@ function SearchPageContent() {
   };
 
   // Calculate map center based on courses with valid coordinates
-  const calculateMapCenter = () => {
+  const calculateMapCenter = useCallback(() => {
     const coursesWithCoordinates = filteredCourses.filter(
       (course) =>
         (course.author?.latitude != null && course.author?.longitude != null) ||
@@ -269,14 +270,14 @@ function SearchPageContent() {
       ) / coursesWithCoordinates.length;
 
     return { longitude: avgLng, latitude: avgLat, zoom: 12 };
-  };
+  }, [filteredCourses]);
 
   const [viewport, setViewport] = React.useState(calculateMapCenter());
 
   // Update viewport when filtered courses change
   useEffect(() => {
     setViewport(calculateMapCenter());
-  }, [filteredCourses]);
+  }, [filteredCourses, calculateMapCenter]);
 
   if (loading) {
     return (
@@ -302,7 +303,6 @@ function SearchPageContent() {
       </div>
     );
   }
-  console.log(filteredCourses);
 
   return (
     <div className="flex flex-col justify-center px-4 pb-20 bg-gray-50">
@@ -379,9 +379,11 @@ function SearchPageContent() {
                 }}
               >
                 <div className="flex flex-col items-center cursor-pointer hover:scale-110 transition-transform">
-                  <img
+                  <Image
                     src="/marker-map.png"
                     alt={course.title}
+                    width={32}
+                    height={32}
                     className="w-8 h-8"
                   />
                   <span className="bg-slate-900 text-white text-xs font-semibold px-2 py-1 rounded-full mt-1 shadow whitespace-nowrap">

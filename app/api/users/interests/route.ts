@@ -123,7 +123,7 @@ export async function POST(req: Request) {
     }
 
     // Update user metadata with interests
-    const { data, error } = await supabaseAdmin.auth.admin.updateUserById(
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(
       user.id,
       {
         user_metadata: {

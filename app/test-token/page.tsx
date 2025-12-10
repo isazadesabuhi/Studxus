@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
 export default function TestTokenPage() {
@@ -35,12 +36,12 @@ export default function TestTokenPage() {
           <p className="text-gray-600">
             Please sign in first to get your access token.
           </p>
-          <a
+          <Link
             href="/"
             className="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700"
           >
             Go to Sign In
-          </a>
+          </Link>
         </div>
       </div>
     );

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import CourseFormStep1 from "@/components/CourseFormStep1";
 import CourseFormStep2 from "@/components/CourseFormStep2";
@@ -9,13 +8,12 @@ import CourseFormStep3 from "@/components/CourseFormStep3";
 import CourseFormRecap from "@/components/CourseFormRecap";
 
 export default function CreateCoursePage() {
-  const router = useRouter();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
-  const [createdCourseId, setCreatedCourseId] = useState<string | null>(null);
+  // const [createdCourseId, setCreatedCourseId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -68,7 +66,7 @@ export default function CreateCoursePage() {
     };
 
     fetchCategories();
-  }, []);
+  }, [formData.category]);
 
   const nextStep = () => setStep((prev) => Math.min(prev + 1, 4));
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
@@ -119,7 +117,7 @@ export default function CreateCoursePage() {
 
       const courseResult = await courseResponse.json();
       const courseId = courseResult.course.id;
-      setCreatedCourseId(courseId);
+      // setCreatedCourseId(courseId);
 
       console.log("Course created successfully:", courseResult);
 

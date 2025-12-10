@@ -138,39 +138,39 @@ export default function CourseDetailPage() {
     router.push(`/cours/reserver/${id}?sessionId=${selectedSessionId}`);
   };
 
-  const handleEditCourse = () => {
-    router.push(`/cours/modifier/${id}`);
-  };
+  // const handleEditCourse = () => {
+  //   router.push(`/cours/modifier/${id}`);
+  // };
 
-  const handleDeleteCourse = async () => {
-    if (!confirm("Êtes-vous sûr de vouloir supprimer ce cours ?")) {
-      return;
-    }
+  // const handleDeleteCourse = async () => {
+  //   if (!confirm("Êtes-vous sûr de vouloir supprimer ce cours ?")) {
+  //     return;
+  //   }
 
-    try {
-      const { data: sessionData } = await supabase.auth.getSession();
+  //   try {
+  //     const { data: sessionData } = await supabase.auth.getSession();
 
-      if (!sessionData.session) {
-        throw new Error("Session expirée");
-      }
+  //     if (!sessionData.session) {
+  //       throw new Error("Session expirée");
+  //     }
 
-      const response = await fetch(`/api/courses/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${sessionData.session.access_token}`,
-        },
-      });
+  //     const response = await fetch(`/api/courses/${id}`, {
+  //       method: "DELETE",
+  //       headers: {
+  //         Authorization: `Bearer ${sessionData.session.access_token}`,
+  //       },
+  //     });
 
-      if (!response.ok) {
-        throw new Error("Échec de la suppression");
-      }
+  //     if (!response.ok) {
+  //       throw new Error("Échec de la suppression");
+  //     }
 
-      alert("Cours supprimé avec succès");
-      router.push("/cours");
-    } catch (err: any) {
-      alert(err.message || "Erreur lors de la suppression");
-    }
-  };
+  //     alert("Cours supprimé avec succès");
+  //     router.push("/cours");
+  //   } catch (err: any) {
+  //     alert(err.message || "Erreur lors de la suppression");
+  //   }
+  // };
 
   const handleContactTeacher = () => {
     if (!currentUser) {

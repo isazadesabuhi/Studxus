@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type LngLatLike = [number, number];
 
@@ -52,10 +52,8 @@ export default function AddressPicker({
 
   const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
-  const fetchResults = async (
-    search: string,
-    signal?: AbortSignal
-  ): Promise<void> => {
+  const fetchResults = useCallback(
+    async (search: string, signal?: AbortSignal): Promise<void> => {
     if (!mapboxToken) {
       console.error("Mapbox token is not configured");
       return;
@@ -93,7 +91,9 @@ export default function AddressPicker({
     } finally {
       setLoading(false);
     }
-  };
+  },
+    [mapboxToken]
+  );
 
   useEffect(() => {
     setQuery(initialValue ?? "");
@@ -141,7 +141,7 @@ export default function AddressPicker({
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [query, mapboxToken]);
+  }, [query, mapboxToken, fetchResults]);
 
   function parseGeocoderResult(
     result: MapboxGeocodeFeature
@@ -229,7 +229,6 @@ export default function AddressPicker({
           autoComplete="off"
           className="mt-2 block w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-[#D4EEFFCC]"
           aria-autocomplete="list"
-          aria-expanded={open}
           aria-controls="address-suggestions"
           aria-activedescendant={
             highlighted >= 0 && results[highlighted]?.id

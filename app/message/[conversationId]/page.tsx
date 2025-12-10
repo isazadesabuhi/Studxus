@@ -36,7 +36,7 @@ export default function ConversationDetailPage() {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState("");
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  // const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -66,7 +66,7 @@ export default function ConversationDetailPage() {
           return;
         }
 
-        setCurrentUserId(user.id);
+        // setCurrentUserId(user.id);
 
         // Get user's token
         const { data: sessionData } = await supabase.auth.getSession();

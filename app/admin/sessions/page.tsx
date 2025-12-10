@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 
@@ -68,13 +68,7 @@ export default function ManageSessionsPage() {
   }, [router]);
 
   // Fetch sessions when course is selected
-  useEffect(() => {
-    if (selectedCourseId) {
-      fetchSessions();
-    }
-  }, [selectedCourseId]);
-
-  const fetchSessions = async () => {
+  const fetchSessions = useCallback(async () => {
     if (!selectedCourseId) return;
 
     try {
@@ -86,7 +80,13 @@ export default function ManageSessionsPage() {
     } catch (err) {
       console.error("Error fetching sessions:", err);
     }
-  };
+  }, [selectedCourseId]);
+
+  useEffect(() => {
+    if (selectedCourseId) {
+      fetchSessions();
+    }
+  }, [selectedCourseId, fetchSessions]);
 
   const createSession = async (e: React.FormEvent) => {
     e.preventDefault();

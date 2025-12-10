@@ -93,7 +93,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
 
   const [categories, setCategories] = useState<string[]>([]);
-  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  // const [categoriesLoading, setCategoriesLoading] = useState(true);
 
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -157,7 +157,7 @@ export default function Profile() {
     };
 
     const fetchCategories = async () => {
-      setCategoriesLoading(true);
+      // setCategoriesLoading(true);
       try {
         const response = await fetch("/api/users/interests", {
           method: "GET",
@@ -178,7 +178,7 @@ export default function Profile() {
         console.error("Error fetching categories:", err);
         setError("Impossible de charger les catégories");
       } finally {
-        setCategoriesLoading(false);
+        // setCategoriesLoading(false);
       }
     };
 

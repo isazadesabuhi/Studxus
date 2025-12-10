@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { MapPin, Star } from "lucide-react";
-import vba from "@/public/vba.jpg";
 
 export type Course = {
   id: string;
@@ -43,8 +42,6 @@ export default function CourseCard({
     title = "Cours sans titre",
     level = "Débutant",
     price = "0€",
-    image = vba,
-    teacherName = "Enseignant",
     rating = 4.0,
     distance = 0,
     days = [],

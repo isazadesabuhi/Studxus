@@ -1,37 +1,46 @@
 "use client";
 
 import data from "@/data/courses.json";
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 interface CourseCalendarProps {
   courseId: string;
 }
 
 const CourseCalendar: React.FC<CourseCalendarProps> = ({ courseId }) => {
-  // On récupère le cours correspondant
-  const selectedCourse = data.find((course) => course.id === courseId);
+  const selectedCourse = useMemo(
+    () => data.find((course) => course.id === courseId),
+    [courseId]
+  );
+
+  // Flatten date array to an object for quick lookups
+  const calendarData = useMemo(() => {
+    if (!selectedCourse) return {};
+    return Object.assign({}, ...selectedCourse.date);
+  }, [selectedCourse]);
+
+  const dates = useMemo(() => Object.keys(calendarData), [calendarData]);
+
+  const [selectedDate, setSelectedDate] = useState<string>(dates[0] || "");
+  const [selectedHour, setSelectedHour] = useState<string | null>(null);
+
+  // Reset selection when course or dates change
+  useEffect(() => {
+    setSelectedDate(dates[0] || "");
+    setSelectedHour(null);
+  }, [courseId, dates]);
+
+  const hours = calendarData[selectedDate] || [];
 
   if (!selectedCourse) {
     return <p className="text-center text-gray-500">Cours introuvable.</p>;
   }
 
-  // On transforme le tableau "date" en objet clé-valeur
-  const calendarData = Object.assign({}, ...selectedCourse.date);
-
-  // Liste des dates disponibles (ex: ["2025-10-07", "2025-10-14", "2025-10-21"])
-  const dates = Object.keys(calendarData);
-
-  // État pour la date et l'heure sélectionnée
-  const [selectedDate, setSelectedDate] = useState<string>(dates[0]);
-  const [selectedHour, setSelectedHour] = useState<string | null>(null);
-
-  const hours = calendarData[selectedDate] || [];
-
   return (
     <div className="w-full mt-4 text-center">
-      <h2 className="text-lg font-semibold mb-2">📅 Sélectionne une date</h2>
+      <h2 className="text-lg font-semibold mb-2">📅 Selectionne une date</h2>
 
-      {/* --- Dates --- */}
+      {/* Dates */}
       <div className="flex justify-center gap-2 overflow-x-auto py-2">
         {dates.map((date) => {
           const day = new Date(date).toLocaleDateString("fr-FR", {
@@ -59,10 +68,8 @@ const CourseCalendar: React.FC<CourseCalendarProps> = ({ courseId }) => {
         })}
       </div>
 
-      {/* --- Horaires --- */}
-      <h3 className="text-md font-semibold mt-4 mb-2">
-        🕒 Créneaux disponibles
-      </h3>
+      {/* Time slots */}
+      <h3 className="text-md font-semibold mt-4 mb-2">⏰ Creneaux disponibles</h3>
       <div className="flex justify-center flex-wrap gap-2">
         {hours.length > 0 ? (
           hours.map((hour: string) => (
@@ -80,11 +87,11 @@ const CourseCalendar: React.FC<CourseCalendarProps> = ({ courseId }) => {
             </button>
           ))
         ) : (
-          <p className="text-gray-500 italic">Aucun créneau ce jour.</p>
+          <p className="text-gray-500 italic">Aucun creneau ce jour.</p>
         )}
       </div>
 
-      {/* --- Bouton Réserver --- */}
+      {/* Reserve button */}
       <div className="mt-6">
         <button
           disabled={!selectedHour}
@@ -95,7 +102,7 @@ const CourseCalendar: React.FC<CourseCalendarProps> = ({ courseId }) => {
                 : "bg-gray-300 cursor-not-allowed"
             }`}
         >
-          {selectedHour ? `Réserver le ${selectedHour}` : "Choisis un créneau"}
+          {selectedHour ? `Reserver le ${selectedHour}` : "Choisis un creneau"}
         </button>
       </div>
     </div>
