@@ -249,36 +249,6 @@ function MyCoursesContent({ activeTab }: { activeTab: TabKey }) {
     };
   };
 
-  // const formatDate = (dateString: string) => {
-  //   const date = new Date(dateString);
-  //   const days = [
-  //     "Dimanche",
-  //     "Lundi",
-  //     "Mardi",
-  //     "Mercredi",
-  //     "Jeudi",
-  //     "Vendredi",
-  //     "Samedi",
-  //   ];
-  //   const months = [
-  //     "janvier",
-  //     "février",
-  //     "mars",
-  //     "avril",
-  //     "mai",
-  //     "juin",
-  //     "juillet",
-  //     "août",
-  //     "septembre",
-  //     "octobre",
-  //     "novembre",
-  //     "décembre",
-  //   ];
-  //   return `${days[date.getDay()]} ${date.getDate()} ${
-  //     months[date.getMonth()]
-  //   }`;
-  // };
-
   const reservedBookings = bookings.filter(
     (b) => b && b.status && b.status !== "cancelled" && b.status !== "completed"
   );
