@@ -265,14 +265,22 @@ export async function GET(req: Request) {
           await supabaseAdmin.auth.admin.getUserById(authorId);
 
         if (userError || !userData) {
+          console.warn("Failed to fetch user metadata for author", authorId, userError);
           return { id: authorId, metadata: null };
         }
+
+        const latRaw = userData.user.user_metadata?.latitude;
+        const lngRaw = userData.user.user_metadata?.longitude;
+        const latitude =
+          typeof latRaw === "string" ? parseFloat(latRaw) : latRaw ?? null;
+        const longitude =
+          typeof lngRaw === "string" ? parseFloat(lngRaw) : lngRaw ?? null;
 
         return {
           id: authorId,
           metadata: {
-            latitude: userData.user.user_metadata?.latitude || null,
-            longitude: userData.user.user_metadata?.longitude || null,
+            latitude: Number.isFinite(latitude) ? latitude : null,
+            longitude: Number.isFinite(longitude) ? longitude : null,
           },
         };
       })
@@ -286,6 +294,10 @@ export async function GET(req: Request) {
     // Format response with author information including coordinates
     const formattedCourses = courses.map((course) => {
       const authorMetadata = authorMetadataMap.get(course.user_id);
+      const courseLat =
+        (course as any).latitude ?? authorMetadata?.latitude ?? null;
+      const courseLng =
+        (course as any).longitude ?? authorMetadata?.longitude ?? null;
 
       return {
         id: course.id,
@@ -298,6 +310,9 @@ export async function GET(req: Request) {
         maxParticipants: course.max_participants,
         createdAt: course.created_at,
         updatedAt: course.updated_at,
+        // Optional course-level coordinates (if the table has them) else fallback to author metadata
+        latitude: Number.isFinite(courseLat) ? courseLat : null,
+        longitude: Number.isFinite(courseLng) ? courseLng : null,
         // Author information with coordinates
         author: course.profiles
           ? {
@@ -307,8 +322,12 @@ export async function GET(req: Request) {
               fullName: `${course.profiles.name} ${course.profiles.surname}`,
               email: course.profiles.email,
               userType: course.profiles.user_type,
-              latitude: authorMetadata?.latitude || null,
-              longitude: authorMetadata?.longitude || null,
+              latitude: Number.isFinite(courseLat)
+                ? courseLat
+                : authorMetadata?.latitude ?? null,
+              longitude: Number.isFinite(courseLng)
+                ? courseLng
+                : authorMetadata?.longitude ?? null,
             }
           : null,
         sessions: course.course_sessions || [],

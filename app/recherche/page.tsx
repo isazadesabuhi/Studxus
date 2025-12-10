@@ -20,6 +20,8 @@ interface APICourse {
   maxParticipants: number;
   createdAt: string;
   updatedAt: string;
+  latitude?: number | null;
+  longitude?: number | null;
   sessions: any;
   author: {
     id: string;
@@ -217,8 +219,8 @@ function SearchPageContent() {
   const transformToCourseCard = (apiCourse: APICourse): Course => {
     const distanceKm = calculateDistanceKm(
       currentUserLocation,
-      apiCourse.author?.latitude ?? null,
-      apiCourse.author?.longitude ?? null
+      apiCourse.author?.latitude ?? apiCourse.latitude ?? null,
+      apiCourse.author?.longitude ?? apiCourse.longitude ?? null
     );
 
     return {
@@ -241,7 +243,8 @@ function SearchPageContent() {
   const calculateMapCenter = () => {
     const coursesWithCoordinates = filteredCourses.filter(
       (course) =>
-        course.author?.latitude != null && course.author?.longitude != null
+        (course.author?.latitude != null && course.author?.longitude != null) ||
+        (course.latitude != null && course.longitude != null)
     );
 
     if (coursesWithCoordinates.length === 0) {
@@ -252,12 +255,16 @@ function SearchPageContent() {
     // Calculate average position
     const avgLat =
       coursesWithCoordinates.reduce(
-        (sum, course) => sum + (course.author?.latitude || 0),
+        (sum, course) =>
+          sum +
+          (course.author?.latitude ?? course.latitude ?? 0),
         0
       ) / coursesWithCoordinates.length;
     const avgLng =
       coursesWithCoordinates.reduce(
-        (sum, course) => sum + (course.author?.longitude || 0),
+        (sum, course) =>
+          sum +
+          (course.author?.longitude ?? course.longitude ?? 0),
         0
       ) / coursesWithCoordinates.length;
 
@@ -354,16 +361,18 @@ function SearchPageContent() {
           <NavigationControl position="bottom-right" />
 
           {filteredCourses.map((course) => {
-            // Only show marker if professor has valid coordinates
-            if (!course.author?.latitude || !course.author?.longitude) {
+            const lat = course.author?.latitude ?? course.latitude;
+            const lng = course.author?.longitude ?? course.longitude;
+            // Only show marker if we have valid coordinates
+            if (!lat || !lng) {
               return null;
             }
 
             return (
               <Marker
                 key={course.id}
-                longitude={course.author.longitude}
-                latitude={course.author.latitude}
+                longitude={lng}
+                latitude={lat}
                 onClick={(e) => {
                   e.originalEvent.stopPropagation();
                   router.push(`/cours/detail/${course.id}`);
@@ -442,13 +451,14 @@ function SearchPageContent() {
                 </span>
               </div>
               {/* Show professor location info if available */}
-              {course.author?.latitude && course.author?.longitude && (
+              {(course.author?.latitude ?? course.latitude) &&
+              (course.author?.longitude ?? course.longitude) ? (
                 <div className="mt-1 px-4">
                   <span className="text-xs text-gray-400">
                     📍 Professeur localisé
                   </span>
                 </div>
-              )}
+              ) : null}
             </div>
           ))}
         </div>

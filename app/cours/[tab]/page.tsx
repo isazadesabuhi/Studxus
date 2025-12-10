@@ -18,6 +18,8 @@ interface APICourse {
   maxParticipants: number;
   createdAt: string;
   updatedAt: string;
+  latitude?: number | null;
+  longitude?: number | null;
   author: {
     id: string;
     name: string;
@@ -227,8 +229,8 @@ function MyCoursesContent({ activeTab }: { activeTab: TabKey }) {
       apiCourse.id;
     const distanceKm = calculateDistanceKm(
       currentUserLocation,
-      courseData?.author?.latitude ?? null,
-      courseData?.author?.longitude ?? null
+      courseData?.author?.latitude ?? (courseData as any)?.latitude ?? null,
+      courseData?.author?.longitude ?? (courseData as any)?.longitude ?? null
     );
 
     return {
