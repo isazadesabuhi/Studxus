@@ -20,7 +20,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^0.544.0",
     "mapbox-gl": "^3.16.0",
-    "next": "15.5.3",
+    "next": "^16.0.8",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-map-gl": "^8.1.0",
@@ -36,7 +36,7 @@
     "@types/react-dom": "^19",
     "@types/swagger-ui-react": "^5.18.0",
     "eslint": "^9",
-    "eslint-config-next": "15.5.3",
+    "eslint-config-next": "^16.0.8",
     "prisma": "^6.16.2",
     "tailwindcss": "^4",
     "typescript": "^5"
