@@ -21,7 +21,6 @@ const eslintConfig = [
     ],
   },
   {
-    extends: ["next/core-web-vitals", "eslint:recommended"],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "react/no-unescaped-entities": "off",
