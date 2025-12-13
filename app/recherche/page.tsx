@@ -216,6 +216,118 @@ function SearchPageContent() {
     return R * c;
   };
 
+  const buildFirstSessionInfo = (
+    sessions?: any[]
+  ): { label: string; availablePlaces?: number } => {
+    if (!Array.isArray(sessions) || sessions.length === 0) {
+      return { label: "Horaire à définir", availablePlaces: undefined };
+    }
+
+    const normalizedSessions = sessions
+      .map((session) => {
+        const dateStr = session?.sessionDate || session?.session_date;
+        const startStr = session?.startTime || session?.start_time;
+        const endStr = session?.endTime || session?.end_time;
+        const maxParticipants =
+          session?.max_participants ?? session?.maxParticipants;
+        const currentParticipants =
+          session?.current_participants ?? session?.currentParticipants ?? 0;
+
+        if (!dateStr || !startStr || !endStr) return null;
+
+        const startDate = new Date(
+          String(startStr).includes("T")
+            ? startStr
+            : `${dateStr}T${startStr}`
+        );
+        const endDate = new Date(
+          String(endStr).includes("T") ? endStr : `${dateStr}T${endStr}`
+        );
+
+        if (
+          Number.isNaN(startDate.getTime()) ||
+          Number.isNaN(endDate.getTime())
+        ) {
+          return null;
+        }
+
+        return {
+          dateStr,
+          startDate,
+          endDate,
+          maxParticipants:
+            typeof maxParticipants === "number" ? maxParticipants : undefined,
+          currentParticipants:
+            typeof currentParticipants === "number"
+              ? currentParticipants
+              : undefined,
+        };
+      })
+      .filter(
+        (
+          value
+        ): value is {
+          dateStr: string;
+          startDate: Date;
+          endDate: Date;
+          maxParticipants: number | undefined;
+          currentParticipants: number | undefined;
+        } => Boolean(value)
+      )
+      .sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
+
+    const firstSession = normalizedSessions[0];
+    if (!firstSession) {
+      return { label: "Horaire à définir", availablePlaces: undefined };
+    }
+
+    const formatTime = (value: Date) => {
+      const hours = value.getHours().toString().padStart(2, "0");
+      const minutes = value.getMinutes().toString().padStart(2, "0");
+      return `${hours}h${minutes}`;
+    };
+
+    const durationMinutes = Math.max(
+      0,
+      Math.round(
+        (firstSession.endDate.getTime() - firstSession.startDate.getTime()) /
+          60000
+      )
+    );
+    const durationHours = Math.floor(durationMinutes / 60);
+    const durationRemainder = durationMinutes % 60;
+    const durationLabel = [
+      durationHours ? `${durationHours}h` : "",
+      durationRemainder ? `${durationRemainder}min` : "",
+    ]
+      .join("")
+      .trim();
+
+    const dateLabel = new Date(firstSession.dateStr).toLocaleDateString(
+      "fr-FR",
+      {
+        day: "2-digit",
+        month: "2-digit",
+      }
+    );
+
+    const availablePlaces =
+      typeof firstSession.maxParticipants === "number"
+        ? Math.max(
+            0,
+            firstSession.maxParticipants -
+              (firstSession.currentParticipants ?? 0)
+          )
+        : undefined;
+
+    return {
+      label: `${dateLabel} ${formatTime(firstSession.startDate)} - ${formatTime(
+        firstSession.endDate
+      )}${durationLabel ? ` (${durationLabel})` : ""}`,
+      availablePlaces,
+    };
+  };
+
   // Transform API data to CourseCard format
   const transformToCourseCard = (apiCourse: APICourse): Course => {
     const distanceKm = calculateDistanceKm(
@@ -223,6 +335,7 @@ function SearchPageContent() {
       apiCourse.author?.latitude ?? apiCourse.latitude ?? null,
       apiCourse.author?.longitude ?? apiCourse.longitude ?? null
     );
+    const firstSessionInfo = buildFirstSessionInfo(apiCourse.sessions);
 
     return {
       id: apiCourse.id,
@@ -237,6 +350,8 @@ function SearchPageContent() {
       sessions: apiCourse.sessions,
       distance: distanceKm ?? 0,
       category: apiCourse.category,
+      timeSlot: firstSessionInfo.label,
+      availablePlaces: firstSessionInfo.availablePlaces,
     };
   };
 
@@ -446,21 +561,21 @@ function SearchPageContent() {
                 currentUserId={currentUserId || undefined}
               />
               {/* Additional info badge */}
-              <div className="mt-2 flex items-center justify-between px-4">
+              {/* <div className="mt-2 flex items-center justify-between px-4">
                 <span className="text-xs text-gray-500">{course.category}</span>
                 <span className="text-xs text-gray-500">
                   Max: {course.maxParticipants} participants
                 </span>
-              </div>
+              </div> */}
               {/* Show professor location info if available */}
-              {(course.author?.latitude ?? course.latitude) &&
+              {/* {(course.author?.latitude ?? course.latitude) &&
               (course.author?.longitude ?? course.longitude) ? (
                 <div className="mt-1 px-4">
                   <span className="text-xs text-gray-400">
                     📍 Professeur localisé
                   </span>
                 </div>
-              ) : null}
+              ) : null} */}
             </div>
           ))}
         </div>

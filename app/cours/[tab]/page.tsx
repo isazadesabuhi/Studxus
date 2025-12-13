@@ -20,6 +20,7 @@ interface APICourse {
   updatedAt: string;
   latitude?: number | null;
   longitude?: number | null;
+  sessions?: any[];
   author: {
     id: string;
     name: string;
@@ -205,6 +206,118 @@ function MyCoursesContent({ activeTab }: { activeTab: TabKey }) {
     return R * c;
   };
 
+  const buildFirstSessionInfo = (
+    sessions?: any[]
+  ): { label: string; availablePlaces?: number } => {
+    if (!Array.isArray(sessions) || sessions.length === 0) {
+      return { label: "Horaire à définir", availablePlaces: undefined };
+    }
+
+    const normalizedSessions = sessions
+      .map((session) => {
+        const dateStr = session?.sessionDate || session?.session_date;
+        const startStr = session?.startTime || session?.start_time;
+        const endStr = session?.endTime || session?.end_time;
+        const maxParticipants =
+          session?.max_participants ?? session?.maxParticipants;
+        const currentParticipants =
+          session?.current_participants ?? session?.currentParticipants ?? 0;
+
+        if (!dateStr || !startStr || !endStr) return null;
+
+        const startDate = new Date(
+          String(startStr).includes("T")
+            ? startStr
+            : `${dateStr}T${startStr}`
+        );
+        const endDate = new Date(
+          String(endStr).includes("T") ? endStr : `${dateStr}T${endStr}`
+        );
+
+        if (
+          Number.isNaN(startDate.getTime()) ||
+          Number.isNaN(endDate.getTime())
+        ) {
+          return null;
+        }
+
+        return {
+          dateStr,
+          startDate,
+          endDate,
+          maxParticipants:
+            typeof maxParticipants === "number" ? maxParticipants : undefined,
+          currentParticipants:
+            typeof currentParticipants === "number"
+              ? currentParticipants
+              : undefined,
+        };
+      })
+      .filter(
+        (
+          value
+        ): value is {
+          dateStr: string;
+          startDate: Date;
+          endDate: Date;
+          maxParticipants: number | undefined;
+          currentParticipants: number | undefined;
+        } => Boolean(value)
+      )
+      .sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
+
+    const firstSession = normalizedSessions[0];
+    if (!firstSession) {
+      return { label: "Horaire à définir", availablePlaces: undefined };
+    }
+
+    const formatTime = (value: Date) => {
+      const hours = value.getHours().toString().padStart(2, "0");
+      const minutes = value.getMinutes().toString().padStart(2, "0");
+      return `${hours}h${minutes}`;
+    };
+
+    const durationMinutes = Math.max(
+      0,
+      Math.round(
+        (firstSession.endDate.getTime() - firstSession.startDate.getTime()) /
+          60000
+      )
+    );
+    const durationHours = Math.floor(durationMinutes / 60);
+    const durationRemainder = durationMinutes % 60;
+    const durationLabel = [
+      durationHours ? `${durationHours}h` : "",
+      durationRemainder ? `${durationRemainder}min` : "",
+    ]
+      .join("")
+      .trim();
+
+    const dateLabel = new Date(firstSession.dateStr).toLocaleDateString(
+      "fr-FR",
+      {
+        day: "2-digit",
+        month: "2-digit",
+      }
+    );
+
+    const availablePlaces =
+      typeof firstSession.maxParticipants === "number"
+        ? Math.max(
+            0,
+            firstSession.maxParticipants -
+              (firstSession.currentParticipants ?? 0)
+          )
+        : undefined;
+
+    return {
+      label: `${dateLabel} ${formatTime(firstSession.startDate)} - ${formatTime(
+        firstSession.endDate
+      )}${durationLabel ? ` (${durationLabel})` : ""}`,
+      availablePlaces,
+    };
+  };
+
   const transformToCourseCard = (apiCourse: APICourse | Booking): Course => {
     const bookingCourse =
       "course" in apiCourse && apiCourse.course ? apiCourse.course : null;
@@ -232,6 +345,11 @@ function MyCoursesContent({ activeTab }: { activeTab: TabKey }) {
       courseData?.author?.latitude ?? (courseData as any)?.latitude ?? null,
       courseData?.author?.longitude ?? (courseData as any)?.longitude ?? null
     );
+    const sessionSource =
+      "session" in apiCourse && (apiCourse as Booking).session
+        ? [(apiCourse as Booking).session]
+        : (courseData as any)?.sessions || (apiCourse as any).sessions;
+    const firstSessionInfo = buildFirstSessionInfo(sessionSource);
 
     return {
       id: courseId,
@@ -246,6 +364,8 @@ function MyCoursesContent({ activeTab }: { activeTab: TabKey }) {
       category: courseData?.category ?? apiCourse.category,
       teacher: teacherName,
       distance: distanceKm ?? 0,
+      timeSlot: firstSessionInfo.label,
+      availablePlaces: firstSessionInfo.availablePlaces,
     };
   };
 
@@ -296,7 +416,7 @@ function MyCoursesContent({ activeTab }: { activeTab: TabKey }) {
                   onDetails={handleDetails}
                   onEdit={handleEdit}
                 />
-                <div className="mt-2 px-4 py-2 bg-gray-50 rounded-lg text-sm">
+                {/* <div className="mt-2 px-4 py-2 bg-gray-50 rounded-lg text-sm">
                   <p className="text-gray-700">
                     <span className="font-semibold">Catégorie:</span>{" "}
                     {course.category}
@@ -305,7 +425,7 @@ function MyCoursesContent({ activeTab }: { activeTab: TabKey }) {
                     <span className="font-semibold">Créé le:</span>{" "}
                     {new Date(course.createdAt).toLocaleDateString("fr-FR")}
                   </p>
-                </div>
+                </div> */}
               </div>
             ))}
           </div>

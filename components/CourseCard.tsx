@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { MapPin, Star } from "lucide-react";
 
 export type Course = {
@@ -20,6 +21,7 @@ export type Course = {
   distance?: number;
   days?: string[]; // e.g., ["Lu", "Ma", "Me", "Je", "Ve", "Sa", "Di"]
   timeSlot?: string; // e.g., "18h-19h"
+  availablePlaces?: number; // remaining seats on the first session
   userId?: string; // ID of the course owner
 };
 
@@ -46,6 +48,7 @@ export default function CourseCard({
     distance = 0,
     days = [],
     timeSlot = "Horaire à définir",
+    availablePlaces,
     userId, // Course owner ID
     category,
   } = course;
@@ -67,7 +70,7 @@ export default function CourseCard({
   }
   return (
     <div className="w-full rounded-3xl border-2 border-slate-300 bg-gradient-to-br from-sky-100 to-blue-50 p-4 shadow-md">
-      <div className="flex items-start gap-4">
+      <Link href={`/cours/detail/${id}`} className="flex items-start gap-4">
         {/* Left: Course Image with Teacher Avatar */}
         <div className="relative flex-shrink-0">
           <div className="relative h-20 w-20 overflow-hidden rounded-2xl">
@@ -125,7 +128,7 @@ export default function CourseCard({
           </div>
 
           {/* Days of Week */}
-          <div className="mb-2 flex items-center gap-1.5">
+          {/* <div className="mb-2 flex items-center gap-1.5">
             {weekDays.map((day) => {
               const isActive = days.includes(day);
               return (
@@ -141,21 +144,31 @@ export default function CourseCard({
                 </div>
               );
             })}
-          </div>
+          </div> */}
 
           {/* Time Slot and Distance */}
           <div className="flex items-center justify-between text-sm text-slate-600">
-            <span className="font-medium">{timeSlot}</span>
+            <span className="font-medium flex flex-col">
+              <span>
+              {timeSlot}
+              </span>
+              <span>
+                {typeof availablePlaces === "number"
+                ? ` • ${availablePlaces} place${availablePlaces > 1 ? "s" : ""} dispo`
+                : ""}
+              </span>
+              
+            </span>
             <div className="flex items-center gap-1">
               <MapPin className="h-4 w-4" />
               <span className="font-medium">{distance.toFixed(1)} km</span>
             </div>
           </div>
         </div>
-      </div>
+      </Link>
 
       {/* Action Buttons */}
-      <div className="mt-4 flex gap-2">
+      {/* <div className="mt-4 flex gap-2">
         {isOwner ? (
           // Show both buttons for course owner
           <>
@@ -181,7 +194,7 @@ export default function CourseCard({
             Plus de détails
           </button>
         )}
-      </div>
+      </div> */}
     </div>
   );
 }
