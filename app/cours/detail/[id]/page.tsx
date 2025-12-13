@@ -425,7 +425,7 @@ export default function CourseDetailPage() {
           >
             Dates
           </button>
-          <button
+          {/* <button
             onClick={() => setActive("similaire")}
             className={`py-3 text-sm font-medium ${
               active === "similaire"
@@ -434,7 +434,7 @@ export default function CourseDetailPage() {
             }`}
           >
             Similaires
-          </button>
+          </button> */}
         </div>
 
         {/* --- Contenu Onglets --- */}
