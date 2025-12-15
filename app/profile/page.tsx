@@ -169,7 +169,7 @@ export default function ProfilePage() {
 
             {/* Quick actions grid */}
             <section className="mt-6 grid grid-cols-2 gap-4 sm:gap-5">
-              <Link className="w-full" href="/cours/reserves">
+              <Link className="w-full" href="/cours#reserves">
                 <Card
                   icon={<CalendarCheck2 className="h-7 w-7" aria-hidden />}
                   label={
@@ -180,7 +180,7 @@ export default function ProfilePage() {
                   }
                 />
               </Link>
-              <Link className="" href="/cours/enseignes">
+              <Link className="" href="/cours#enseignes">
                 <Card
                   icon={<FolderClosed className="h-7 w-7" aria-hidden />}
                   label={<>Mes annonces</>}

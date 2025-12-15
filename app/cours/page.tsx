@@ -438,23 +438,34 @@ function MyCoursesContent() {
 
   return (
     <div className="p-4 space-y-6">
-      <div className="flex gap-3">
+      <div className="fixed bottom-12 left-0 right-0 mx-auto max-w-[450px]">
+          <div className="pointer-events-none absolute inset-0 h-32 bg-gradient-to-t from-white via-white/90 to-transparent"></div>
+          <div className="relative z-10 flex justify-center align-middle px-6 pb-4">
+            <button
+              onClick={() => router.push("/cours/creer-cours")}
+              className="pointer-events-auto inline-flex w-full items-center justify-center rounded-full bg-slate-900 px-6 py-3 text-sm font-bold text-amber-400 hover:bg-slate-800 sm:w-auto"
+            >
+              Créer un nouveau cours
+            </button>
+          </div>
+        </div>
+      <div className="flex gap-4 border-b border-gray-200">
         <button
           onClick={() => handleFilterChange("reserves")}
-          className={`flex-1 rounded-full border px-4 py-2 text-sm font-semibold transition ${
+          className={`flex-1 pb-3 text-sm font-semibold transition ${
             activeFilter === "reserves"
-              ? "border-blue-900 bg-blue-900 text-white"
-              : "border-gray-300 bg-white text-gray-700 hover:border-blue-900"
+              ? "text-blue-900 border-b-2 border-blue-900"
+              : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
           }`}
         >
           Reserves
         </button>
         <button
           onClick={() => handleFilterChange("enseignes")}
-          className={`flex-1 rounded-full border px-4 py-2 text-sm font-semibold transition ${
+          className={`flex-1 pb-3 text-sm font-semibold transition ${
             activeFilter === "enseignes"
-              ? "border-blue-900 bg-blue-900 text-white"
-              : "border-gray-300 bg-white text-gray-700 hover:border-blue-900"
+              ? "text-blue-900 border-b-2 border-blue-900"
+              : "text-gray-500 hover:text-gray-700 border-b-2 border-transparent"
           }`}
         >
           Enseignes
@@ -516,16 +527,6 @@ function MyCoursesContent() {
                     onEdit={handleEdit}
                     currentUserId={currentUserId ?? undefined}
                   />
-                  <div className="mt-2 px-4 py-2 bg-gray-50 rounded-lg text-sm">
-                    <p className="text-gray-700">
-                      <span className="font-semibold">Categorie:</span>{" "}
-                      {course.category}
-                    </p>
-                    <p className="text-gray-700">
-                      <span className="font-semibold">Cree le:</span>{" "}
-                      {new Date(course.createdAt).toLocaleDateString("fr-FR")}
-                    </p>
-                  </div>
                   <button
                     onClick={() => handleDelete(course.id)}
                     className="mt-2 w-full text-red-600 text-sm py-2 border border-red-600 rounded-full hover:bg-red-50"
