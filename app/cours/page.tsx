@@ -47,6 +47,7 @@ interface Booking {
     title: string;
     level: string;
     author: {
+      id?: string;
       fullName: string;
       latitude?: number | null;
       longitude?: number | null;

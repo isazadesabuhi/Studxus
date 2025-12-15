@@ -76,6 +76,8 @@ export default function ProfilePage() {
             <header className="flex items-center justify-between py-3">
               <button
                 aria-label="Retour"
+                type="button"
+                onClick={() => router.back()}
                 className="rounded-full border border-neutral-200 p-2 active:scale-95"
               >
                 <ArrowLeft className="h-5 w-5" />
